@@ -1,0 +1,10 @@
+echo This script installs packages required to build and run hsmodem
+echo
+echo ATTENTION ! These libraries must be installed manually according to your system
+echo libbass.so, libbassopus.so, libbassenc.so
+echo copy it to /usr/lib, /usr/local/lib or whereever your system expects them
+echo you find them at: https://www.un4seen.com/
+echo Press ENTER to continue
+echo
+sudo apt-get update
+sudo apt-get -y install libopus-dev libfftw3-dev libcodec2-dev libsndfile-dev libasound-dev mono-complete pavucontrol
