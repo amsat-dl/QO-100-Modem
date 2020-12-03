@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsmodem", "hsmodem\hsmodem.vcxproj", "{E6292FAA-E794-4107-BD89-2310BCDBC858}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oscardata", "oscardata\oscardata\oscardata.csproj", "{989BF5C6-36F6-4158-9FB2-42E86D2020DB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		64bit|Any CPU = 64bit|Any CPU
+		64bit|Mixed Platforms = 64bit|Mixed Platforms
+		64bit|Win32 = 64bit|Win32
+		64bit|x64 = 64bit|x64
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|Any CPU.ActiveCfg = 64bit|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|Any CPU.Build.0 = 64bit|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|Mixed Platforms.ActiveCfg = 64bit|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|Mixed Platforms.Build.0 = 64bit|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|Win32.ActiveCfg = 64bit|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|Win32.Build.0 = 64bit|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|x64.ActiveCfg = 64bit|x64
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.64bit|x64.Build.0 = 64bit|x64
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|Win32.Build.0 = Debug|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|x64.ActiveCfg = Debug|x64
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Debug|x64.Build.0 = Debug|x64
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|Any CPU.Build.0 = Release|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|Win32.ActiveCfg = Release|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|Win32.Build.0 = Release|Win32
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|x64.ActiveCfg = Release|x64
+		{E6292FAA-E794-4107-BD89-2310BCDBC858}.Release|x64.Build.0 = Release|x64
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|Any CPU.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|Any CPU.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|Mixed Platforms.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|Win32.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|Win32.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|x64.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.64bit|x64.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|Win32.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Debug|x64.Build.0 = Debug|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|Win32.ActiveCfg = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|Win32.Build.0 = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|x64.ActiveCfg = Release|Any CPU
+		{989BF5C6-36F6-4158-9FB2-42E86D2020DB}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4CD5C45F-4015-48B4-A51D-E5D8D066732E}
+	EndGlobalSection
+EndGlobal
