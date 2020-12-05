@@ -54,10 +54,10 @@ namespace oscardata
             InitializeComponent();
 
             // needed for ARM mono, which cannot load a picbox directly from file
-            var bmp = new Bitmap(Resources.image);
+            var bmp = new Bitmap(Resources.hintergrundxcf);
             pictureBox_rximage.BackgroundImage = bmp;
 
-            bmp = new Bitmap(Resources.image1);
+            bmp = new Bitmap(Resources.hintergrundxcf);
             pictureBox_tximage.BackgroundImage = bmp;
 
             // if this program was started from another loacation
@@ -91,7 +91,7 @@ namespace oscardata
             statics.jpg_tempfilename = statics.addTmpPath(statics.jpg_tempfilename);
 
             load_Setup();
-            cb_language_SelectedIndexChanged(null,null);
+            cb_language_SelectedIndexChanged(null, null);
 
             if (cb_autostart.Checked)
             {
@@ -102,7 +102,7 @@ namespace oscardata
             checkBox_small_CheckedChanged(null, null);
 
             // init speed
-            comboBox1_SelectedIndexChanged(null,null);
+            comboBox1_SelectedIndexChanged(null, null);
 
             // create Udp Communication ports and init UDP system
             Udp.InitUdp();
@@ -290,14 +290,14 @@ namespace oscardata
 
             if (last_initAudioStatus != statics.initAudioStatus)
             {
-                if ((statics.initAudioStatus & 1) == 1) 
+                if ((statics.initAudioStatus & 1) == 1)
                     pb_audioPBstatus.BackgroundImage = Properties.Resources.fail;
-                else 
+                else
                     pb_audioPBstatus.BackgroundImage = Properties.Resources.ok;
 
-                if ((statics.initAudioStatus & 2) == 2) 
+                if ((statics.initAudioStatus & 2) == 2)
                     pb_audioCAPstatus.BackgroundImage = Properties.Resources.fail;
-                else 
+                else
                     pb_audioCAPstatus.BackgroundImage = Properties.Resources.ok;
 
                 last_initAudioStatus = statics.initAudioStatus;
@@ -360,37 +360,42 @@ namespace oscardata
 
             if (cb_autostart.Checked)
             {
-                // tell hsmodem to terminate itself
-                Byte[] txdata = new byte[1];
-                txdata[0] = (Byte)statics.terminate;
-                Udp.UdpSendCtrl(txdata);
-
-                Thread.Sleep(250);
-
-                if (statics.ostype == 0)
-                {
-                    int to = 0;
-                    while(statics.isProcRunning("hsmodem.exe"))
-                    {
-                        Thread.Sleep(250);
-                        // tell hsmodem to terminate itself
-                        Udp.UdpSendCtrl(txdata);
-                        if (++to >= 10) break;  // give up after 2,5s
-                    }
-
-                    if (to >= 10)
-                        statics.killall("hsmodem.exe");
-                }
-                else
-                {
-                    Thread.Sleep(250);
-                    statics.killall("hsmodem");
-                }
-                
+                killLocalModem();
             }
             // exit the threads
             statics.running = false;
             Udp.Close();
+        }
+
+        void killLocalModem()
+        {
+            // tell hsmodem to terminate itself
+            Byte[] txdata = new byte[1];
+            txdata[0] = (Byte)statics.terminate;
+            Udp.UdpSendCtrl(txdata);
+
+            Thread.Sleep(250);
+
+            // if that did not work, kill it directly
+            if (statics.ostype == 0)
+            {
+                int to = 0;
+                while (statics.isProcRunning("hsmodem.exe"))
+                {
+                    Thread.Sleep(250);
+                    // tell hsmodem to terminate itself
+                    Udp.UdpSendCtrl(txdata);
+                    if (++to >= 10) break;  // give up after 2,5s
+                }
+
+                if (to >= 10)
+                    statics.killall("hsmodem.exe");
+            }
+            else
+            {
+                Thread.Sleep(250);
+                statics.killall("hsmodem");
+            }
         }
 
         // RX timer
@@ -1639,7 +1644,7 @@ namespace oscardata
                 button_sendimage.Text = "Senden";
                 button_cancelimg.Text = "    Abbruch";
                 bt_rximages.Text = "RX Bilder";
-                cb_loop.Text = "Alle Bilder im Verzeichnis";
+                cb_loop.Text = "Endlosschleife: Alle Bilder im Verzeichnis senden";
                 label_nextimage.Text = "nächstes Bild in ...";
                 label_tximage.Text = "TX Bild";
                 label_rximage.Text = "RX Bild";
@@ -1760,6 +1765,27 @@ namespace oscardata
             " Sequenz OK",
             " von ",
         };
+
+        private void cb_autostart_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cb_autostart.Checked == false)
+            {
+                if (modemrunning)
+                {
+                    statics.StartHSmodem(false);
+                    Console.WriteLine("Kill Modem");
+                    modemrunning = false;
+                }
+            }
+            else
+            {
+                if (modemrunning == false)
+                {
+                    modemrunning = statics.StartHSmodem(true);
+                    Console.WriteLine("Start Modem");
+                }
+            }
+        }
     }
 
 }

@@ -139,6 +139,7 @@
     <None Include="Properties\texttx.png" />
     <None Include="Properties\greenmarker.png" />
     <None Include="Properties\redmarker.png" />
+    <None Include="Properties\hintergrundxcf.png" />
     <Content Include="Satellite-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

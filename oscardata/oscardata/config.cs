@@ -315,36 +315,40 @@ namespace oscardata
         }
 
         static Process cmd = null;
-        public static bool StartHSmodem()
+        public static bool StartHSmodem(bool start = true)
         {
             // kill old processes already running
             killall("hsmodem");
             killall("hsmodem.exe");
-            // starte Prozesse
-            try
-            {
-                if (ostype == 0)
-                {
-                    if (!File.Exists("hsmodem.exe")) return false;
-                    cmd = new Process();
-                    cmd.StartInfo.FileName = "hsmodem.exe";
-                }
-                else
-                {
-                    if (!File.Exists("hsmodem")) return false;
-                    cmd = new Process();
-                    cmd.StartInfo.FileName = "hsmodem";
-                }
 
-                if (cmd != null)
+            if (start == true)
+            {
+                // starte Prozesse
+                try
                 {
-                    cmd.StartInfo.WindowStyle = ProcessWindowStyle.Normal;// .Hidden;
-                    cmd.StartInfo.Arguments = "";
-                    cmd.Start();
-                    Console.WriteLine("hsmodem started");
+                    if (ostype == 0)
+                    {
+                        if (!File.Exists("hsmodem.exe")) return false;
+                        cmd = new Process();
+                        cmd.StartInfo.FileName = "hsmodem.exe";
+                    }
+                    else
+                    {
+                        if (!File.Exists("hsmodem")) return false;
+                        cmd = new Process();
+                        cmd.StartInfo.FileName = "hsmodem";
+                    }
+
+                    if (cmd != null)
+                    {
+                        cmd.StartInfo.WindowStyle = ProcessWindowStyle.Normal;// .Hidden;
+                        cmd.StartInfo.Arguments = "";
+                        cmd.Start();
+                        Console.WriteLine("hsmodem started");
+                    }
                 }
+                catch { return false; }
             }
-            catch { return false; }
             return true;
         }
 
