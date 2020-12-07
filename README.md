@@ -32,7 +32,7 @@ this software uses these programs:
 # Download alternatives
 * download from github and build from source
 * download windows installer and download Odroid and Raspberry images:
-https://wx.spdns.de/german/technik/sat/modem/images.htm
+https://dj0abr.de/german/technik/sat/modem/images.htm
 
 
 # building the software for Linux
