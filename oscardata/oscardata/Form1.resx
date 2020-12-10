@@ -137,7 +137,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAABw
-        FwAAAk1TRnQBSQFMAgEBDQEAARgBAQEYAQEBEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
+        FwAAAk1TRnQBSQFMAgEBDQEAATgBAQE4AQEBEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
         AwABQAMAAUADAAEBAQABCAYAARAYAAGAAgABgAMAAoABAAGAAwABgAEAAYABAAKAAgADwAEAAcAB3AHA
         AQAB8AHKAaYBAAEzBQABMwEAATMBAAEzAQACMwIAAxYBAAMcAQADIgEAAykBAANVAQADTQEAA0IBAAM5
         AQABgAF8Af8BAAJQAf8BAAGTAQAB1gEAAf8B7AHMAQABxgHWAe8BAAHWAucBAAGQAakBrQIAAf8BMwMA
@@ -249,9 +249,6 @@ Open Source: https://github.com/dj0abr/SSB_HighSpeed_Modem
 
 3rd Party, Credits and Licensing:
 
-BASS audio library:
-www.un4seen.com: BASS is free for non-commercial use
-
 DSP Library liquid-DSP:
 https://liquidsdr.org/
 MIT License
@@ -266,6 +263,14 @@ GNU General Public License
 FreeDV: https://github.com/drowe67/codec2
 GNU Lesser General Public License v2.1
 
+Sound Library: libsoundio
+https://github.com/andrewrk/libsoundio
+MIT License
+
+Reed Solomon error correction:
+https://www.schifra.com/
+License: Schifra User Group 1, GPL V2
+
 Image from ICON Archive: https://www.iconarchive.com/
 Artist: Oxygen Team
 Iconset: Oxygen Icons (883 icons)
@@ -273,7 +278,7 @@ License: GNU Lesser General Public License
 
 Artist: Sallee Design (Available for custom work)
 Iconset: Music Icons (29 icons)
-License: CC Attribution 4.0
+License: CC Attribution 4.0 (unchanged, https://creativecommons.org/licenses/by/4.0/)
 
 Testing &amp; Manual:
 DD1US: https://www.dd1us.de/

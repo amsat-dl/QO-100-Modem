@@ -101,7 +101,8 @@ namespace oscardata
                             statics.initAudioStatus = b[0];
                             statics.initVoiceStatus = b[1];
 
-                            String s = statics.ByteArrayToString(b,2);
+                            //String s = statics.ByteArrayToString(b,2);
+                            String s = statics.ByteArrayToStringUtf8(b, 2);
                             String[] sa1 = s.Split(new char[] { '^' });
                             statics.AudioPBdevs = sa1[0].Split(new char[] { '~' });
                             statics.AudioCAPdevs = sa1[1].Split(new char[] { '~' }); 

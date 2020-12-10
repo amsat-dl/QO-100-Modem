@@ -74,14 +74,8 @@ void closeAllandTerminate()
     // terminate all Threads
     keeprunning = 0;
     // close audio
-#ifdef _LINUX_
-    close_audio();
-    close_audio_voice();
-#endif
-#ifdef _WIN32_
-    close_wasapi();
-    close_wasapi_voice();
-#endif
+    io_close_audio();
+    io_close_voice();
     // close fft
     exit_fft();
     // close codec2 and opus
@@ -122,9 +116,9 @@ void showbytestring16(char *title, uint16_t *data, int anz)
     printf("\n");
 }
 
-void showbytestringf(char* title, float* data, int anz)
+void showbytestringf(char* title, float* data, int totallen, int anz)
 {
-    printf("%s. Len %d: ", title, anz);
+    printf("%s. Len %d: ", title, totallen);
     for (int i = 0; i < anz; i++)
         printf("%7.4f ", data[i]);
     printf("\n");

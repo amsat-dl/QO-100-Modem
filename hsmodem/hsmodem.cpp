@@ -76,7 +76,6 @@ int keeprunning = 1;
 // UDP I/O
 int BC_sock_AppToModem = -1;
 int DATA_sock_AppToModem = -1;
-//int DATA_sock_from_GR = -1;
 int DATA_sock_FFT_from_GR = -1;
 int DATA_sock_I_Q_from_GR = -1;
 
@@ -102,12 +101,16 @@ int txinterpolfactor = 20;
 int rxPreInterpolfactor = 5;
 int linespeed = 4410;
 
-int captureDeviceNo = -1;
-int playbackDeviceNo = -1;
-int MicDeviceNo = -1;
-int LSDeviceNo = -1;
-int initialPBvol = -1;
-int initialCAPvol = -1;
+char captureDeviceName[101] = { 0 };
+char playbackDeviceName[101] = { 0 };
+char micDeviceName[101] = { 0 };
+char lsDeviceName[101] = { 0 };
+
+float softwareCAPvolume = 1;
+float softwarePBvolume = 1;
+float softwareMICvolume = 1;
+float softwareLSvolume = 1;
+
 int announcement = 0;
 int VoiceAudioMode = VOICEMODE_OFF;
 int codec = 1;  // 0=opus, 1=codec2
@@ -174,28 +177,16 @@ int main(int argc, char* argv[])
         }
     }
 #endif
-
     
     init_packer();
     initFEC();
     init_fft();
-    init_voiceproc();
-
-    /*int ar = init_audio(playbackDeviceNo, captureDeviceNo);
-    if (ar == -1)
-    {
-        keeprunning = 0;
-        exit(0);
-    }*/
 
     // start udp RX to listen for broadcast search message from Application
     UdpRxInit(&BC_sock_AppToModem, UdpBCport_AppToModem, &bc_rxdata, &keeprunning);
 
     // start udp RX for data from application
     UdpRxInit(&DATA_sock_AppToModem, UdpDataPort_AppToModem, &appdata_rxdata, &keeprunning);
-
-    // start udp RX to listen for data from GR Receiver
-    //UdpRxInit(&DATA_sock_from_GR, UdpDataPort_fromGR, &GRdata_rxdata, &keeprunning);
 
     printf("QO100modem initialised and running\n");
 
@@ -206,17 +197,15 @@ int main(int argc, char* argv[])
             startModem();
             restart_modems = 0;
         }
-
+        
         //doArraySend();
         if (VoiceAudioMode == VOICEMODE_INTERNALLOOP)
         {
             // loop voice mic to LS
             float f;
-            if (cap_read_fifo_voice(&f))
+            if (io_mic_read_fifo(&f))
             {
-                if(softwareCAPvolume_voice >= 0)
-                    f *= softwareCAPvolume_voice;
-                pb_write_fifo_voice(f);
+                 io_ls_write_fifo(f);
             }
         }
 
@@ -224,30 +213,29 @@ int main(int argc, char* argv[])
         {
             // send mic to codec
             float f;
-            if (cap_read_fifo_voice(&f))
+            if (io_mic_read_fifo(&f))
             {
-                if (softwareCAPvolume_voice >= 0)
-                    f *= softwareCAPvolume_voice;
                 encode(f);
             }
         }
-
+        
         // demodulate incoming audio data stream
         static int old_tm = 0;
         int tm = getus();
         if (tm >= (old_tm + 1000000))
         {
             // read Audio device list every 1s
-            readAudioDevices();
+            io_readAudioDevices();
             old_tm = tm;
         }
-
         int dret = demodulator();
         if (dret == 0)
         {
             // no new data in fifo
             // not important how long to sleep, 10ms is fine
+#ifdef _LINUX_
             sleep_ms(10);   
+#endif
         }
     }
     printf("stopped: %d\n", keeprunning);
@@ -301,28 +289,29 @@ void startModem()
 
     // int TX audio and modulator
     close_dsp();
-    init_audio_result = init_audio(playbackDeviceNo, captureDeviceNo);
-    setPBvolume(initialPBvol);
-    setCAPvolume(initialCAPvol);
+    init_audio_result = io_init_sound(playbackDeviceName, captureDeviceName);
     init_dsp();
 }
 
-void setAudioDevices(int pb, int cap, int pbvol, int capvol, int announce, int pbls, int pbmic)
+void io_setAudioDevices(uint8_t pbvol, uint8_t capvol, uint8_t announce, uint8_t pbls, uint8_t pbmic, char *pbname, char*capname)
 {
-    //printf("%d %d\n", pb, cap);
-
-    if (pb != playbackDeviceNo || cap != captureDeviceNo)
-    {
-        restart_modems = 1;
-        playbackDeviceNo = pb;
-        captureDeviceNo = cap;
-        initialPBvol = pbvol;
-        initialCAPvol = capvol;
-        initialLSvol = pbls;
-        initialMICvol = pbmic;
-    }
+    io_setPBvolume(pbvol);
+    io_setCAPvolume(capvol);
+    io_setLSvolume(pbls);
+    io_setMICvolume(pbmic);
 
     announcement = announce;
+
+    if (strcmp(pbname, playbackDeviceName) || strcmp(captureDeviceName,capname))
+    {
+        restart_modems = 1;
+
+        snprintf(playbackDeviceName, 100, "%s", pbname);
+        playbackDeviceName[99] = 0;
+
+        snprintf(captureDeviceName, 100, "%s", capname);
+        captureDeviceName[99] = 0;
+    }
 }
 
 // called from UDP RX thread for Broadcast-search from App
@@ -330,7 +319,22 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
     if (len > 0 && pdata[0] == 0x3c)
     {
-        setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
+        /* searchmodem message received
+        * Format:
+        * Byte :
+        * 0 ... 0x3c
+        * 1 ... PB volume
+        * 2 ... CAP volume
+        * 3 ... announcement on / off, duration
+        * 4 ... DV loudspeaker volume
+        * 5 ... DV mic volume
+        * 6..9 ... unused
+        * 10 .. 109 ... PB device name
+        * 110 .. 209 ... CAP device name
+        */
+
+        //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
+        io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char *)(pdata + 10), (char *)(pdata + 110));
 
         char rxip[20];
         strcpy(rxip, inet_ntoa(rxsock->sin_addr));
@@ -347,7 +351,7 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
             // App searches for the modem IP, mirror the received messages
             // so the app gets an UDP message with this local IP
             int alen;
-            uint8_t* txdata = getAudioDevicelist(&alen);
+            uint8_t* txdata = io_getAudioDevicelist(&alen);
             sendUDP(appIP, UdpDataPort_ModemToApp, txdata, alen);
         }
         else
@@ -360,7 +364,7 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                 // App searches for the modem IP, mirror the received messages
                 // so the app gets an UDP message with this local IP
                 int alen;
-                uint8_t* txdata = getAudioDevicelist(&alen);
+                uint8_t* txdata = io_getAudioDevicelist(&alen);
                 sendUDP(appIP, UdpDataPort_ModemToApp, txdata, alen);
             }
         }
@@ -432,14 +436,14 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     if (type == 21)
     {
         // set playback volume (in % 0..100)
-        setVolume(0,minfo);
+        io_setVolume(0,minfo);
         return;
     }
 
     if (type == 22)
     {
         // set capture volume (in % 0..100)
-        setVolume(1,minfo);
+        io_setVolume(1,minfo);
         return;
     }
 
@@ -459,16 +463,35 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 
     if (type == 25)
     {
-        //printf("%d %d %d %d %d\n", pdata[0], pdata[1], pdata[2], pdata[3], pdata[4]);
-        LSDeviceNo = pdata[1];
-        MicDeviceNo = pdata[2];
-        VoiceAudioMode = pdata[3];
-        codec = pdata[4];
+        /*
+        * Format:
+        * 0 ... statics.SetVoiceMode (25)
+        * 1 ... voicemode
+        * 2 ... codec
+        * 3-102 ... LS device name
+        * 103-202 ... MIC device name
+        */
+        memcpy(lsDeviceName, pdata + 3, 100);
+        lsDeviceName[99] = 0;
+        memcpy(micDeviceName, pdata + 103, 100);
+        micDeviceName[99] = 0;
+
+        VoiceAudioMode = pdata[1];
+        codec = pdata[2];
+
+        printf("LS:<%s> MIC:<%s> Mode:%d codec:%d\n", lsDeviceName, micDeviceName, VoiceAudioMode, codec);
 
         // init voice audio
-        init_voice_result = init_audio_voice(LSDeviceNo, MicDeviceNo);
-        init_voiceproc();
-
+        if (VoiceAudioMode == 0)
+        {
+            close_voiceproc();
+            io_close_voice();
+        }
+        else
+        {
+            init_voice_result = io_init_voice(lsDeviceName, micDeviceName);
+            init_voiceproc();
+        }
         return;
     }
 
@@ -492,7 +515,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     {
         // this is the first frame of a larger file
         sendAnnouncement();
-        // send it multiple times, like a preamble, to give the
+        // send first frame multiple times, like a preamble, to give the
         // receiver some time for synchronisation
         // caprate: samples/s. This are symbols: caprate/txinterpolfactor
         // and bits: symbols * bitsPerSymbol

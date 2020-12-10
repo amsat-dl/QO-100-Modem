@@ -25,9 +25,9 @@ Raspberry 4 (3B+)
 this software uses these programs:
 * Shifra Reed Solomon code: https://www.schifra.com/ (GPL V.2)
 * liquid-SDR: https://github.com/jgaeddert/liquid-dsp (MIT License)
-* BASS Audio: https://www.un4seen.com/ (free for non-commercial use)
+* libsoundio: https://github.com/andrewrk/libsoundio (MIT License)
 * fftw3: http://www.fftw.org (GPL V.2 or later)
-* libcodec2 (Linux: standard lib, Windows: from freeDV)
+* libcodec2: https://github.com/drowe67/codec2 (LGPL 2.1, Linux: standard lib, Windows: from freeDV)
 
 # Download alternatives
 * download from github and build from source

@@ -39,9 +39,6 @@
     <ClCompile Include="fec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="audio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="udp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,22 +48,28 @@
     <ClCompile Include="liquid_if.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="audio_wasapi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="symboltracker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="audio_voice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="voiceprocessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="audio_voice_wasapi.cpp">
+    <ClCompile Include="codec2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="codec2.cpp">
+    <ClCompile Include="soundio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fifo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="announcement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fifo_voice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="voiceio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -117,6 +120,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="codec2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="soundio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="endian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

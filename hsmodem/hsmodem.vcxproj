@@ -131,6 +131,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:libcmt.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -226,6 +228,7 @@
     <ClInclude Include="bassenc_opus.h" />
     <ClInclude Include="basswasapi.h" />
     <ClInclude Include="codec2.h" />
+    <ClInclude Include="endian.h" />
     <ClInclude Include="fec.h" />
     <ClInclude Include="fftw3.h" />
     <ClInclude Include="fftw_lib\fftw3.h" />
@@ -235,27 +238,29 @@
     <ClInclude Include="opus.h" />
     <ClInclude Include="opus_defines.h" />
     <ClInclude Include="opus_types.h" />
+    <ClInclude Include="soundio.h" />
     <ClInclude Include="symboltracker.h" />
     <ClInclude Include="udp.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="audio.cpp" />
-    <ClCompile Include="audio_voice.cpp" />
-    <ClCompile Include="audio_voice_wasapi.cpp" />
-    <ClCompile Include="audio_wasapi.cpp" />
+    <ClCompile Include="announcement.cpp" />
     <ClCompile Include="codec2.cpp" />
     <ClCompile Include="constellation.cpp" />
     <ClCompile Include="crc16.cpp" />
     <ClCompile Include="fec.cpp" />
     <ClCompile Include="fft.cpp" />
+    <ClCompile Include="fifo.cpp" />
+    <ClCompile Include="fifo_voice.cpp" />
     <ClCompile Include="frame_packer.cpp" />
     <ClCompile Include="hsmodem.cpp" />
     <ClCompile Include="liquid_if.cpp" />
     <ClCompile Include="main_helper.cpp" />
     <ClCompile Include="scrambler.cpp" />
+    <ClCompile Include="soundio.cpp" />
     <ClCompile Include="speed.cpp" />
     <ClCompile Include="symboltracker.cpp" />
     <ClCompile Include="udp.cpp" />
+    <ClCompile Include="voiceio.cpp" />
     <ClCompile Include="voiceprocessor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

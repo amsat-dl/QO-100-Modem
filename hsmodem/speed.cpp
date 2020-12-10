@@ -160,7 +160,7 @@ void measure_speed_bps(int len)
     speed = meanvalbps((int)dspd);
 
     // here we have number of elements after 1s
-    printf("%d bit/s\n", speed);
+    printf(" ======================= %d bit/s\n", speed);
 
     elems = 0;
     lasttim = tim;

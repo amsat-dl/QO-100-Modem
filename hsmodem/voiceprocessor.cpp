@@ -134,7 +134,7 @@ void encode(float f)
             }
 
             for (int i = 0; i < r; i++)
-                pb_write_fifo_voice(fresult[i]);
+               io_ls_write_fifo(fresult[i]);
         }
 
         farridx = 0;
@@ -171,7 +171,7 @@ void sendCodecToModulator(uint8_t *pdata, int len)
         while (1)
         {
             // we have to check if the TX fifo has enough data. In case of an underrun the Q(8A)PSK signal will be distorted
-            int us = pb_fifo_usedspace();
+            int us = io_pb_fifo_usedspace();
             if (us < 20000)
             {
                 //printf("tx filler\n");
@@ -245,7 +245,7 @@ void toCodecDecoder(uint8_t *pdata, int len)
             {
                 //measure_speed_bps(r);
                 for (int j = 0; j < r; j++)
-                    pb_write_fifo_voice(fresult[j]);
+                   io_ls_write_fifo(fresult[j]);
             }
         }
     }

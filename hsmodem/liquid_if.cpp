@@ -37,7 +37,7 @@ void close_modulator();
 void init_dsp()
 {
     init_modulator();
-    pb_write_fifo_clear();
+    io_pb_write_fifo_clear();
     init_demodulator();
 }
 
@@ -197,13 +197,13 @@ void modulator(uint8_t sym_in)
         int fs;
         while(1)
         {
-            fs = pb_fifo_freespace(0);
+            fs = io_pb_fifo_freespace(0);
             // wait until there is space in fifo
             if(fs) break;
             sleep_ms(10);
         }
         
-        pb_write_fifo(usb * 0.2f); // reduce volume and send to soundcard
+        io_pb_write_fifo(usb * 0.2f); // reduce volume and send to soundcard
     }
 }
 
@@ -280,11 +280,11 @@ void make_FFTdata(float f)
         int bidx = 0;
         txpl[bidx++] = 4;    // type 4: FFT data follows
 
-        int us = pb_fifo_usedBlocks();
+        int us = io_pb_fifo_usedBlocks();
         if (us > 255 || ann_running == 1) us = 255;
         txpl[bidx++] = us;    // usage of TX fifo
 
-        us = cap_fifo_usedPercent();
+        us = io_cap_fifo_usedPercent();
         if (us > 255) us = 255;
         txpl[bidx++] = us;    // usage of TX fifo
 
@@ -338,9 +338,13 @@ static int ccol_idx = 0;
     
     // get one received sample
     float f;
-    int ret = cap_read_fifo(&f);
+    int ret = io_cap_read_fifo(&f);
     if(ret == 0) return 0;
        
+    if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
+    {
+        io_ls_write_fifo(f);
+    }
 
     // input volume
     f *= softwareCAPvolume;

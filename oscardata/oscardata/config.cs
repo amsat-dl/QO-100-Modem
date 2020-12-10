@@ -149,6 +149,12 @@ namespace oscardata
             return enc.GetBytes(str);
         }
 
+        public static byte[] StringToByteArrayUtf8(string str)
+        {
+            System.Text.UTF8Encoding enc = new System.Text.UTF8Encoding();
+            return enc.GetBytes(str);
+        }
+
         public static string ByteArrayToString(byte[] arr, int offset = 0)
         {
             Byte[] ba = new byte[arr.Length];
@@ -161,6 +167,23 @@ namespace oscardata
             Array.Copy(ba, ban, dst);
 
             System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
+            
+            return enc.GetString(ban);
+        }
+
+        public static string ByteArrayToStringUtf8(byte[] arr, int offset = 0)
+        {
+            Byte[] ba = new byte[arr.Length];
+            int dst = 0;
+            for (int i = offset; i < arr.Length; i++)
+            {
+                if (arr[i] != 0) ba[dst++] = arr[i];
+            }
+            Byte[] ban = new byte[dst];
+            Array.Copy(ba, ban, dst);
+
+            System.Text.UTF8Encoding enc = new System.Text.UTF8Encoding();
+
             return enc.GetString(ban);
         }
 

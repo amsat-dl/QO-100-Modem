@@ -106,7 +106,6 @@ namespace oscardata
 
             // create Udp Communication ports and init UDP system
             Udp.InitUdp();
-            search_modem();
             ArraySend.ArraySendInit();
 
             // enable processing
@@ -291,14 +290,14 @@ namespace oscardata
             if (last_initAudioStatus != statics.initAudioStatus)
             {
                 if ((statics.initAudioStatus & 1) == 1)
-                    pb_audioPBstatus.BackgroundImage = Properties.Resources.fail;
-                else
                     pb_audioPBstatus.BackgroundImage = Properties.Resources.ok;
+                else
+                    pb_audioPBstatus.BackgroundImage = Properties.Resources.fail;
 
                 if ((statics.initAudioStatus & 2) == 2)
-                    pb_audioCAPstatus.BackgroundImage = Properties.Resources.fail;
-                else
                     pb_audioCAPstatus.BackgroundImage = Properties.Resources.ok;
+                else
+                    pb_audioCAPstatus.BackgroundImage = Properties.Resources.fail;
 
                 last_initAudioStatus = statics.initAudioStatus;
             }
@@ -306,14 +305,14 @@ namespace oscardata
             if (last_initVoiceStatus != statics.initVoiceStatus)
             {
                 if ((statics.initVoiceStatus & 1) == 1)
-                    pb_voicePBstatus.BackgroundImage = Properties.Resources.fail;
-                else
                     pb_voicePBstatus.BackgroundImage = Properties.Resources.ok;
+                else
+                    pb_voicePBstatus.BackgroundImage = Properties.Resources.fail;
 
                 if ((statics.initVoiceStatus & 2) == 2)
-                    pb_voiceCAPstatus.BackgroundImage = Properties.Resources.fail;
-                else
                     pb_voiceCAPstatus.BackgroundImage = Properties.Resources.ok;
+                else
+                    pb_voiceCAPstatus.BackgroundImage = Properties.Resources.fail;
 
                 last_initVoiceStatus = statics.initVoiceStatus;
             }
@@ -434,7 +433,7 @@ namespace oscardata
                 // handle file receive
                 if (rxtype == statics.Image)
                 {
-                    if (recfile.receive(rxd))
+                    if (recfile.receive(rxd) == 1)
                     {
                         if (recfile.filename != null && recfile.filename.Length > 0 && minfo != statics.FirstFrame)
                         {
@@ -457,17 +456,21 @@ namespace oscardata
 
                 if (rxtype == statics.AsciiFile)
                 {
-                    if(recfile.receive(rxd))
+                    int fret = recfile.receive(rxd);
+                    if (fret == 1)
                     {
                         // ASCII file received, show in window
                         String serg = File.ReadAllText(recfile.filename);
                         printText(rtb_RXfile, serg);
                     }
+                    if (fret == -5)
+                        printBadBlocks();
                 }
 
                 if (rxtype == statics.HTMLFile)
                 {
-                    if (recfile.receive(rxd))
+                    int fret = recfile.receive(rxd);
+                    if (fret == 1)
                     {
                         // HTML file received, show in window
                         String serg = File.ReadAllText(recfile.filename);
@@ -475,24 +478,36 @@ namespace oscardata
                         // and show in browser
                         OpenUrl(recfile.filename);
                     }
+                    if (fret == -5)
+                        printBadBlocks();
                 }
 
                 if (rxtype == statics.BinaryFile)
                 {
-                    if (recfile.receive(rxd))
+                    int fret = recfile.receive(rxd);
+                    if (fret == 1)
                     {
                         // Binary file received, show statistics in window
-                        printText(rtb_RXfile, langstr[2]);
-                        printText(rtb_RXfile, "--------------------\r\n\r\n");
-                        printText(rtb_RXfile, langstr[3] + ((int)recfile.runtime.TotalSeconds).ToString() + " seconds" + "\r\n\r\n");
-                        printText(rtb_RXfile, langstr[4] + ((int)(recfile.filesize * 8 / recfile.runtime.TotalSeconds)).ToString() + " bit/s" + "\r\n\r\n");
-                        printText(rtb_RXfile, langstr[5] + recfile.filesize + " byte\r\n\r\n");
-                        printText(rtb_RXfile, langstr[6] + recfile.filename + "\r\n\r\n");
-                        if(recfile.filename.Length <= 1)
+                        try
                         {
-                            printText(rtb_RXfile, langstr[7]);
+                            printText(rtb_RXfile, langstr[2]);
+                            printText(rtb_RXfile, "--------------------\r\n\r\n");
+                            printText(rtb_RXfile, langstr[3] + ((int)recfile.runtime.TotalSeconds).ToString() + " seconds" + "\r\n\r\n");
+                            printText(rtb_RXfile, langstr[4] + ((int)(recfile.filesize * 8 / recfile.runtime.TotalSeconds)).ToString() + " bit/s" + "\r\n\r\n");
+                            printText(rtb_RXfile, langstr[5] + recfile.filesize + " byte\r\n\r\n");
+                            printText(rtb_RXfile, langstr[6] + recfile.filename + "\r\n\r\n");
+                            if (recfile.filename.Length <= 1)
+                            {
+                                printText(rtb_RXfile, langstr[7]);
+                            }
+                        }
+                        catch 
+                        {
+                            printText(rtb_RXfile, "RX error\r\n");
                         }
                     }
+                    if (fret == -5)
+                        printBadBlocks();
                 }
 
                 // ===== BER Test ================================================
@@ -503,6 +518,26 @@ namespace oscardata
 
                 ShowStatus(rxtype, minfo);
             }
+        }
+
+        void printBadBlocks()
+        {
+            rtb_RXfile.Text = "";
+            printText(rtb_RXfile, langstr[2]);
+            printText(rtb_RXfile, "--------------------\r\n\r\n");
+            printText(rtb_RXfile, langstr[31] + "\r\n\r\n");
+
+            int[] d = new int[2];
+            recfile.oldblockinfo(d);
+            int failed = d[0] - d[1];
+
+            String s = "\n" + langstr[25] +
+                "-------------------\n" +
+                "total : " + (d[0]+1) + "\n" +
+                langstr[26] + (d[1]+1) + "\n" +
+                langstr[27] + failed + "\n";
+            printText(rtb_RXfile, s + "\r\n\r\n");
+            printText(rtb_RXfile, langstr[32] + ": " + recfile.missingBlockString());
         }
 
         private void OpenUrl(string url)
@@ -902,23 +937,23 @@ namespace oscardata
             if (bits > 1000)
             {
                 bits /= 1000;
-                sbit = "kb";
+                sbit = "kbit";
             }
             if (bits > 1000)
             {
                 bits /= 1000;
-                sbit = "Mb";
+                sbit = "Mbit";
             }
 
             if (bytes > 1000)
             {
                 bytes /= 1000;
-                sbyt = "kB";
+                sbyt = "kByte";
             }
             if (bytes > 1000)
             {
                 bytes /= 1000;
-                sbyt = "MB";
+                sbyt = "MByte";
             }
 
             line += " " + bits.ToString() + " " + sbit + "  " + bytes.ToString() + " " + sbyt;
@@ -1085,23 +1120,7 @@ namespace oscardata
             }
             return ip;
         }
-
-        Byte getPBaudioDevice()
-        {
-            String s = cb_audioPB.Text;
-            Byte x = (Byte)cb_audioPB.Items.IndexOf(s);
-            //if (s.ToUpper() == "DEFAULT") x = 255;
-            return x;
-        }
-
-        Byte getCAPaudioDevice()
-        {
-            String s = cb_audioCAP.Text;
-            Byte x = (Byte)cb_audioCAP.Items.IndexOf(s);
-            //if (s.ToUpper() == "DEFAULT") x = 255;
-            return x;
-        }
-
+                
         Byte getLSaudioDevice()
         {
             String s = cb_loudspeaker.Text;
@@ -1126,19 +1145,52 @@ namespace oscardata
          * if a modem receives this message, it returns with an
          * UDP message to UdpBCport containing a String with it's IP address
          * this message also contains the selected Audio Devices
+         * 
+         * Format:
+         * Byte:
+         * 0 ... 0x3c
+         * 1 ... PB volume
+         * 2 ... CAP volume
+         * 3 ... announcement on/off, duration
+         * 4 ... DV loudspeaker volume
+         * 5 ... DV mic volume
+         * 6..9 ... unused
+         * 10 .. 109 ... PB device name
+         * 110 .. 209 ... CAP device name
+         * 
         */
 
         private void search_modem()
         {
-            Byte[] txb = new byte[8];
+            Byte[] txb = new byte[210];
             txb[0] = 0x3c;  // ID of this message
-            txb[1] = getPBaudioDevice();
-            txb[2] = getCAPaudioDevice();
-            txb[3] = (Byte)tb_PBvol.Value;
-            txb[4] = (Byte)tb_CAPvol.Value;
-            txb[5] = (Byte)cb_announcement.Items.IndexOf(cb_announcement.Text);
-            txb[6] = (Byte)tb_loadspeaker.Value;
-            txb[7] = (Byte)tb_mic.Value;
+            txb[1] = (Byte)tb_PBvol.Value;
+            txb[2] = (Byte)tb_CAPvol.Value;
+            txb[3] = (Byte)cb_announcement.Items.IndexOf(cb_announcement.Text);
+            txb[4] = (Byte)tb_loadspeaker.Value;
+            txb[5] = (Byte)tb_mic.Value;
+            txb[6] = (Byte)0;   // unused
+            txb[7] = (Byte)0;   // unused
+            txb[8] = (Byte)0;   // unused
+            txb[9] = (Byte)0;   // unused
+
+            Byte[] bpb = statics.StringToByteArrayUtf8(cb_audioPB.Text);
+            Byte[] bcap = statics.StringToByteArrayUtf8(cb_audioCAP.Text);
+            //Byte[] bpb = statics.StringToByteArray(cb_audioPB.Text);
+            //Byte[] bcap = statics.StringToByteArray(cb_audioCAP.Text);
+
+            for (int i=0; i<100; i++)
+            {
+                if (i >= bpb.Length)
+                    txb[i + 10] = 0;
+                else
+                    txb[i+10] = bpb[i];
+
+                if (i >= bcap.Length)
+                    txb[i + 110] = 0;
+                else
+                    txb[i + 110] = bcap[i];
+            }
 
             Udp.UdpBCsend(txb, GetMyBroadcastIP(), statics.UdpBCport_AppToModem);
 
@@ -1453,10 +1505,16 @@ namespace oscardata
 
         void setVoiceAudio()
         {
-            Byte[] txdata = new byte[5];
+            /*
+             * Format:
+             * 0 ... statics.SetVoiceMode (25)
+             * 1 ... voicemode
+             * 2 ... codec
+             * 3-102 ... LS device name
+             * 103-202 ... MIC device name
+             */
+            Byte[] txdata = new byte[203];
             txdata[0] = (Byte)statics.SetVoiceMode;
-            txdata[1] = (Byte)getLSaudioDevice();
-            txdata[2] = (Byte)getMICaudioDevice();
             Byte opmode = 0;
             // values see: hsmodem.h _VOICEMODES_
             if (cb_switchtoLS.Checked) opmode = 1;
@@ -1465,11 +1523,30 @@ namespace oscardata
             if (cb_digitalVoice.Checked) opmode = 4;
             if (cb_digitalVoiceRXonly.Checked) opmode = 5;
             if(opmode == 0) pb_voice.BackgroundImage = null;
-            txdata[3] = opmode;
+            txdata[1] = opmode;
             Byte codec;
             if (rb_opus.Checked) codec = 0;
             else codec = 1;
-            txdata[4] = codec;
+            txdata[2] = codec;
+
+            Byte[] bpb = statics.StringToByteArrayUtf8(cb_loudspeaker.Text);
+            Byte[] bcap = statics.StringToByteArrayUtf8(cb_mic.Text);
+            //Byte[] bpb = statics.StringToByteArray(cb_loudspeaker.Text);
+            //Byte[] bcap = statics.StringToByteArray(cb_mic.Text);
+
+            for (int i = 0; i < 100; i++)
+            {
+                if (i >= bpb.Length)
+                    txdata[i + 3] = 0;
+                else
+                    txdata[i + 3] = bpb[i];
+
+                if (i >= bcap.Length)
+                    txdata[i + 103] = 0;
+                else
+                    txdata[i + 103] = bcap[i];
+            }
+
             Udp.UdpSendCtrl(txdata);
 
             if(opmode > 0)
@@ -1729,7 +1806,9 @@ namespace oscardata
             "failed: ",
             "\nfile incomplete, ask for retransmission",    //28
             " sequence OK",
-            " of ",
+            " of ", //30
+            "Bad blocks, retransmission required",
+            "Bad blocks",   //32
         };
 
         String[] langstr_de = new String[]{
@@ -1763,7 +1842,9 @@ namespace oscardata
             "defekt: ",
             "\nDatei nicht komplett, bitte neu Senden ",    //28
             " Sequenz OK",
-            " von ",
+            " von ", //30
+            "defekte Blöcke, Datei muss nochmal empfangen werden",
+            "defekte Blöcke",   //32
         };
 
         private void cb_autostart_CheckedChanged(object sender, EventArgs e)

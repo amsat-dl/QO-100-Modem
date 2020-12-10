@@ -81,7 +81,15 @@ namespace oscardata
         bool autoRXnum = false;
         String blockFilename = "";
 
-        public bool receive(Byte []rxdp)
+        //  1 ... file OK
+        //  0 ... continue receiving
+        // -1 ... invalid header
+        // -2 ... first frame invalid
+        // -3 ... invalid data in cont frame
+        // -4 ... invalid data in last frame
+        // -5 ... file ends, but bad blocks
+
+        public int receive(Byte []rxdp)
         {
             // read frame header
             if(!getFrameHeader(rxdp))
@@ -89,7 +97,7 @@ namespace oscardata
                 // invalid situation
                 blockidx = 0;
                 receiving = false;
-                return false;
+                return -1;
             }
 
             // receive first frame of a transmission
@@ -100,7 +108,7 @@ namespace oscardata
                 rxbytes = 0;
                 filesize = 0;
                 filename = "";
-                if (!StartFileRX()) return false;   // invalid file
+                if (!StartFileRX()) return -2;   // invalid file
             }
 
             if (receiving && minfo != statics.FirstFrame)
@@ -115,7 +123,7 @@ namespace oscardata
                     // invalid situation
                     blockidx = 0;
                     receiving = false;
-                    return false;
+                    return -3;
                 }
             }
 
@@ -129,12 +137,17 @@ namespace oscardata
                     // invalid situation
                     blockidx = 0;
                     receiving = false;
-                    return false;
+                    return -4;
                 }
 
                 // the last block was received ok
                 // save file if all blocks valid
-                SaveFile();
+                bool fileisok = SaveFile();
+                if(fileisok == false)
+                {
+                    // file not complete, do not to unzip
+                    return -5;
+                }
                 blockidx = 0;
                 receiving = false;
 
@@ -143,7 +156,7 @@ namespace oscardata
                     // these file type must be unzipped
                     handleZIPfiles();
                     receiving = false;
-                    return true;
+                    return 1;
                 }
             }
 
@@ -151,10 +164,10 @@ namespace oscardata
             {
                 // build bitmap from received data
                 pbmp = buildBitmap();
-                return true;
+                return 1;
             }
 
-            return false;
+            return 0;
         }
 
         bool getFrameHeader(Byte[] rxd)
@@ -280,6 +293,26 @@ namespace oscardata
             result[1] = ok;
         }
 
+        public String missingBlockString()
+        {
+            String s = "";
+            bool f = true;
+            for (int i = 0; i <= lastblockidx; i++)
+            {
+                if (!lastblockvalid[i])
+                {
+                    if (!f)
+                        s += ", ";
+                    else
+                        f = false;
+
+                    s += i.ToString();
+                }
+            }
+
+            return s;
+        }
+
         void saveBlocks()
         {
             try
@@ -337,7 +370,7 @@ namespace oscardata
         {
             if (!receiving)
             {
-                Console.WriteLine("next/last block: not receiving, first block missing?");
+                //Console.WriteLine("next/last block: not receiving, first block missing?");
                 return false;
             }
 

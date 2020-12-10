@@ -110,7 +110,7 @@ void encode_codec2(float f)
 					f /= 32768;
 					// here we have 8kS/s, need to interpolate to 48 kS/s
 					for(int x=0; x<6; x++)
-						pb_write_fifo_voice(f);
+						io_ls_write_fifo(f);
 				}
 			}
 		}
@@ -159,7 +159,7 @@ void toCodecDecoder_codec2(uint8_t* pdata, int len)
 				f /= 32768;
 				// here we have 8kS/s, need to interpolate to 48 kS/s
 				for (int x = 0; x < 6; x++)
-					pb_write_fifo_voice(f);
+					io_ls_write_fifo(f);
 			}
 		}
 	}
