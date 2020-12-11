@@ -31,35 +31,6 @@
 * !!! compile x86 (32bit) version !!! all supplied dlls are 32 bit !!!
 * ====================================================================
 * 
-* 3rd party libraries:
-* 1) BASS Audio from https://www.un4seen.com/
-	copy bass.h and bass.lib into source directory
-	Windows: copy bass.dll into executable directory
-	Linux: copy libbass.so into shared-lib folder, usually /usr/local/lib
-	! NOTE: for PC-Linux and ARM-Linux you need different libraries !
-
-2) liquid-DSP
-	Linux Install Script:
-		this installs it from source
-
-		sudo apt install git autoconf libsndfile-dev libasound-dev
-		git clone git://github.com/jgaeddert/liquid-dsp.git
-		cd liquid-dsp
-		./bootstrap.sh
-		./configure
-		make -j 8
-		sudo make install
-		sudo ldconfig
-
-		a working copy of the source code is in ../3rdParty/liquid-dsp
-		to use this source simply remove the "git clone" line from above script
-		it installs libliquid.so into /usr/local/lib (Ubuntu) and
-		liquid.h into /usr/local/include/liquid/
-
-	Windows:
-		ready libraries are in ../3rdParty/liquid-dsp-windows
-		copy liquid.h and liquid.lib into source directory
-		copy liquid.dll into executable directory
 */
 
 
@@ -97,6 +68,7 @@ int restart_modems = 0;
 int trigger_resetmodem = 0;
 
 int caprate = 44100;
+int physcaprate = 44100;
 int txinterpolfactor = 20;
 int rxPreInterpolfactor = 5;
 int linespeed = 4410;
@@ -203,7 +175,7 @@ int main(int argc, char* argv[])
         {
             // loop voice mic to LS
             float f;
-            if (io_mic_read_fifo(&f))
+            while (io_mic_read_fifo(&f))
             {
                  io_ls_write_fifo(f);
             }
@@ -213,7 +185,7 @@ int main(int argc, char* argv[])
         {
             // send mic to codec
             float f;
-            if (io_mic_read_fifo(&f))
+            while (io_mic_read_fifo(&f))
             {
                 encode(f);
             }
@@ -590,7 +562,7 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
             fnd = 0;
             trigger_resetmodem = 0;
             rx_in_sync = 0;
-            printf("no signal detected %d, reset RX modem\n", wt);
+            //printf("no signal detected %d, reset RX modem\n", wt);
             resetModem();
         }
         else if (fnd >= wt)

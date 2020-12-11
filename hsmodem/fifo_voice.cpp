@@ -53,7 +53,7 @@ void IO_MIC_UNLOCK() { pthread_mutex_unlock(&io_mic_crit_sec); }
 void IO_LS_UNLOCK() { pthread_mutex_unlock(&io_ls_crit_sec); }
 #endif
 
-#define VOICE_PLAYBACK_BUFLEN (48000 * 15) // space for 10 seconds of samples
+#define VOICE_PLAYBACK_BUFLEN (500000)
 #define VOICE_CAPTURE_BUFLEN  (10000) //48000)// * 10) // space for 10 seconds of samples
 
 int io_mic_wridx = 0;

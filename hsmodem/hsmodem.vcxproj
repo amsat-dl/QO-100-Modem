@@ -223,10 +223,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bass.h" />
-    <ClInclude Include="bassenc.h" />
-    <ClInclude Include="bassenc_opus.h" />
-    <ClInclude Include="basswasapi.h" />
     <ClInclude Include="codec2.h" />
     <ClInclude Include="endian.h" />
     <ClInclude Include="fec.h" />

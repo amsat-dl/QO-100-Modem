@@ -83,9 +83,6 @@
     <ClInclude Include="frameformat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="udp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -95,19 +92,10 @@
     <ClInclude Include="fftw_lib\fftw3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="basswasapi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="symboltracker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bassenc_opus.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bassenc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="opus.h">

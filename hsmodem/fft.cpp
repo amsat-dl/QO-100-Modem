@@ -52,10 +52,11 @@ uint16_t *make_waterfall(float fre, int *retlen)
     // caprate 48k: downsample by 6
     // caprate 44,1k: downsample by 5,5
 
-    if (caprate == 48000)
+    if (physcaprate == 48000)
         if (++downsamp < 6) return NULL;
 
-    if (caprate == 44100)
+    // TODO: the following simple resamp results in double peeks in fft
+    if (physcaprate == 44100)
     {
         if (downphase <= 1100)
         {
@@ -95,43 +96,60 @@ uint16_t *make_waterfall(float fre, int *retlen)
             fftrdy = 1;
         }
 
-        // signal detection
-        // measure level at band edges
-        float edgelevel = 0;
-        for (int e = 0; e < 10; e++)
-            edgelevel += f_fftout[e];
-        for (int e = 390; e < fftcnt; e++)
-            edgelevel += f_fftout[e];
-        edgelevel /= 20;
-
-        // measure level at mid band
-        float midlevel = 0;
-        for (int e = 100; e < 300; e++)
-            midlevel += f_fftout[e];
-        midlevel /= 20;
-
-        //calc difference in %
-        int idiff = (int)((edgelevel * 100) / midlevel);
-        //printf("diff:%d %%  edge:%10.6f midband:%10.6f\n", ldiff, idiff,edgelevel, midlevel);
-
-        // IC9700 ... noise makes about 5% idiff
-        // Signal makes 0-2%, so we take the decision at 3%
-        const int maxchecks = 3;
-        static int rxstat = 0;
-        if (idiff < 3)
+        if (rx_in_sync == 0)
         {
-            if (rxstat == maxchecks)
+            // signal detection
+            // measure level at band edges
+            float edgelevel = 0;
+            for (int e = 0; e < 10; e++)
+                edgelevel += f_fftout[e];
+            edgelevel /= 10;
+
+            for (int e = 300; e < 320; e++)
+                edgelevel += f_fftout[e];
+            edgelevel /= 20;
+
+            // measure level at mid band
+            float midlevel = 0;
+            for (int e = 100; e < 300; e++)
+                midlevel += f_fftout[e];
+            midlevel /= 200;
+
+            //calc difference in %
+            int idiff = (int)((edgelevel * 100) / midlevel);
+            //printf("diff:%d %%  edge:%10.6f midband:%10.6f\n", idiff,edgelevel, midlevel);
+
+            // idiff SDR Console:
+            // no signal ... > 100
+            // signal < 20
+            static int checks = 0;
+            static int lastsig = 0;
+            int sig = 0;
+
+            // check if signal detected or not
+            if (idiff > 100) sig = 0;
+            if (idiff < 20) sig = 1;
+
+            rxlevel_deteced = sig;
+
+            // check if changed since last check
+            if (sig != lastsig)
             {
-                printf("===>>> level detected, reset modem\n");
-                trigger_resetmodem = 1;
-                rxlevel_deteced = 1;
+                lastsig = sig;
+                checks = 0;
             }
-            if(rxstat <= maxchecks) rxstat++;
-        }
-        else
-        {
-            rxstat = 0;
-            rxlevel_deteced = 0;
+            else
+            {
+                if (checks <= 3) checks++;
+                if (checks == 3)
+                {
+                    if (sig == 1)
+                    {
+                        printf("===>>> level detected, reset modem\n");
+                        trigger_resetmodem = 1;
+                    }
+                }
+            }
         }
     }
     

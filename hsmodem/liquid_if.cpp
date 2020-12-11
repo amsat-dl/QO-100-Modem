@@ -212,10 +212,15 @@ void modulator(uint8_t sym_in)
 nco_crcf dnnco = NULL;
 symtrack_cccf symtrack = NULL;
 firdecim_crcf decim = NULL;
+msresamp_crcf adecim = NULL;
 
 // decimator parameters
 unsigned int m_predec = 8;  // filter delay
 float As_predec = 40.0f;    // stop-band att 
+
+// adecimator parameters
+float r_OutDivInRatio;      // resampling rate (output/input)
+float As_adecim = 60.0f;     // resampling filter stop-band attenuation [dB]
 
 // symtrack parameters
 int          ftype_st       = LIQUID_FIRFILT_RRC;
@@ -240,20 +245,24 @@ void init_demodulator()
     // create pre-decimator
     decim = firdecim_crcf_create_kaiser(rxPreInterpolfactor, m_predec, As_predec);
     firdecim_crcf_set_scale(decim, 1.0f/(float)rxPreInterpolfactor);
+
+    // create arbitrary pre decimator
+    // if Audio SR is 48000 but caprate is 44100
+    r_OutDivInRatio = (float)((float)caprate / 48000.0);
+    adecim = msresamp_crcf_create(r_OutDivInRatio, As_adecim);
     
     // create symbol tracking synchronizer
-    //k_st = txinterpolfactor;
-    //symtrack = km_symtrack_cccf_create(ftype_st,k_st,m_st,beta_st,getMod());
     km_symtrack_cccf_create(ftype_st, k_st, m_st, beta_st, getMod());
-    //symtrack_cccf_set_bandwidth(symtrack,bandwidth_st);
     km_symtrack_cccf_set_bandwidth(bandwidth_st);
 }
 
 void close_demodulator()
 {
     if(decim != NULL) firdecim_crcf_destroy(decim);
+    if(adecim) msresamp_crcf_destroy(adecim);
     symtrack = NULL;
     decim = NULL;
+    adecim = NULL;
 }
 
 void resetModem()
@@ -340,7 +349,7 @@ static int ccol_idx = 0;
     float f;
     int ret = io_cap_read_fifo(&f);
     if(ret == 0) return 0;
-       
+
     if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
     {
         io_ls_write_fifo(f);
@@ -351,7 +360,21 @@ static int ccol_idx = 0;
 
     getMax(f);
 
-    make_FFTdata(f*60);
+    make_FFTdata(f * 60);
+
+    if (caprate == 44100 && physcaprate == 48000)
+    {
+        // the sound card capture for a VAC always works with 48000 because
+        // a VAC cannot be set to a specific cap rate in shared mode
+        unsigned int num_written = 0;
+        liquid_float_complex in;
+        liquid_float_complex out;
+        in.real = f;
+        in.imag = 0;
+        msresamp_crcf_execute(adecim, &in, 1, &out, &num_written);
+        if (num_written == 0) return 1;
+        f = out.real;
+    }
     
     // downconvert into baseband
     // still at soundcard sample rate
@@ -376,51 +399,55 @@ static int ccol_idx = 0;
     liquid_float_complex y;
     firdecim_crcf_execute(decim, ccol, &y);
 
-    unsigned int num_symbols_sync;
-    liquid_float_complex syms;
-    //symtrack_cccf_execute(symtrack, y, &syms, &num_symbols_sync);
-    unsigned int nsym_out;   // output symbol
-    km_symtrack_execute(y, &syms, &num_symbols_sync,&nsym_out);
-    
-    if(num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n",num_symbols_sync);
-    if(num_symbols_sync != 0)
-    {
-        unsigned int sym_out;   // output symbol
-        sym_out = nsym_out;
+    unsigned int num_written = 1;
 
-        measure_speed_syms(1);
-        
-        // try to extract a complete frame
-        uint8_t symb = sym_out;
-        if(bitsPerSymbol == 2) symb ^= (symb>>1);
-        GRdata_rxdata(&symb, 1, NULL);
-            
-        // send the data "as is" to app for Constellation Diagram
-        // we have about 2000 S/s, but this many points would make the GUI slow
-        // so we send only every x
-        static int ev = 0;
-        if (++ev >= 10)
+    for (unsigned int sa = 0; sa < num_written; sa++)
+    {
+        unsigned int num_symbols_sync;
+        liquid_float_complex syms;
+        unsigned int nsym_out;   // output symbol
+        km_symtrack_execute(y, &syms, &num_symbols_sync, &nsym_out);
+
+        if (num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n", num_symbols_sync);
+        if (num_symbols_sync != 0)
         {
-            ev = 0;
-            int32_t re = (int32_t)(syms.real * 16777216.0);
-            int32_t im = (int32_t)(syms.imag * 16777216.0);
-            uint8_t txpl[13];
-            int idx = 0;
-            txpl[idx++] = 5;    // type 5: IQ data follows
-            uint32_t sy = 0x3e8;
-            txpl[idx++] = sy >> 24;
-            txpl[idx++] = sy >> 16;
-            txpl[idx++] = sy >> 8;
-            txpl[idx++] = sy;
-            txpl[idx++] = re >> 24;
-            txpl[idx++] = re >> 16;
-            txpl[idx++] = re >> 8;
-            txpl[idx++] = re;
-            txpl[idx++] = im >> 24;
-            txpl[idx++] = im >> 16;
-            txpl[idx++] = im >> 8;
-            txpl[idx++] = im;
-            sendUDP(appIP, UdpDataPort_ModemToApp, txpl, 13);
+            unsigned int sym_out;   // output symbol
+            sym_out = nsym_out;
+
+            //measure_speed_syms(1);
+
+            // try to extract a complete frame
+            uint8_t symb = sym_out;
+            if (bitsPerSymbol == 2) symb ^= (symb >> 1);
+            GRdata_rxdata(&symb, 1, NULL);
+
+            // send the data "as is" to app for Constellation Diagram
+            // we have about 2000 S/s, but this many points would make the GUI slow
+            // so we send only every x
+            static int ev = 0;
+            if (++ev >= 10)
+            {
+                ev = 0;
+                int32_t re = (int32_t)(syms.real * 16777216.0);
+                int32_t im = (int32_t)(syms.imag * 16777216.0);
+                uint8_t txpl[13];
+                int idx = 0;
+                txpl[idx++] = 5;    // type 5: IQ data follows
+                uint32_t sy = 0x3e8;
+                txpl[idx++] = sy >> 24;
+                txpl[idx++] = sy >> 16;
+                txpl[idx++] = sy >> 8;
+                txpl[idx++] = sy;
+                txpl[idx++] = re >> 24;
+                txpl[idx++] = re >> 16;
+                txpl[idx++] = re >> 8;
+                txpl[idx++] = re;
+                txpl[idx++] = im >> 24;
+                txpl[idx++] = im >> 16;
+                txpl[idx++] = im >> 8;
+                txpl[idx++] = im;
+                sendUDP(appIP, UdpDataPort_ModemToApp, txpl, 13);
+            }
         }
     }
             

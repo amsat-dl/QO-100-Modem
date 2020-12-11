@@ -76,6 +76,7 @@
 
 // voice audio sampling rate
 #define VOICE_SAMPRATE  48000   // do NOT change, OPUS works with 48k only
+#define AUDIO_SAMPRATE  48000   // do NOT change, WASAPI VACs work with 48k only
 
 enum _VOICEMODES_ {
     VOICEMODE_OFF,
@@ -180,6 +181,8 @@ void io_close_voice();
 int io_ls_read_fifo_num(float* data, int num);
 void io_mic_write_fifo(float sample);
 void write_sample_s16ne(char* ptr, double sample);
+int io_ls_fifo_usedspace();
+void write_sample_float32ne(char* ptr, double sample);
 
 void km_symtrack_cccf_create(int          _ftype,
     unsigned int _k,
@@ -222,6 +225,8 @@ extern int rxlevel_deteced;
 extern int rx_in_sync;
 extern float softwareMICvolume;
 extern float softwareLSvolume;
+extern int physcaprate;
+extern int restart_modems;
 
 #ifdef _LINUX_
 int isRunning(char* prgname);

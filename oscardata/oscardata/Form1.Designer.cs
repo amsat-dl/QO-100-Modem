@@ -1428,7 +1428,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "QO-100 NB Transponder HS Multimedia Modem AMSAT-DL V0.44 by DJ0ABR";
+            this.Text = "QO-100 NB Transponder HS Multimedia Modem AMSAT-DL V0.45 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();

@@ -49,9 +49,6 @@ typedef struct _AUDIODEV_ {
 AUDIODEV audiodev[MAXAUDIODEVICES];
 int audiodevidx = 0;
 
-bool pbrawdev = true;
-bool caprawdev = true;
-
 void print_devs()
 {
     printf("\n ==== AUDIO devices ====\n");
@@ -83,6 +80,11 @@ int print_device(struct SoundIoDevice* device)
 {
     if (!device->probe_error)
     {
+/*#ifdef _WIN32_
+        // only use raw (exclusive) devices
+        if (device->is_raw == false) return 0;
+#endif*/
+
         // ignore if exists
         for (int i = 0; i < audiodevidx; i++)
             if (!strcmp(device->id, audiodev[i].id)) return 0;
@@ -221,8 +223,8 @@ int min_int(int a, int b)
 
 void read_callback(struct SoundIoInStream* instream, int frame_count_min, int frame_count_max)
 {
+
     int err;
-    if (instream == NULL) return;
     //printf("cap: %d  %d\n", frame_count_min, frame_count_max);
     //int chans = instream->layout.channel_count;
 
@@ -235,8 +237,7 @@ void read_callback(struct SoundIoInStream* instream, int frame_count_min, int fr
         if ((err = soundio_instream_begin_read(instream, &areas, &frame_count)))
         {
             fprintf(stderr, "begin read error: %s", soundio_strerror(err));
-            restart_modems = 1;
-            return;
+            exit(1);
         }
         if (!frame_count)
             break;
@@ -245,47 +246,25 @@ void read_callback(struct SoundIoInStream* instream, int frame_count_min, int fr
         {
             for (int ch = 0; ch < instream->layout.channel_count; ch += 1)
             {
-                if (caprawdev == false)
+                int16_t rxdata;
+                memcpy(&rxdata, areas[ch].ptr, instream->bytes_per_sample);
+                areas[ch].ptr += areas[ch].step;
+                if (ch == 0)
                 {
-                    // shared device
-                    float frxdata;
-                    memcpy(&frxdata, areas[ch].ptr, instream->bytes_per_sample);
-                    areas[ch].ptr += areas[ch].step;
-                    if (ch == 0)
-                    {
-                        float f = frxdata;
-                        f *= softwareCAPvolume;
-                        io_cap_write_fifo(f);
-                    }
-                }
-                else
-                {
-                    // raw device
-                    // shared device
-                    int16_t rxdata;
-                    memcpy(&rxdata, areas[ch].ptr, instream->bytes_per_sample);
-                    areas[ch].ptr += areas[ch].step;
-                    if (ch == 0)
-                    {
-                        float f = rxdata;
-                        f /= 32768;
-                        f *= softwareCAPvolume;
-                        io_cap_write_fifo(f);
-                    }
+                    float f = rxdata;
+                    f /= 32768;
+                    f *= softwareCAPvolume;
+                    io_cap_write_fifo(f);
                 }
             }
         }
-        //printf("%d into fifo\n", frame_count);
-        // needs to sleep or it will not work correctly, no idea why
-        sleep_ms(1);
 
         //measure_speed_bps(frame_count);
 
         if ((err = soundio_instream_end_read(instream)))
         {
             fprintf(stderr, "end read error: %s", soundio_strerror(err));
-            restart_modems = 1;
-            return;
+            exit(1);
         }
 
         frames_left -= frame_count;
@@ -293,91 +272,106 @@ void read_callback(struct SoundIoInStream* instream, int frame_count_min, int fr
             break;
     }
 }
+/*
+void read_callback(struct SoundIoInStream* instream, int frame_count_min, int frame_count_max) 
+{
+    int err;
+    //printf("cap: %d  %d\n", frame_count_min, frame_count_max);
+    // bytes_per_frame == 4 because we use float
+    // instream->bytes_per_sample/bytes_per_frame = 1 (mono) or 2 (stereo)
+    int chans = instream->layout.channel_count;
 
+    struct SoundIoChannelArea* areas;
+    // samples are in areas.ptr
+    int frames_left = frame_count_max; // take all
+    while (1)
+    {
+        int frame_count = frames_left;
+        if ((err = soundio_instream_begin_read(instream, &areas, &frame_count)))
+        {
+            fprintf(stderr, "begin read error: %s", soundio_strerror(err));
+            exit(1);
+        }
+        if (!frame_count)
+            break;
+
+        // do something with the data in *area.ptr
+        // take a float every chans*4 Bytes
+        int16_t* samples = (int16_t*)(areas[0].ptr);
+        int pos = 0;
+        for (int i = 0; i < frame_count; i++)
+        {
+            float f = samples[pos];
+            f /= 32768;
+            f *= softwareCAPvolume;
+            io_cap_write_fifo(f);
+            pos += chans;
+        }
+
+        //measure_speed_bps(frame_count);
+
+        if ((err = soundio_instream_end_read(instream))) {
+            fprintf(stderr, "end read error: %s", soundio_strerror(err));
+            exit(1);
+        }
+
+        frames_left -= frame_count;
+        if (frames_left <= 0)
+            break;
+    }
+}
+*/
 void overflow_callback(struct SoundIoInStream* instream) 
 {
     static int count = 0;
     printf("overflow %d\n", ++count);
 }
 
-// #define SINEWAVETEST
-
-#ifdef SINEWAVETEST
-static const double PI = 3.14159265358979323846264338328;
-static double seconds_offset = 0.0;
-#endif
+#define MAXCAPCHUNKLEN  50000
 
 static void write_callback(struct SoundIoOutStream* outstream, int frame_count_min, int frame_count_max)
 {
-    //printf("pb: %d  %d\n", frame_count_min, frame_count_max);
-#ifdef SINEWAVETEST
-    double float_sample_rate = outstream->sample_rate;
-    double seconds_per_frame = 1.0 / float_sample_rate;
-    double pitch = 440.0;
-    double radians_per_second = pitch * 2.0 * PI;
-#endif
     struct SoundIoChannelArea* areas;
     int err;
+    int frames_left = frame_count_max;
 
-    int frames_left = 4800;
-    if (frame_count_max < frames_left)
-        frames_left = frame_count_max;
-
-    for (;;) {
+    while (1)
+    {
         int frame_count = frames_left;
-        if ((err = soundio_outstream_begin_write(outstream, &areas, &frame_count))) {
-            fprintf(stderr, "write_callback unrecoverable soundio_outstream_begin_write error: %s\n", soundio_strerror(err));
-            restart_modems = 1;
-            return;
+        if ((err = soundio_outstream_begin_write(outstream, &areas, &frame_count)))
+        {
+            fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
+            exit(1);
         }
 
         if (!frame_count)
             break;
 
-        //printf("ck: %d\n", frame_count);
-
-        float* f = (float*)malloc(frame_count * sizeof(float));
+        float f[MAXCAPCHUNKLEN];
         int fiforet = io_pb_read_fifo_num(f, frame_count);
         if (fiforet == 0)
         {
             // elements not available, fill with zeroes
+            //printf("not enough data, send zeroes\n");
             memset(f, 0, sizeof(float) * frame_count);
         }
 
         const struct SoundIoChannelLayout* layout = &outstream->layout;
 
-        for (int frame = 0; frame < frame_count; frame += 1) 
+        for (int frame = 0; frame < frame_count; frame++)
         {
-#ifdef SINEWAVETEST
-            double sample = sin((seconds_offset + frame * seconds_per_frame) * radians_per_second);
-#endif
-            for (int channel = 0; channel < layout->channel_count; channel += 1) 
+            for (int channel = 0; channel < layout->channel_count; channel++)
             {
-                float ftx = f[frame] * softwarePBvolume;
-                if (pbrawdev == false)
-                {
-#ifdef SINEWAVETEST
-                    write_sample_float32ne(areas[channel].ptr, sample); // sine wave test tone
-#endif
-                    write_sample_float32ne(areas[channel].ptr, ftx);
-                }
-                else
-                    write_sample_s16ne(areas[channel].ptr, ftx);
+                write_sample_s16ne(areas[channel].ptr, f[frame]);
                 areas[channel].ptr += areas[channel].step;
             }
         }
-#ifdef SINEWAVETEST
-        seconds_offset = fmod(seconds_offset + seconds_per_frame * frame_count, 1.0);
-#endif
-
-        free(f);
 
         if ((err = soundio_outstream_end_write(outstream))) {
             if (err == SoundIoErrorUnderflow)
                 return;
             fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
-            restart_modems = 1;
-            return;
+            exit(1);
         }
 
         frames_left -= frame_count;
@@ -385,7 +379,66 @@ static void write_callback(struct SoundIoOutStream* outstream, int frame_count_m
             break;
     }
 }
+/*
+static void write_callback(struct SoundIoOutStream* outstream, int frame_count_min, int frame_count_max) 
+{
+    int chans = outstream->layout.channel_count;
+    struct SoundIoChannelArea* areas;
+    int err;
+    int frames_left = min_int(frame_count_max,MAXCAPCHUNKLEN);// frame_count_max;
+    //printf("\nmin: %d max:%d\n", frame_count_min, frame_count_max);
 
+    // we have to write frame_count_max, not less, or we get an underrun
+    // this has to be written in chunks requested by soundio_outstream_begin_write
+    float f[MAXCAPCHUNKLEN];
+    while (1)
+    {
+        int frame_count = frames_left;
+        if ((err = soundio_outstream_begin_write(outstream, &areas, &frame_count))) {
+            printf("unrecoverable soundio_outstream_begin_write error: %s\n", soundio_strerror(err));
+            exit(1);
+        }
+        if (!frame_count) break; // will normally never happen
+        //printf("chunk: %d\n", frame_count);
+
+        // soundio_outstream_begin_write requested to write frame_count elements
+        int fiforet = io_pb_read_fifo_num(f, frame_count);
+        if (fiforet == 0)
+        {
+            // elements not available, fill with zeroes
+            //printf("not enough data, send zeroes\n");
+            memset(f, 0, sizeof(float) * frame_count);
+        }
+
+        // apply volume
+        for (int i = 0; i < frame_count; i++)
+            f[i] *= softwarePBvolume;
+        
+        // put data into soundio buffer
+        for (int frame = 0; frame < frame_count; frame++) 
+        {
+            for (int ch = 0; ch < chans; ch++) 
+            {
+                int16_t* s = (int16_t*)areas[ch].ptr;
+                *s = (int16_t)(f[frame] * 32768.0);
+                areas[ch].ptr += areas[ch].step;
+            }
+        }
+
+        // and finalize this chunk
+        if ((err = soundio_outstream_end_write(outstream))) {
+            if (err == SoundIoErrorUnderflow)
+                return;
+            printf("unrecoverable soundio_outstream_end_write error: %s\n", soundio_strerror(err));
+            exit(1);
+        }
+
+        frames_left -= frame_count;
+        if (frames_left <= 0)
+            break;
+    }
+}
+*/
 void underflow_callback(struct SoundIoOutStream* outstream) 
 {
     static int count = 0;
@@ -399,7 +452,7 @@ int io_init_sound(char *pbname, char *capname)
     init_audio_result = 0;
 
     printf("\n ==== IO INIT AUDIO devices ====\n");
-    printf("requested\nTX:<%s>\nRX:<%s>\ncapture rate:%d\n\n",pbname,capname,caprate);
+    printf("requested: <%s> <%s>\ncapture rate:%d\n",pbname,capname,caprate);
 
     io_close_audio();
 
@@ -438,18 +491,9 @@ int io_init_sound(char *pbname, char *capname)
     if (capdevid == NULL) return 0;
 
     // define the capture device
+    printf("selected CAP device:\nname:%s\nid  :%s\n", capname, capdevid);
+
     soundio_flush_events(soundio);
-
-    // under Windows we usually use raw devices. This does not work with 
-    // virtual sound cards due to problems in libsoundio
-    // for VACs we use shared devices, otherwise raw
-    pbrawdev = true;
-    if (strstr(pbname, "irtual") || strstr(pbname, "VAC"))
-        pbrawdev = false;
-
-    caprawdev = true;
-    if (strstr(capname, "irtual") || strstr(capname, "VAC"))
-        caprawdev = false;
 
     for (int i = 0; i < soundio_input_device_count(soundio); i++)
     {
@@ -457,7 +501,7 @@ int io_init_sound(char *pbname, char *capname)
         struct SoundIoDevice* device = soundio_get_input_device(soundio, i);
         if (strcmp(device->id, capdevid) == 0 
 #ifdef _WIN32_
-            && device->is_raw == caprawdev
+            && device->is_raw == true
 #endif
             )
         {
@@ -485,27 +529,15 @@ int io_init_sound(char *pbname, char *capname)
         return 0;
     }
 
-    // raw devices: 16bit LE, shared devices float
-    if (caprawdev)
-    {
-        instream->format = SoundIoFormatS16NE;
-        instream->sample_rate = caprate;
-        physcaprate = caprate;
-    }
-    else 
-    {
-        // a VAC needs these settings or it will not work with 44100
-        instream->format = SoundIoFormatFloat32NE;
-        instream->sample_rate = AUDIO_SAMPRATE;
-        physcaprate = AUDIO_SAMPRATE;
-    }
+    instream->format = SoundIoFormatS16NE;
+    instream->sample_rate = caprate;
     instream->software_latency = 0.0;
     instream->read_callback = read_callback;
     instream->overflow_callback = overflow_callback;
     instream->userdata = NULL;
 
     if ((err = soundio_instream_open(instream))) {
-        printf("unable to open input stream: %d: %s", err, soundio_strerror(err));
+        printf("unable to open input stream: %s", soundio_strerror(err));
         return 0;
     }
 
@@ -514,21 +546,18 @@ int io_init_sound(char *pbname, char *capname)
         return 0;
     }
     init_audio_result |= 2;
-
-    printf("selected CAPTURE device:\nname:%s\nid  :%s\n", capname, capdevid);
-    printf("physical capture rate:%d, logical capture rate:%d\n", physcaprate, caprate);
-    printf("format: %s\n\n", soundio_format_string(instream->format));
-
     // the CAP callback is running now
-    
+
     // define the playback device
+    printf("selected PB device:\nname:%s\nid  :%s\n", pbname, pbdevid);
+
     for (int i = 0; i < soundio_output_device_count(soundio); i++)
     {
         io_pb_device = NULL;
         struct SoundIoDevice* device = soundio_get_output_device(soundio, i);
         if (strcmp(device->id, pbdevid) == 0 
 #ifdef _WIN32_
-            && device->is_raw == pbrawdev
+            && device->is_raw == true
 #endif
             )
         {
@@ -556,14 +585,9 @@ int io_init_sound(char *pbname, char *capname)
         return 0;
     }
 
-    // raw devices: 16bit LE, shared devices float
-    if (pbrawdev)
-        outstream->format = SoundIoFormatS16NE;
-    else
-        outstream->format = SoundIoFormatFloat32NE;
-
+    outstream->format = SoundIoFormatS16NE;
     outstream->sample_rate = caprate;
-    outstream->software_latency = 1.0;
+    outstream->software_latency = 0.0;
     outstream->write_callback = write_callback;
     outstream->underflow_callback = underflow_callback;
     outstream->userdata = NULL;
@@ -579,9 +603,7 @@ int io_init_sound(char *pbname, char *capname)
     }
     init_audio_result |= 1;
 
-    printf("selected PLAYBACK device:\nname:%s\nid  :%s\n", pbname, pbdevid);
-    printf("physical capture rate:%d, logical capture rate:%d\n", caprate, caprate);
-    printf("format: %s\n\n", soundio_format_string(outstream->format));
+    printf("==== Audio init finished: %d ====\n", init_audio_result);
     
 	return init_audio_result;
 }
