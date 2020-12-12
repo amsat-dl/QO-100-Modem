@@ -107,8 +107,8 @@
             this.bt_resetmodem = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.vu_cap = new KmProgressBar();
-            this.vu_pb = new KmProgressBar();
+            this.vu_cap = new oscardata.KmProgressBar();
+            this.vu_pb = new oscardata.KmProgressBar();
             this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
             this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -135,10 +135,10 @@
             this.cb_speed = new System.Windows.Forms.ComboBox();
             this.label_speed = new System.Windows.Forms.Label();
             this.timer_searchmodem = new System.Windows.Forms.Timer(this.components);
-            this.progressBar_fifo = new KmProgressBar();
+            this.progressBar_fifo = new oscardata.KmProgressBar();
             this.label_fifo = new System.Windows.Forms.Label();
             this.bt_blockinfo = new System.Windows.Forms.Button();
-            this.progressBar_capfifo = new KmProgressBar();
+            this.progressBar_capfifo = new oscardata.KmProgressBar();
             this.label_capfifo = new System.Windows.Forms.Label();
             this.lb_rxsignal = new System.Windows.Forms.Label();
             this.lb_rxsync = new System.Windows.Forms.Label();
@@ -1485,7 +1485,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "QO-100 NB Transponder HS Multimedia Modem AMSAT-DL V0.45 by DJ0ABR";
+            this.Text = "QO-100 NB Transponder HS Multimedia Modem AMSAT-DL V0.50 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
