@@ -36,7 +36,6 @@
 
 #include "hsmodem.h"
 
-void toGR_sendData(uint8_t* data, int type, int status);
 void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
 void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
 void startModem();
@@ -89,6 +88,8 @@ int codec = 1;  // 0=opus, 1=codec2
 
 int init_audio_result = 0;
 int init_voice_result = 0;
+
+int safemode = 0;
 
 int main(int argc, char* argv[])
 {
@@ -300,13 +301,16 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         * 3 ... announcement on / off, duration
         * 4 ... DV loudspeaker volume
         * 5 ... DV mic volume
-        * 6..9 ... unused
+        * 6 ... safe mode number
+        * 7..9 ... unused
         * 10 .. 109 ... PB device name
         * 110 .. 209 ... CAP device name
         */
 
         //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
         io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char *)(pdata + 10), (char *)(pdata + 110));
+
+        safemode = pdata[6];
 
         char rxip[20];
         strcpy(rxip, inet_ntoa(rxsock->sin_addr));
@@ -474,12 +478,13 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         closeAllandTerminate();
     }
 
+    // here we are with payload data to be sent via the modulator
+
     if (len != (PAYLOADLEN + 2))
     {
         printf("data from app: wrong length:%d (should be %d)\n", len - 2, PAYLOADLEN);
         return;
     }
-
 
     //if (getSending() == 1) return;   // already sending (Array sending)
 
@@ -493,9 +498,10 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         // and bits: symbols * bitsPerSymbol
         // and bytes/second: bits/8 = (caprate/txinterpolfactor) * bitsPerSymbol / 8
         // one frame has 258 bytes, so we need for 6s: 6* ((caprate/txinterpolfactor) * bitsPerSymbol / 8) /258 + 1 frames
+        toGR_sendData(pdata + 2, type, minfo,0);
         int numframespreamble = 6 * ((caprate / txinterpolfactor) * bitsPerSymbol / 8) / 258 + 1;
         for (int i = 0; i < numframespreamble; i++)
-            toGR_sendData(pdata + 2, type, minfo);
+            toGR_sendData(pdata + 2, type, minfo,1);
     }
     else if ((len - 2) < PAYLOADLEN)
     {
@@ -503,18 +509,41 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         uint8_t payload[PAYLOADLEN];
         memset(payload, 0, PAYLOADLEN);
         memcpy(payload, pdata + 2, len - 2);
-        toGR_sendData(payload, type, minfo);
+        toGR_sendData(payload, type, minfo,0);
+        if (safemode > 0)
+        {
+            for (int sm = 0; sm < safemode; sm++)
+                toGR_sendData(payload, type, minfo, 1);
+        }
+        if (minfo == 2)
+        {
+            // repeat last frame
+            for (int rl = 0; rl < (10 - safemode); rl++)
+                toGR_sendData(payload, type, minfo, 1);
+        }
     }
     else
     {
-        toGR_sendData(pdata + 2, type, minfo);
+        toGR_sendData(pdata + 2, type, minfo,0);
+
+        if (safemode > 0)
+        {
+            for(int sm=0; sm < safemode; sm++)
+                toGR_sendData(pdata + 2, type, minfo, 1);
+        }
+        if (minfo == 2)
+        {
+            // repeat last frame
+            for(int rl = 0; rl < (10-safemode); rl ++)
+                toGR_sendData(pdata + 2, type, minfo, 1);
+        }
     }
 }
 
-void toGR_sendData(uint8_t* data, int type, int status)
+void toGR_sendData(uint8_t* data, int type, int status, int repeat)
 {
     int len = 0;
-    uint8_t* txdata = Pack(data, type, status, &len);
+    uint8_t* txdata = Pack(data, type, status, &len, repeat);
 
     //showbytestring((char *)"BERtx: ", txdata, len);
 

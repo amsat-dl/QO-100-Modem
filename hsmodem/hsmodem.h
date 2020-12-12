@@ -88,7 +88,7 @@ enum _VOICEMODES_ {
 };
 
 void init_packer();
-uint8_t* Pack(uint8_t* payload, int type, int status, int* plen);
+uint8_t* Pack(uint8_t* payload, int type, int status, int* plen, int repeat);
 uint8_t* unpack_data(uint8_t* rxd, int len);
 
 void convertBytesToSyms_QPSK(uint8_t* bytes, uint8_t* syms, int bytenum);
@@ -142,7 +142,7 @@ void sendAnnouncement();
 void sleep_ms(int ms);
 int getus();
 void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
-void toGR_sendData(uint8_t* data, int type, int status);
+void toGR_sendData(uint8_t* data, int type, int status, int repeat);
 
 void modulator(uint8_t sym_in);
 int io_pb_fifo_usedBlocks();
@@ -213,6 +213,7 @@ extern int ann_running;
 extern int transmissions;
 extern int linespeed;
 extern uint8_t maxLevel;
+extern uint8_t maxTXLevel;
 extern int VoiceAudioMode;
 extern int opusbitrate;
 extern int init_audio_result;
@@ -227,6 +228,7 @@ extern float softwareMICvolume;
 extern float softwareLSvolume;
 extern int physcaprate;
 extern int restart_modems;
+extern int safemode;
 
 #ifdef _LINUX_
 int isRunning(char* prgname);

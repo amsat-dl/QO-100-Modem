@@ -400,7 +400,6 @@ namespace oscardata
         // RX timer
         int rxstat = 0;
         int speed;
-        int maxlevel = 0;
         private void timer_udprx_Tick(object sender, EventArgs e)
         {
             while (true)
@@ -418,11 +417,11 @@ namespace oscardata
                 speed = rxd[5];
                 speed <<= 8;
                 speed += rxd[6];
-                maxlevel = rxd[7];
+                int dummy3 = rxd[7];
                 int dummy4 = rxd[8];
                 int dummy5 = rxd[9];
 
-                rxbytecounter += statics.UdpBlocklen;
+                rxbytecounter = statics.UdpBlocklen * rxfrmnum;
 
                 Byte[] rxdata = new byte[rxd.Length - 10];
                 Array.Copy(rxd, 10, rxdata, 0, rxd.Length - 10);
@@ -581,6 +580,32 @@ namespace oscardata
             // Show RX Status LEDs
             if (statics.RXlevelDetected == 1) pb_rxsignal.BackgroundImage = Resources.greenmarker; else pb_rxsignal.BackgroundImage = Resources.redmarker;
             if (statics.RXinSync == 1 && statics.RXlevelDetected == 1) pb_rxsync.BackgroundImage = Resources.greenmarker; else pb_rxsync.BackgroundImage = Resources.redmarker;
+
+            // update rx,tx level progress bar
+            int factor = 1;
+            int addf = 80;
+            double vl100 = (100 / addf) + Math.Log10(100 + factor);
+            double vl = ((double)statics.maxRXlevel / addf) + Math.Log10((double)statics.maxRXlevel + factor);
+            vl = vl * 100 / vl100;
+            if (vl > 99) vl = 99;
+            if (vl < 1) vl = 1;
+            vu_cap.Value = (int)vl;
+            if (vl < 20 || vl > 85)
+                vu_cap.ForeColor = Color.Red;
+            else
+                vu_cap.ForeColor = Color.Yellow;
+
+            addf = 80;
+            vl = ((double)statics.maxTXlevel / addf) + Math.Log10((double)statics.maxTXlevel + factor);
+            vl100 = (100 / addf) + Math.Log10(100 + factor);
+            vl = vl * 100 / vl100;
+            if (vl > 99) vl = 99;
+            if (vl < 1) vl = 1;
+            vu_pb.Value = (int)vl;
+            if(vl <20 || vl > 85)
+                vu_pb.ForeColor = Color.Red;
+            else
+                vu_pb.ForeColor = Color.Yellow;
         }
 
         private void panel_constel_Paint(object sender, PaintEventArgs e)
@@ -602,7 +627,7 @@ namespace oscardata
         static Brush brgreen = new SolidBrush(Color.FromArgb(255, (byte)240, (byte)255, (byte)240));
         static Brush brgray = new SolidBrush(Color.FromArgb(255, (byte)220, (byte)220, (byte)220));
         static Pen pen = new Pen(Brushes.Black);
-        static Pen penblue = new Pen(Brushes.Blue, 2);
+        static Pen penblue = new Pen(Brushes.Blue, 1);
         static Pen pengrey = new Pen(brgray, 1);
         Font fnt = new Font("Verdana", 8.0f);
         Font smallfnt = new Font("Verdana", 6.0f);
@@ -673,12 +698,14 @@ namespace oscardata
             for (int i = 0; i < maxxval; i++)
             {
                 UInt16 u = 0;
-                if (i >= 1 && i < maxxval - 1)
-                    u = (UInt16)((su[i - 1] + su[i] + su[i + 1]) / 3);
+                if (i >= 2 && i < maxxval - 2)
+                    u = (UInt16)((su[i - 2] + su[i - 1] + su[i] + su[i + 1] + su[i + 2]) / 5);
                 else
                     u = su[i];
 
-                u *= 3;
+                if (i < 3) u = 0;
+
+                u *= 10;
                 gp.AddLine(GetFFTPos(i, lastu), GetFFTPos(i + 1, u));
                 lastu = u;
             }
@@ -698,7 +725,7 @@ namespace oscardata
                 dam[0, i] = v[i];
         }
 
-        readonly static int meansize = 20;
+        readonly static int meansize = 6;//0;
         readonly static int maxxval = (statics.real_datarate / 10) * 6 / 10;
         readonly int maxyval = 3000;
 
@@ -1154,7 +1181,8 @@ namespace oscardata
          * 3 ... announcement on/off, duration
          * 4 ... DV loudspeaker volume
          * 5 ... DV mic volume
-         * 6..9 ... unused
+         * 6 ... safe mode
+         * 7..9 ... unused
          * 10 .. 109 ... PB device name
          * 110 .. 209 ... CAP device name
          * 
@@ -1162,6 +1190,10 @@ namespace oscardata
 
         private void search_modem()
         {
+            Byte safemode = 0; //number of frame repeats
+            if (cb_safemode.Text.Contains("medium")) safemode = 2;
+            else if (cb_safemode.Text.Contains("high")) safemode = 4;
+
             Byte[] txb = new byte[210];
             txb[0] = 0x3c;  // ID of this message
             txb[1] = (Byte)tb_PBvol.Value;
@@ -1169,7 +1201,7 @@ namespace oscardata
             txb[3] = (Byte)cb_announcement.Items.IndexOf(cb_announcement.Text);
             txb[4] = (Byte)tb_loadspeaker.Value;
             txb[5] = (Byte)tb_mic.Value;
-            txb[6] = (Byte)0;   // unused
+            txb[6] = safemode;
             txb[7] = (Byte)0;   // unused
             txb[8] = (Byte)0;   // unused
             txb[9] = (Byte)0;   // unused

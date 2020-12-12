@@ -276,7 +276,7 @@ void read_callback(struct SoundIoInStream* instream, int frame_count_min, int fr
             }
         }
         //printf("%d into fifo\n", frame_count);
-        // needs to sleep or it will not work correctly, no idea why
+        // needs to sleep or it will not work correctly on Windows, no idea why
         sleep_ms(1);
 
         //measure_speed_bps(frame_count);
@@ -298,6 +298,35 @@ void overflow_callback(struct SoundIoInStream* instream)
 {
     static int count = 0;
     printf("overflow %d\n", ++count);
+}
+
+#define MTXCHECK 48000
+void getTXMax(float fv)
+{
+    static float farr[MTXCHECK];
+    static int idx = 0;
+    static int f = 1;
+
+    if (f)
+    {
+        f = 0;
+        for (int i = 0; i < MTXCHECK; i++)
+            farr[i] = 1;
+    }
+
+    farr[idx] = fv;
+    idx++;
+    if (idx == MTXCHECK)
+    {
+        idx = 0;
+        float max = 0;
+        for (int i = 0; i < MTXCHECK; i++)
+        {
+            if (farr[i] > max) max = farr[i];
+        }
+        maxTXLevel = (uint8_t)(max * 100);
+        //printf("TX max: %10.6f\n", max);
+    }
 }
 
 // #define SINEWAVETEST
@@ -354,6 +383,7 @@ static void write_callback(struct SoundIoOutStream* outstream, int frame_count_m
             for (int channel = 0; channel < layout->channel_count; channel += 1) 
             {
                 float ftx = f[frame] * softwarePBvolume;
+                getTXMax(ftx);
                 if (pbrawdev == false)
                 {
 #ifdef SINEWAVETEST

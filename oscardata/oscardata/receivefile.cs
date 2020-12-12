@@ -24,11 +24,11 @@
 * =========================
 * 1) file header is received, get filename and file ID (which is the CRC16 over the complete file contents)
 * 2) is this file already existing ? yes-> 3)
-* 3) this file does not exist -> 4)
+*    this file does not exist -> 4)
 * 
 * 3) file with this name and ID exists is already, cancel reception, show file
 * 
-* 4) file dows not exist, receive the blocks
+* 4) file doews not exist, receive the blocks
 * 5) a block is missing -> find a previous block-file with this name+ID. If exists, take the block from this file
 * 6) reception complete, the files is OK -> save the file, delete a block file
 * 7) reception complete, the files is incomplete -> save the block file for late use
@@ -189,6 +189,8 @@ namespace oscardata
             if (!autoRXnum)
                 blockidx = rxfrmnum;
 
+            Console.WriteLine("minfo:" + minfo + " framenum:" + rxfrmnum + " blockidx:" + blockidx);
+
             Array.Copy(rxd, 10, rxdata, 0, rxd.Length - 10);
             return true;
         }
@@ -269,7 +271,10 @@ namespace oscardata
 
         public bool blockstat(int[] result)
         {
+            // return if no blocks received
             if (blockidx == 0) return false;
+
+            // count the number of good blocks
             int ok = 0;
             for (int i = 0; i <= blockidx; i++)
             {
@@ -278,6 +283,7 @@ namespace oscardata
             result[0] = blockidx+1; // +1 because we start with block 0
             result[1] = ok;
 
+            // store in lastblockvalid for later evaluation for status display on the screen
             Array.Copy(blockvalid, lastblockvalid, blockvalid.Length);
             lastblockidx = blockidx;
 
@@ -385,10 +391,12 @@ namespace oscardata
 
             if (autoRXnum)
             {
+                // for compatibility with old implementation which did not send a block number
                 blockidx++;
                 Console.WriteLine("blockidx: do auto increment " + blockidx);
             }
 
+            // insert the received payload into the block buffer and set this block's status to "valid"
             for (int i = 0; i < rxdata.Length; i++)
                 blockbuf[blockidx, i] = rxdata[i];
 

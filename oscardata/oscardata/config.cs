@@ -76,6 +76,8 @@ namespace oscardata
         public static int initVoiceStatus;
         public static int RXlevelDetected = 0;
         public static int RXinSync = 0;
+        public static int maxRXlevel = 0;
+        public static int maxTXlevel = 0;
 
 
         public static String[] getOwnIPs()

@@ -165,7 +165,7 @@ void sendCodecToModulator(uint8_t *pdata, int len)
         if (vdidx == PAYLOADLEN)
         {
             vdidx = 0;
-            toGR_sendData(payload, 6, 1);   // 6 ... voice data, 1 ... valid voice data
+            toGR_sendData(payload, 6, 1 ,0);   // 6 ... voice data, 1 ... valid voice data
         }
 
         while (1)
@@ -179,7 +179,7 @@ void sendCodecToModulator(uint8_t *pdata, int len)
                 // send a dummy frame, a frame with 0 voice data
                 uint8_t dummy[PAYLOADLEN];
                 memset(dummy, 0, PAYLOADLEN);
-                toGR_sendData(dummy, 6, 0);
+                toGR_sendData(dummy, 6, 0, 0);
             }
             else
                 break;

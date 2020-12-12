@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>oscardata</RootNamespace>
     <AssemblyName>oscardata</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -71,6 +71,9 @@
       <DependentUpon>Form2_showtext.cs</DependentUpon>
     </Compile>
     <Compile Include="imagehandler.cs" />
+    <Compile Include="KmProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="receivefile.cs" />

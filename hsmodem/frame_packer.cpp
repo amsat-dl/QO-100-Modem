@@ -89,24 +89,28 @@ void init_packer()
 // the payload has a size of PAYLOADLEN
 // type ... inserted in the "frame type information" field
 // status ... specifies first/last frame of a data stream
-uint8_t *Pack(uint8_t *payload, int type, int status, int *plen) 
+// repeat ... 0=normal frame, 1=repeated frame (do not increment frame counter)
+uint8_t *Pack(uint8_t *payload, int type, int status, int *plen, int repeat) 
 {
     FRAME frame;    // raw frame without fec 
     
     // polulate the raw frame
     
     // make the frame counter
-    if(status == 0)
-        framecounter = 0;   // first block of a stream
-    else
+    if(repeat == 0 || type == 1) // 1=BER test
         framecounter++;
-    
+
+    if (status == 0)
+        framecounter = 0;   // start of file
+
     // insert frame counter and status bits
     frame.counter_LSB = framecounter & 0xff;
     int framecnt_MSB = (framecounter >> 8) & 0x03;  // Bit 8+9 of framecounter
     frame.status = framecnt_MSB << 6;
     frame.status += ((status & 0x03)<<4);
     frame.status += (type & 0x0f);
+
+    //printf("type:%d stat:%d frmnum:%d fifo:%d\n", type, status, framecounter, io_pb_fifo_freespace(0));
     
     // insert the payload
     memcpy(frame.payload, payload, PAYLOADLEN);
@@ -344,8 +348,8 @@ uint8_t *getPayload(uint8_t *rxb)
     payload[4] = rx_status;                 // frame lost information
     payload[5] = speed >> 8;                // measured line speed
     payload[6] = speed;
-    payload[7] = maxLevel;                  // actual max level on sound capture in %
-    payload[8] = 0;                         // free for later use
+    payload[7] = 0;                         // free for later use
+    payload[8] = 0;                         
     payload[9] = 0;
     
     //printf("Frame no.: %d, type:%d, minfo:%d\n",framenumrx,payload[0],payload[3]);

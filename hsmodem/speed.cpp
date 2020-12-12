@@ -132,8 +132,8 @@ void measure_speed_syms(int len)
     speed = meanval((int)dspd) * bitsPerSymbol;
     
     // here we have number of elements after 1s
-    printf("%d sym/s\n",speed);
-    
+    //printf("%d sym/s\n",speed);
+    // do NOT uncomment this function for RX, it is used to measure the speed for the GUI    
     elems=0;
     lasttim = tim;
 }
@@ -160,7 +160,7 @@ void measure_speed_bps(int len)
     speed = meanvalbps((int)dspd);
 
     // here we have number of elements after 1s
-    printf(" ======================= %d bit/s\n", speed);
+    //printf(" ======================= %d bit/s\n", speed);
 
     elems = 0;
     lasttim = tim;

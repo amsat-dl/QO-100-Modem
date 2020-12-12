@@ -97,6 +97,9 @@
             this.label11 = new System.Windows.Forms.Label();
             this.tabPage_setup = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.cb_safemode = new System.Windows.Forms.ComboBox();
             this.cb_language = new System.Windows.Forms.ComboBox();
             this.cb_autostart = new System.Windows.Forms.CheckBox();
             this.bt_shutdown = new System.Windows.Forms.Button();
@@ -104,6 +107,8 @@
             this.bt_resetmodem = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.vu_cap = new KmProgressBar();
+            this.vu_pb = new KmProgressBar();
             this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
             this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -130,10 +135,10 @@
             this.cb_speed = new System.Windows.Forms.ComboBox();
             this.label_speed = new System.Windows.Forms.Label();
             this.timer_searchmodem = new System.Windows.Forms.Timer(this.components);
-            this.progressBar_fifo = new System.Windows.Forms.ProgressBar();
+            this.progressBar_fifo = new KmProgressBar();
             this.label_fifo = new System.Windows.Forms.Label();
             this.bt_blockinfo = new System.Windows.Forms.Button();
-            this.progressBar_capfifo = new System.Windows.Forms.ProgressBar();
+            this.progressBar_capfifo = new KmProgressBar();
             this.label_capfifo = new System.Windows.Forms.Label();
             this.lb_rxsignal = new System.Windows.Forms.Label();
             this.lb_rxsync = new System.Windows.Forms.Label();
@@ -223,7 +228,7 @@
             // timer_qpsk
             // 
             this.timer_qpsk.Enabled = true;
-            this.timer_qpsk.Interval = 500;
+            this.timer_qpsk.Interval = 200;
             this.timer_qpsk.Tick += new System.EventHandler(this.timer_qpsk_Tick);
             // 
             // panel_txspectrum
@@ -926,6 +931,9 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.label13);
+            this.groupBox4.Controls.Add(this.label12);
+            this.groupBox4.Controls.Add(this.cb_safemode);
             this.groupBox4.Controls.Add(this.cb_language);
             this.groupBox4.Controls.Add(this.cb_autostart);
             this.groupBox4.Controls.Add(this.bt_shutdown);
@@ -939,13 +947,44 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Maintenance";
             // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(240, 78);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(70, 13);
+            this.label13.TabIndex = 27;
+            this.label13.Text = "data security:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(253, 23);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(54, 13);
+            this.label12.TabIndex = 26;
+            this.label12.Text = "language:";
+            // 
+            // cb_safemode
+            // 
+            this.cb_safemode.FormattingEnabled = true;
+            this.cb_safemode.Items.AddRange(new object[] {
+            "off (fast)",
+            "medium",
+            "high (slow)"});
+            this.cb_safemode.Location = new System.Drawing.Point(326, 75);
+            this.cb_safemode.Name = "cb_safemode";
+            this.cb_safemode.Size = new System.Drawing.Size(110, 21);
+            this.cb_safemode.TabIndex = 25;
+            this.cb_safemode.Text = "off";
+            // 
             // cb_language
             // 
             this.cb_language.FormattingEnabled = true;
             this.cb_language.Items.AddRange(new object[] {
             "English",
             "German/Deutsch"});
-            this.cb_language.Location = new System.Drawing.Point(207, 19);
+            this.cb_language.Location = new System.Drawing.Point(326, 19);
             this.cb_language.Name = "cb_language";
             this.cb_language.Size = new System.Drawing.Size(110, 21);
             this.cb_language.TabIndex = 24;
@@ -989,7 +1028,7 @@
             // 
             // bt_resetmodem
             // 
-            this.bt_resetmodem.Location = new System.Drawing.Point(356, 82);
+            this.bt_resetmodem.Location = new System.Drawing.Point(529, 92);
             this.bt_resetmodem.Name = "bt_resetmodem";
             this.bt_resetmodem.Size = new System.Drawing.Size(117, 23);
             this.bt_resetmodem.TabIndex = 6;
@@ -1012,6 +1051,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.vu_cap);
+            this.groupBox3.Controls.Add(this.vu_pb);
             this.groupBox3.Controls.Add(this.pb_audioCAPstatus);
             this.groupBox3.Controls.Add(this.pb_audioPBstatus);
             this.groupBox3.Controls.Add(this.label6);
@@ -1029,11 +1070,25 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Transceiver Audio";
             // 
+            // vu_cap
+            // 
+            this.vu_cap.Location = new System.Drawing.Point(479, 87);
+            this.vu_cap.Name = "vu_cap";
+            this.vu_cap.Size = new System.Drawing.Size(100, 10);
+            this.vu_cap.TabIndex = 20;
+            // 
+            // vu_pb
+            // 
+            this.vu_pb.Location = new System.Drawing.Point(479, 45);
+            this.vu_pb.Name = "vu_pb";
+            this.vu_pb.Size = new System.Drawing.Size(100, 10);
+            this.vu_pb.TabIndex = 19;
+            // 
             // pb_audioCAPstatus
             // 
             this.pb_audioCAPstatus.BackgroundImage = global::oscardata.Properties.Resources.ok;
             this.pb_audioCAPstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 52);
+            this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 63);
             this.pb_audioCAPstatus.Name = "pb_audioCAPstatus";
             this.pb_audioCAPstatus.Size = new System.Drawing.Size(21, 21);
             this.pb_audioCAPstatus.TabIndex = 18;
@@ -1052,7 +1107,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(428, 54);
+            this.label6.Location = new System.Drawing.Point(428, 65);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(45, 13);
             this.label6.TabIndex = 16;
@@ -1070,9 +1125,10 @@
             // tb_CAPvol
             // 
             this.tb_CAPvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.tb_CAPvol.Location = new System.Drawing.Point(479, 50);
+            this.tb_CAPvol.Location = new System.Drawing.Point(479, 61);
             this.tb_CAPvol.Maximum = 100;
             this.tb_CAPvol.MaximumSize = new System.Drawing.Size(0, 24);
+            this.tb_CAPvol.Minimum = 1;
             this.tb_CAPvol.MinimumSize = new System.Drawing.Size(100, 0);
             this.tb_CAPvol.Name = "tb_CAPvol";
             this.tb_CAPvol.Size = new System.Drawing.Size(100, 24);
@@ -1087,6 +1143,7 @@
             this.tb_PBvol.Location = new System.Drawing.Point(479, 19);
             this.tb_PBvol.Maximum = 100;
             this.tb_PBvol.MaximumSize = new System.Drawing.Size(0, 24);
+            this.tb_PBvol.Minimum = 1;
             this.tb_PBvol.MinimumSize = new System.Drawing.Size(100, 0);
             this.tb_PBvol.Name = "tb_PBvol";
             this.tb_PBvol.Size = new System.Drawing.Size(100, 24);
@@ -1116,7 +1173,7 @@
             // cb_audioCAP
             // 
             this.cb_audioCAP.FormattingEnabled = true;
-            this.cb_audioCAP.Location = new System.Drawing.Point(138, 52);
+            this.cb_audioCAP.Location = new System.Drawing.Point(138, 63);
             this.cb_audioCAP.Name = "cb_audioCAP";
             this.cb_audioCAP.Size = new System.Drawing.Size(230, 21);
             this.cb_audioCAP.TabIndex = 9;
@@ -1125,7 +1182,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 56);
+            this.label4.Location = new System.Drawing.Point(12, 67);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(112, 13);
             this.label4.TabIndex = 10;
@@ -1538,7 +1595,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TrackBar tb_CAPvol;
-        private System.Windows.Forms.ProgressBar progressBar_fifo;
+        private KmProgressBar progressBar_fifo;
         private System.Windows.Forms.Label label_fifo;
         private System.Windows.Forms.CheckBox cb_autostart;
         private System.Windows.Forms.TextBox textBox5;
@@ -1579,13 +1636,18 @@
         private System.Windows.Forms.RadioButton rb_codec2;
         private System.Windows.Forms.CheckBox cb_digitalVoiceRXonly;
         private System.Windows.Forms.PictureBox pb_voice;
-        private System.Windows.Forms.ProgressBar progressBar_capfifo;
+        private KmProgressBar progressBar_capfifo;
         private System.Windows.Forms.Label label_capfifo;
         private System.Windows.Forms.PictureBox pb_rxsignal;
         private System.Windows.Forms.Label lb_rxsignal;
         private System.Windows.Forms.Label lb_rxsync;
         private System.Windows.Forms.PictureBox pb_rxsync;
         private System.Windows.Forms.ComboBox cb_language;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.ComboBox cb_safemode;
+        private KmProgressBar vu_cap;
+        private KmProgressBar vu_pb;
     }
 }
 

@@ -199,7 +199,7 @@ void modulator(uint8_t sym_in)
         {
             fs = io_pb_fifo_freespace(0);
             // wait until there is space in fifo
-            if(fs) break;
+            if(fs > 20000) break;
             sleep_ms(10);
         }
         
@@ -229,7 +229,8 @@ unsigned int m_st           = 7;       // filter delay (symbols)
 float        beta_st        = beta_excessBW;//0.30f;   // filter excess bandwidth factor
 float        bandwidth_st   = 0.9f;  // loop filter bandwidth
 
-uint8_t maxLevel = 0; // maximum level over the last x samples in %
+uint8_t maxLevel = 0;   // maximum RXlevel over the last x samples in %
+uint8_t maxTXLevel = 0; // maximum TXlevel over the last x samples in %
 
 void init_demodulator()
 {
@@ -282,7 +283,7 @@ void make_FFTdata(float f)
         uint8_t txpl[10000];
         if (fftlen > (10000 * 2 + 1))
         {
-            printf("GRdata_FFTdata: txpl too small !!!\n");
+            printf("FFTdata: txpl too small !!!\n");
             return;
         }
 
@@ -300,6 +301,9 @@ void make_FFTdata(float f)
         txpl[bidx++] = rxlevel_deteced; // RX level present
         txpl[bidx++] = rx_in_sync;
 
+        txpl[bidx++] = maxLevel;                  // actual max level on sound capture in %
+        txpl[bidx++] = maxTXLevel;           // actual max level on sound playback in %
+
         for (int i = 0; i < fftlen; i++)
         {
             txpl[bidx++] = fft[i] >> 8;
@@ -309,7 +313,7 @@ void make_FFTdata(float f)
     }
 }
 
-#define MCHECK 1000
+#define MCHECK 48000
 void getMax(float fv)
 {
     static float farr[MCHECK];
@@ -334,7 +338,7 @@ void getMax(float fv)
             if (farr[i] > max) max = farr[i];
         }
         maxLevel = (uint8_t)(max*100);
-        //printf("max: %10.6f\n", max);
+        //printf("RX max: %10.6f\n", max);
     }
 }
 
@@ -414,7 +418,7 @@ static int ccol_idx = 0;
             unsigned int sym_out;   // output symbol
             sym_out = nsym_out;
 
-            //measure_speed_syms(1);
+            measure_speed_syms(1); // do NOT remove, used for speed display in GUI
 
             // try to extract a complete frame
             uint8_t symb = sym_out;

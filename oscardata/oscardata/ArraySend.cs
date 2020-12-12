@@ -17,6 +17,7 @@ namespace oscardata
         public static Byte filestat = statics.noTX;
         static private readonly object busyLock = new object();
         static int timeout_period_ms = 10;
+        static UInt16 fncrc;
 
         // start a timer which is used to send a file from txdata
         public static void ArraySendInit()
@@ -81,7 +82,7 @@ namespace oscardata
 
             // CRC16 over complete file contents is the file ID
             Crc c = new Crc();
-            UInt16 fncrc = c.crc16_messagecalc(data, data.Length);
+            fncrc = c.crc16_messagecalc(data, data.Length);
 
             // create the file header
             // 50 bytes ... Filename (or first 50 chars of the filename)
@@ -133,7 +134,7 @@ namespace oscardata
             return null;
         }
 
-        // runs every 10 ms
+        // runs every 10 ms to send a file
         static void TimerTick(object stateInfo)
         {
             // check if we need to send something
@@ -157,7 +158,7 @@ namespace oscardata
                 }
                 else
                 {
-                    // additional frame follow
+                    // additional frame follows
                     // from txdata send one chunk of length statics.PayloadLen
                     // frame is repeated for preamble by hsmodem.cpp
                     Array.Copy(txdata, 0, txarr, 0, statics.PayloadLen);
@@ -176,9 +177,9 @@ namespace oscardata
                 {
                     // send as the last frame
                     Array.Copy(txdata, txpos, txarr, 0, restlen); // unused byte will be 0
-                    // send the last frame a couple of times
-                    for(int i=0; i<10; i++)
-                        txudp(txarr, txtype, statics.LastFrame);
+
+                    // send the last frame a couple of times (see hsmodem.cpp)
+                    txudp(txarr, txtype, statics.LastFrame);
                     setSending(false);  // transmission complete
                 }
                 else
