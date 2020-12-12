@@ -13,7 +13,7 @@ echo
 echo "Install required packages and libraries. Press ENTER ..."
 read
 sudo apt-get update
-sudo apt-get -y install libopus-dev libfftw3-dev libcodec2-dev libsndfile-dev libasound-dev mono-complete pavucontrol git g++ build-essential
+sudo apt-get -y install libopus-dev libfftw3-dev libcodec2-dev libsndfile-dev libasound-dev mono-complete pavucontrol git g++ build-essential libsoundio-dev
 echo
 echo "Download hsmodem sources from github. Press ENTER ... "
 read
