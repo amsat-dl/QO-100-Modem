@@ -175,7 +175,7 @@ namespace oscardata
         }
 
         static int panelw = 75, panelh = 75;
-        static int maxdrawanz = 160;
+        static int maxdrawanz = 350;//160;
         static int drawanz = 0;
         static Bitmap bm;
         static void drawBitmap(Int32 re, Int32 im)

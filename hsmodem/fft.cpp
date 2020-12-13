@@ -128,7 +128,7 @@ uint16_t *make_waterfall(float fre, int *retlen)
 
             // check if signal detected or not
             if (idiff > 100) sig = 0;
-            if (idiff < 20) sig = 1;
+            if (idiff < 30) sig = 1;
 
             rxlevel_deteced = sig;
 

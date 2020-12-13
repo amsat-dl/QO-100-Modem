@@ -137,7 +137,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAABw
-        FwAAAk1TRnQBSQFMAgEBDQEAAUgBAgFIAQIBEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
+        FwAAAk1TRnQBSQFMAgEBDQEAAaABAgGgAQIBEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
         AwABQAMAAUADAAEBAQABCAYAARAYAAGAAgABgAMAAoABAAGAAwABgAEAAYABAAKAAgADwAEAAcAB3AHA
         AQAB8AHKAaYBAAEzBQABMwEAATMBAAEzAQACMwIAAxYBAAMcAQADIgEAAykBAANVAQADTQEAA0IBAAM5
         AQABgAF8Af8BAAJQAf8BAAGTAQAB1gEAAf8B7AHMAQABxgHWAe8BAAHWAucBAAGQAakBrQIAAf8BMwMA
@@ -241,11 +241,13 @@
 </value>
   </data>
   <data name="richTextBox1.Text" xml:space="preserve">
-    <value>QO-100 Multimedia High Speed Modem (Linux &amp; Windows)
+    <value>Amsat-DL Multimedia High Speed Modem (Linux &amp; Windows)
 
-(c) DJ0ABR, Kurt Moraw, Germany https://dj0abr.de/
+Author: (c) DJ0ABR, Kurt Moraw, Germany https://dj0abr.de/
+Wiki: https://hsmodem.dj0abr.de/doku.php
+License: GPL V2 or later
 Amsat-DL: https://amsat-dl.org/
-Open Source: https://github.com/dj0abr/SSB_HighSpeed_Modem
+Open Source: https://github.com/amsat-dl
 
 3rd Party, Credits and Licensing:
 

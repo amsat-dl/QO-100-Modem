@@ -429,7 +429,7 @@ static int ccol_idx = 0;
             // we have about 2000 S/s, but this many points would make the GUI slow
             // so we send only every x
             static int ev = 0;
-            if (++ev >= 10)
+            if (++ev >= 5)//10)
             {
                 ev = 0;
                 int32_t re = (int32_t)(syms.real * 16777216.0);

@@ -189,7 +189,7 @@ namespace oscardata
             if (!autoRXnum)
                 blockidx = rxfrmnum;
 
-            Console.WriteLine("minfo:" + minfo + " framenum:" + rxfrmnum + " blockidx:" + blockidx);
+            //Console.WriteLine("minfo:" + minfo + " framenum:" + rxfrmnum + " blockidx:" + blockidx);
 
             Array.Copy(rxd, 10, rxdata, 0, rxd.Length - 10);
             return true;

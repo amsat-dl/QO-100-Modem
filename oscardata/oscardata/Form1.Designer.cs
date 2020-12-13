@@ -33,6 +33,7 @@
             this.timer_udpTX = new System.Windows.Forms.Timer(this.components);
             this.timer_udprx = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStrip_Type = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ts_ip = new System.Windows.Forms.ToolStripStatusLabel();
             this.RXstatus = new System.Windows.Forms.ToolStripStatusLabel();
@@ -107,8 +108,6 @@
             this.bt_resetmodem = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.vu_cap = new oscardata.KmProgressBar();
-            this.vu_pb = new oscardata.KmProgressBar();
             this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
             this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -135,15 +134,17 @@
             this.cb_speed = new System.Windows.Forms.ComboBox();
             this.label_speed = new System.Windows.Forms.Label();
             this.timer_searchmodem = new System.Windows.Forms.Timer(this.components);
-            this.progressBar_fifo = new oscardata.KmProgressBar();
             this.label_fifo = new System.Windows.Forms.Label();
             this.bt_blockinfo = new System.Windows.Forms.Button();
-            this.progressBar_capfifo = new oscardata.KmProgressBar();
             this.label_capfifo = new System.Windows.Forms.Label();
             this.lb_rxsignal = new System.Windows.Forms.Label();
             this.lb_rxsync = new System.Windows.Forms.Label();
             this.pb_rxsync = new System.Windows.Forms.PictureBox();
             this.pb_rxsignal = new System.Windows.Forms.PictureBox();
+            this.progressBar_capfifo = new oscardata.KmProgressBar();
+            this.progressBar_fifo = new oscardata.KmProgressBar();
+            this.vu_cap = new oscardata.KmProgressBar();
+            this.vu_pb = new oscardata.KmProgressBar();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -188,6 +189,7 @@
             // 
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStrip_Type,
             this.toolStripStatusLabel,
             this.ts_ip,
             this.RXstatus});
@@ -196,6 +198,13 @@
             this.statusStrip1.Size = new System.Drawing.Size(1293, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStrip_Type
+            // 
+            this.toolStrip_Type.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Bold);
+            this.toolStrip_Type.ForeColor = System.Drawing.Color.Red;
+            this.toolStrip_Type.Name = "toolStrip_Type";
+            this.toolStrip_Type.Size = new System.Drawing.Size(0, 17);
             // 
             // toolStripStatusLabel
             // 
@@ -1070,20 +1079,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Transceiver Audio";
             // 
-            // vu_cap
-            // 
-            this.vu_cap.Location = new System.Drawing.Point(479, 87);
-            this.vu_cap.Name = "vu_cap";
-            this.vu_cap.Size = new System.Drawing.Size(100, 10);
-            this.vu_cap.TabIndex = 20;
-            // 
-            // vu_pb
-            // 
-            this.vu_pb.Location = new System.Drawing.Point(479, 45);
-            this.vu_pb.Name = "vu_pb";
-            this.vu_pb.Size = new System.Drawing.Size(100, 10);
-            this.vu_pb.TabIndex = 19;
-            // 
             // pb_audioCAPstatus
             // 
             this.pb_audioCAPstatus.BackgroundImage = global::oscardata.Properties.Resources.ok;
@@ -1375,17 +1370,6 @@
             this.timer_searchmodem.Interval = 1000;
             this.timer_searchmodem.Tick += new System.EventHandler(this.timer_searchmodem_Tick);
             // 
-            // progressBar_fifo
-            // 
-            this.progressBar_fifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.progressBar_fifo.Location = new System.Drawing.Point(658, 618);
-            this.progressBar_fifo.Maximum = 20;
-            this.progressBar_fifo.Name = "progressBar_fifo";
-            this.progressBar_fifo.Size = new System.Drawing.Size(304, 18);
-            this.progressBar_fifo.Step = 11;
-            this.progressBar_fifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar_fifo.TabIndex = 13;
-            // 
             // label_fifo
             // 
             this.label_fifo.AutoSize = true;
@@ -1404,16 +1388,6 @@
             this.bt_blockinfo.Text = "Block Info";
             this.bt_blockinfo.UseVisualStyleBackColor = true;
             this.bt_blockinfo.Click += new System.EventHandler(this.bt_blockinfo_Click);
-            // 
-            // progressBar_capfifo
-            // 
-            this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.progressBar_capfifo.Location = new System.Drawing.Point(658, 642);
-            this.progressBar_capfifo.Name = "progressBar_capfifo";
-            this.progressBar_capfifo.Size = new System.Drawing.Size(304, 18);
-            this.progressBar_capfifo.Step = 1;
-            this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar_capfifo.TabIndex = 15;
             // 
             // label_capfifo
             // 
@@ -1462,6 +1436,41 @@
             this.pb_rxsignal.TabIndex = 17;
             this.pb_rxsignal.TabStop = false;
             // 
+            // progressBar_capfifo
+            // 
+            this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.progressBar_capfifo.Location = new System.Drawing.Point(658, 642);
+            this.progressBar_capfifo.Name = "progressBar_capfifo";
+            this.progressBar_capfifo.Size = new System.Drawing.Size(304, 18);
+            this.progressBar_capfifo.Step = 1;
+            this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar_capfifo.TabIndex = 15;
+            // 
+            // progressBar_fifo
+            // 
+            this.progressBar_fifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.progressBar_fifo.Location = new System.Drawing.Point(658, 618);
+            this.progressBar_fifo.Maximum = 20;
+            this.progressBar_fifo.Name = "progressBar_fifo";
+            this.progressBar_fifo.Size = new System.Drawing.Size(304, 18);
+            this.progressBar_fifo.Step = 11;
+            this.progressBar_fifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar_fifo.TabIndex = 13;
+            // 
+            // vu_cap
+            // 
+            this.vu_cap.Location = new System.Drawing.Point(479, 87);
+            this.vu_cap.Name = "vu_cap";
+            this.vu_cap.Size = new System.Drawing.Size(100, 10);
+            this.vu_cap.TabIndex = 20;
+            // 
+            // vu_pb
+            // 
+            this.vu_pb.Location = new System.Drawing.Point(479, 45);
+            this.vu_pb.Name = "vu_pb";
+            this.vu_pb.Size = new System.Drawing.Size(100, 10);
+            this.vu_pb.TabIndex = 19;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1485,7 +1494,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "QO-100 NB Transponder HS Multimedia Modem AMSAT-DL V0.50 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.51 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -1648,6 +1657,7 @@
         private System.Windows.Forms.ComboBox cb_safemode;
         private KmProgressBar vu_cap;
         private KmProgressBar vu_pb;
+        private System.Windows.Forms.ToolStripStatusLabel toolStrip_Type;
     }
 }
 

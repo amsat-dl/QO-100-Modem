@@ -397,6 +397,22 @@ namespace oscardata
             }
         }
 
+        int lasttype = -1;
+        void showType(int rxtype)
+        {
+            if(rxtype != lasttype)
+            {
+                if (rxtype == statics.Image) toolStrip_Type.Text = "RX: IMAGE";
+                if (rxtype == statics.AsciiFile) toolStrip_Type.Text = "RX: TEXT";
+                if (rxtype == statics.HTMLFile) toolStrip_Type.Text = "RX: HTML/Web";
+                if (rxtype == statics.BinaryFile) toolStrip_Type.Text = "RX: BINARY";
+                if (rxtype == statics.BERtest) toolStrip_Type.Text = "RX: BER TEST";
+                if (rxtype == statics.Audio) toolStrip_Type.Text = "RX: DV-Audio";
+                if (rxtype == -1) toolStrip_Type.Text = "no RX";
+                lasttype = rxtype;
+            }
+        }
+
         // RX timer
         int rxstat = 0;
         int speed;
@@ -425,6 +441,8 @@ namespace oscardata
 
                 Byte[] rxdata = new byte[rxd.Length - 10];
                 Array.Copy(rxd, 10, rxdata, 0, rxd.Length - 10);
+
+                showType(rxtype);
 
                 //Console.WriteLine("minfo:" + minfo + " data:" + rxdata[0].ToString("X2") + " " + rxdata[1].ToString("X2"));
 
@@ -578,7 +596,15 @@ namespace oscardata
             if (statics.CAPfifousage > 50) progressBar_capfifo.ForeColor = Color.Red; else progressBar_capfifo.ForeColor = Color.Green;
 
             // Show RX Status LEDs
-            if (statics.RXlevelDetected == 1) pb_rxsignal.BackgroundImage = Resources.greenmarker; else pb_rxsignal.BackgroundImage = Resources.redmarker;
+            if (statics.RXlevelDetected == 1)
+            {
+                pb_rxsignal.BackgroundImage = Resources.greenmarker;
+            }
+            else
+            {
+                pb_rxsignal.BackgroundImage = Resources.redmarker;
+                showType(-1);
+            }
             if (statics.RXinSync == 1 && statics.RXlevelDetected == 1) pb_rxsync.BackgroundImage = Resources.greenmarker; else pb_rxsync.BackgroundImage = Resources.redmarker;
 
             // update rx,tx level progress bar

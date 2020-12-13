@@ -307,11 +307,6 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         * 110 .. 209 ... CAP device name
         */
 
-        //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
-        io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char *)(pdata + 10), (char *)(pdata + 110));
-
-        safemode = pdata[6];
-
         char rxip[20];
         strcpy(rxip, inet_ntoa(rxsock->sin_addr));
 
@@ -336,14 +331,19 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
             if (!strcmp(appIP, rxip))
             {
                 //printf("app (%s) is searching modem. Sending modem IP to the app\n",appIP);
-                restart_modems = 1;
                 // App searches for the modem IP, mirror the received messages
                 // so the app gets an UDP message with this local IP
                 int alen;
                 uint8_t* txdata = io_getAudioDevicelist(&alen);
                 sendUDP(appIP, UdpDataPort_ModemToApp, txdata, alen);
             }
+            else
+                return;
         }
+
+        //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
+        io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char*)(pdata + 10), (char*)(pdata + 110));
+        safemode = pdata[6];
     }
 }
 
@@ -560,16 +560,14 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     uint8_t* pl = unpack_data(pdata, len);
     if (pl != NULL)
     {
-        if (VoiceAudioMode != VOICEMODE_DV_FULLDUPLEX)
-        {
-            // complete frame received
-            // send payload to app
-            uint8_t txpl[PAYLOADLEN + 10 + 1];
-            memcpy(txpl + 1, pl, PAYLOADLEN + 10);
-            txpl[0] = 1;    // type 1: payload data follows
-            sendUDP(appIP, UdpDataPort_ModemToApp, txpl, PAYLOADLEN + 10 + 1);
-        }
-        else
+        // complete frame received
+        // send payload to app
+        uint8_t txpl[PAYLOADLEN + 10 + 1];
+        memcpy(txpl + 1, pl, PAYLOADLEN + 10);
+        txpl[0] = 1;    // type 1: payload data follows
+        sendUDP(appIP, UdpDataPort_ModemToApp, txpl, PAYLOADLEN + 10 + 1);
+
+        if (VoiceAudioMode == VOICEMODE_DV_FULLDUPLEX)
         {
             // send to Codec decoder
             if (*(pl + 3) != 0) // minfo=0 ... just a filler, ignore
