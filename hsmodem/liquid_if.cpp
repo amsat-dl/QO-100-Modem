@@ -49,12 +49,14 @@ void close_dsp()
 
 modulation_scheme getMod()
 {
+    if (bitsPerSymbol == 1)
+        return LIQUID_MODEM_BPSK;
     if(bitsPerSymbol == 2)
         return LIQUID_MODEM_QPSK;
-    else
-    {
+    if (bitsPerSymbol == 3)
         return LIQUID_MODEM_APSK8;
-    }
+
+    return LIQUID_MODEM_QPSK;
 }
 
 // =========== MODULATOR ==================================================
@@ -108,10 +110,10 @@ void init_modulator()
     
     // calculate filter coeffs
     unsigned int h_len_NumFilterCoeefs = 2 * k_SampPerSymb * m_filterDelay_Symbols + 1;
-    float h[1000];
-    if (h_len_NumFilterCoeefs >= 1000)
+    float h[4000];
+    if (h_len_NumFilterCoeefs >= 4000)
     {
-        printf("h in h_len_NumFilterCoeefs too small\n");
+        printf("h in h_len_NumFilterCoeefs too small, need %d\n", h_len_NumFilterCoeefs);
         return;
     }
     liquid_firdes_prototype(    LIQUID_FIRFILT_RRC,
@@ -150,9 +152,12 @@ void sendToModulator(uint8_t *d, int len)
         printf("syms in symanz too small\n");
         return;
     }
-    if(bitsPerSymbol == 2)
+
+    if (bitsPerSymbol == 1)
+        convertBytesToSyms_BPSK(d, syms, len);
+    else if (bitsPerSymbol == 2)
         convertBytesToSyms_QPSK(d, syms, len);
-    else
+    else if (bitsPerSymbol == 3)
         convertBytesToSyms_8PSK(d, syms, len);
 
     for(int i=0; i<symanz; i++)
@@ -175,10 +180,10 @@ void modulator(uint8_t sym_in)
     //printf("TX ================= sample: %f + i%f\n", sample.real, sample.imag);
     
     // interpolate by k_SampPerSymb
-    liquid_float_complex y[100];
-    if (k_SampPerSymb >= 100)
+    liquid_float_complex y[400];
+    if (k_SampPerSymb >= 400)
     {
-        printf("y in k_SampPerSymb too small\n");
+        printf("y in k_SampPerSymb too small, need %d\n", k_SampPerSymb);
         return;
     }
 
@@ -224,7 +229,7 @@ float As_adecim = 60.0f;     // resampling filter stop-band attenuation [dB]
 
 // symtrack parameters
 int          ftype_st       = LIQUID_FIRFILT_RRC;
-unsigned int k_st           = 4;       // samples per symbol
+unsigned int k_st = 4;       // samples per symbol
 unsigned int m_st           = 7;       // filter delay (symbols)
 float        beta_st        = beta_excessBW;//0.30f;   // filter excess bandwidth factor
 float        bandwidth_st   = 0.9f;  // loop filter bandwidth
@@ -342,11 +347,15 @@ void getMax(float fv)
     }
 }
 
+#define CONSTPOINTS 400
 int demodulator()
 {
-static liquid_float_complex ccol[100];
+static liquid_float_complex ccol[500];
 static int ccol_idx = 0;
-    
+static int16_t const_re[CONSTPOINTS];
+static int16_t const_im[CONSTPOINTS];
+static int const_idx = 0;
+
     if(dnnco == NULL) return 0;
     
     // get one received sample
@@ -355,21 +364,19 @@ static int ccol_idx = 0;
     if(ret == 0) return 0;
 
     if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
-    {
         io_ls_write_fifo(f);
-    }
 
     // input volume
     f *= softwareCAPvolume;
 
     getMax(f);
-
-    make_FFTdata(f * 60);
+    make_FFTdata(f * 100);
 
     if (caprate == 44100 && physcaprate == 48000)
     {
         // the sound card capture for a VAC always works with 48000 because
         // a VAC cannot be set to a specific cap rate in shared mode
+        // downsample 48k to 44.1k
         unsigned int num_written = 0;
         liquid_float_complex in;
         liquid_float_complex out;
@@ -380,8 +387,7 @@ static int ccol_idx = 0;
         f = out.real;
     }
     
-    // downconvert into baseband
-    // still at soundcard sample rate
+    // downconvert 1,5kHz into baseband, still at soundcard sample rate
     nco_crcf_step(dnnco);
     
     liquid_float_complex in;
@@ -399,59 +405,46 @@ static int ccol_idx = 0;
     ccol_idx = 0;
     
     // we have rxPreInterpolfactor samples in ccol
-    //printf("sc:%10.6f dn:%10.6f j%10.6f  ", f, c.real, c.imag);
     liquid_float_complex y;
     firdecim_crcf_execute(decim, ccol, &y);
+    // the output of the pre decimator is exactly one sample in y
 
-    unsigned int num_written = 1;
+    unsigned int num_symbols_sync;
+    liquid_float_complex syms;
+    unsigned int nsym_out;   // demodulated output symbol
+    km_symtrack_execute(y, &syms, &num_symbols_sync, &nsym_out);
 
-    for (unsigned int sa = 0; sa < num_written; sa++)
+    if (num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n", num_symbols_sync);
+    if (num_symbols_sync != 0)
     {
-        unsigned int num_symbols_sync;
-        liquid_float_complex syms;
-        unsigned int nsym_out;   // output symbol
-        km_symtrack_execute(y, &syms, &num_symbols_sync, &nsym_out);
+        measure_speed_syms(1); // do NOT remove, used for speed display in GUI
 
-        if (num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n", num_symbols_sync);
-        if (num_symbols_sync != 0)
+        // try to extract a complete frame
+        uint8_t symb = nsym_out;
+        if (bitsPerSymbol == 2) symb ^= (symb >> 1);
+        GRdata_rxdata(&symb, 1, NULL);
+
+        // send the data "as is" to app for Constellation Diagram
+        // collect values until a UDP frame is full
+        const_re[const_idx] = (int16_t)(syms.real * 15000.0f);
+        const_im[const_idx] = (int16_t)(syms.imag * 15000.0f);
+        if (++const_idx >= CONSTPOINTS)
         {
-            unsigned int sym_out;   // output symbol
-            sym_out = nsym_out;
+            uint8_t txpl[CONSTPOINTS * sizeof(int16_t) * 2 + 1];
+            int idx = 0;
+            txpl[idx++] = 5;    // type 5: IQ data follows
 
-            measure_speed_syms(1); // do NOT remove, used for speed display in GUI
-
-            // try to extract a complete frame
-            uint8_t symb = sym_out;
-            if (bitsPerSymbol == 2) symb ^= (symb >> 1);
-            GRdata_rxdata(&symb, 1, NULL);
-
-            // send the data "as is" to app for Constellation Diagram
-            // we have about 2000 S/s, but this many points would make the GUI slow
-            // so we send only every x
-            static int ev = 0;
-            if (++ev >= 5)//10)
+            for (int i = 0; i < CONSTPOINTS; i++)
             {
-                ev = 0;
-                int32_t re = (int32_t)(syms.real * 16777216.0);
-                int32_t im = (int32_t)(syms.imag * 16777216.0);
-                uint8_t txpl[13];
-                int idx = 0;
-                txpl[idx++] = 5;    // type 5: IQ data follows
-                uint32_t sy = 0x3e8;
-                txpl[idx++] = sy >> 24;
-                txpl[idx++] = sy >> 16;
-                txpl[idx++] = sy >> 8;
-                txpl[idx++] = sy;
-                txpl[idx++] = re >> 24;
-                txpl[idx++] = re >> 16;
-                txpl[idx++] = re >> 8;
-                txpl[idx++] = re;
-                txpl[idx++] = im >> 24;
-                txpl[idx++] = im >> 16;
-                txpl[idx++] = im >> 8;
-                txpl[idx++] = im;
-                sendUDP(appIP, UdpDataPort_ModemToApp, txpl, 13);
+                txpl[idx++] = (uint8_t)(const_re[i] >> 8);
+                txpl[idx++] = (uint8_t)(const_re[i]);
+                txpl[idx++] = (uint8_t)(const_im[i] >> 8);
+                txpl[idx++] = (uint8_t)(const_im[i]);
             }
+            
+            sendUDP(appIP, UdpDataPort_ModemToApp, txpl, sizeof(txpl));
+
+            const_idx = 0;
         }
     }
             

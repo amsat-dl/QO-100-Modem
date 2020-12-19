@@ -127,46 +127,30 @@ namespace oscardata
                             statics.RXinSync = b[3];
                             statics.maxRXlevel = b[4];
                             statics.maxTXlevel = b[5];
-                            Byte[] b1 = new byte[b.Length - 4];
-                            Array.Copy(b, 4, b1, 0, b1.Length);
-                            uq_fft.Add(b1);
+                            Byte[] b1 = new byte[b.Length - 6];
+                            Array.Copy(b, 6, b1, 0, b1.Length);
+                            drawFftBitmap(b1);
                         }
 
                         // IQ data
                         if (rxtype == statics.udp_iq)
                         {
-                            //Console.WriteLine("IQ");
-                            for (int i = 0; i < b.Length; i++)
+                            Int16[] re = new Int16[b.Length / 2];
+                            Int16[] im = new Int16[b.Length / 2];
+                            int idx = 0;
+
+                            for (int i = 0; i < b.Length; i+=4)
                             {
-                                // insert new byte in lastb
-                                for (int sh = 12 - 1; sh > 0; sh--)
-                                    lastb[sh] = lastb[sh - 1];
-                                lastb[0] = b[i];
+                                re[idx] = b[i+0];
+                                re[idx] <<= 8;
+                                re[idx] += b[i+1];
 
-                                // test if aligned
-                                Int32 re = 0, im = 0;
-                                if (lastb[0] == 0xe8 && lastb[1] == 3 && lastb[2] == 0 && lastb[3] == 0)
-                                {
-                                    // we are aligned
-                                    re = lastb[7];
-                                    re <<= 8;
-                                    re += lastb[6];
-                                    re <<= 8;
-                                    re += lastb[5];
-                                    re <<= 8;
-                                    re += lastb[4];
-
-                                    im = lastb[11];
-                                    im <<= 8;
-                                    im += lastb[10];
-                                    im <<= 8;
-                                    im += lastb[9];
-                                    im <<= 8;
-                                    im += lastb[8];
-                                }
-
-                                drawBitmap(re, im);
+                                im[idx] = b[i+2];
+                                im[idx] <<= 8;
+                                im[idx] += b[i+3];
+                                idx++;
                             }
+                            drawBitmap(re, im);
                         }
                     }
                 }
@@ -175,36 +159,169 @@ namespace oscardata
         }
 
         static int panelw = 75, panelh = 75;
-        static int maxdrawanz = 350;//160;
-        static int drawanz = 0;
         static Bitmap bm;
-        static void drawBitmap(Int32 re, Int32 im)
+        const int maxsum = 5000;
+        static Int16[] resum = new Int16[maxsum];
+        static Int16[] imsum = new Int16[maxsum];
+        static int sumidx = 0;
+        static SolidBrush bgcol = new SolidBrush(Color.Silver);//FromArgb(255, (byte) 0x40, (byte) 0x00, (byte) 0x00));
+
+        static double scaleiq(int v)
         {
-            if (re == 0 && im == 0) return;
-            if (++drawanz >= maxdrawanz && uq_iq.Count() <= 1)
+            double f = v;
+            f /= 15000.0;
+            // f goes from -1 to +1
+            // scale it to the graphics
+            const int sz = 45;
+            f += 1;
+            f /= 2;
+            f *= sz;
+            f += (panelw-sz)/2;
+            return f;
+        }
+
+        static void drawBitmap(Int16[] re, Int16[] im)
+        {
+            // collect IQ data
+            for (int i = 0; i < re.Length; i++)
             {
-                drawanz = 0;
-                uq_iq.Add(bm);
-                bm = new Bitmap(75, 75);
+                if (sumidx < maxsum)
+                {
+                    resum[sumidx] = re[i];
+                    imsum[sumidx] = im[i];
+                    sumidx++;
+                }
             }
-            
+
+            // check if there is space in bitmap fifo
+            // if the GUI does not process the bitmaps fast enough, just cancel it
+            if (uq_iq.Count() > 2)
+                return;
+
+            // bitmap for drawing the complete picture
+            bm = new Bitmap(panelw, panelh);
+
             using (Graphics gr = Graphics.FromImage(bm))
             {
-                // re and im are in the range of +/- 2^24 (16777216)
-                // scale it to +/- 128
-                double fre = re;
-                double fim = im;
+                // background
+                gr.FillRectangle(bgcol, 0,0, panelw, panelh);
+                // oscilloscope screen
+                gr.DrawImage(new Bitmap(Properties.Resources.screen), 2, 1);
+                // screws at the 4 corners
+                Bitmap screw = new Bitmap(Properties.Resources.schraube);
+                gr.DrawImage(screw, 2, 2);
+                gr.DrawImage(screw, panelw - 2-screw.Width, 2);
+                gr.DrawImage(screw, 2, panelh - 2 - screw.Height);
+                gr.DrawImage(screw, panelw - 2 - screw.Width, panelh - 2 - screw.Height);
 
-                fre = fre * panelw / 2 / 16777216.0;
-                fim = fim * panelh / 2 / 16777216.0;
+                // draw constellation points
+                for (int i = 0; i < sumidx; i++)
+                {
+                    if (resum[i] == 0 || imsum[i] == 0) continue;
+                    double dist = Math.Sqrt((resum[i] * resum[i]) + (imsum[i] * imsum[i]));
+                    if (dist > 22000) continue; // do not draw outside scope
 
-                // scale it to the picture
-                int x = panelw / 2 + (int)fre;
-                int y = panelh / 2 + (int)fim;
+                    double x = scaleiq(resum[i]);
+                    double y = scaleiq(imsum[i]);
 
-                int et = 2;
-                gr.FillEllipse(Brushes.Blue, x - et, y - et, et * 2, et * 2);
+                    double et = 1.6;
+                    x -= et;
+                    y -= et;
+                    double w = et * 2;
+                    double h = et * 2;
+                    gr.FillEllipse(Brushes.Yellow, (int)x, (int)y, (int)w, (int)h);
+                }
             }
+
+            uq_iq.Add(bm);
+            sumidx = 0;
+        }
+
+        static int fftw = 410, ffth = 72;
+        static Bitmap bmskala = new Bitmap(fftw,ffth);
+        static bool bmf = false;
+        static Font fnt = new Font("Verdana", 9.0f);
+        static Font smallfnt = new Font("Verdana", 7.0f);
+        static Pen penyl = new Pen(Brushes.Yellow, 1);
+
+        static void drawFftBitmap(Byte[] b1)
+        {
+            if(!bmf)
+            {
+                // pre-draw background
+                bmf = true;
+                int yl = ffth - 20;
+                int yh = 20;
+                Pen pen = new Pen(Brushes.Navy, 1);
+                Pen pensolid = new Pen(Brushes.Navy, 1);
+                pen.DashPattern = new float[] { 1.0F, 2.0F, 1.0F, 2.0F };
+                Pen penred = new Pen(Brushes.Red, 1);
+
+                using (Graphics gr = Graphics.FromImage(bmskala))
+                {
+                    gr.FillRectangle(bgcol, 0, 0, fftw, ffth);
+                    gr.DrawImage(new Bitmap(Properties.Resources.osci), 0, 0);
+
+                    for (int x = 10; x <= 390; x += 10)
+                        gr.DrawLine(pen, x, yl, x, yh);
+
+                    gr.DrawLine(penred, 150, yl, 150, yh);
+                    gr.DrawLine(pensolid, 20, yl, 20, yh);
+                    gr.DrawLine(pensolid, 280, yl, 280, yh);
+                    gr.DrawLine(pensolid, 360, yl, 360, yh);
+
+                    gr.DrawRectangle(penred, 15, yh, 270, yl-yh);
+
+                    gr.DrawString("200", smallfnt, Brushes.Black, 8, yl);
+                    gr.DrawString("1500", smallfnt, Brushes.Black, 135, yl);
+                    gr.DrawString("2800", smallfnt, Brushes.Black, 265, yl);
+                    gr.DrawString("3600", smallfnt, Brushes.Black, 345, yl);
+
+                    gr.DrawString(statics.langstr[8], fnt, Brushes.Black, 100, 0);
+                }
+
+                bmskala.MakeTransparent(Color.White);
+            }
+
+            // check if there is space in bitmap fifo
+            // if the GUI does not process the bitmaps fast enough, just cancel it
+            if (uq_fft.Count() > 2)
+                return;
+
+            // bitmap for drawing the complete picture
+            bm = new Bitmap(442, 76);
+
+            using (Graphics gr = Graphics.FromImage(bm))
+            {
+                // background
+                gr.FillRectangle(bgcol, 0, 0, bm.Width, bm.Height);
+                // scala
+                gr.DrawImage(bmskala,16,2);
+                // screws at the 4 corners
+                Bitmap screw = new Bitmap(Properties.Resources.schraube);
+                gr.DrawImage(screw, 2, 2);
+                gr.DrawImage(screw, 442 - 2 - screw.Width, 2);
+                gr.DrawImage(screw, 2, 76 - 2 - screw.Height);
+                gr.DrawImage(screw, 442 - 2 - screw.Width, 76 - 2 - screw.Height);
+                // spectrum
+                int lastus = -1;
+                // values
+                for (int i = 0; i < b1.Length-1; i+=2)
+                {
+                    int us = b1[i];
+                    us <<= 8;
+                    us += b1[i + 1];
+                    double fus = 0;
+                    if (us > 0)
+                        fus = 35 * Math.Log10((double)us / 10);
+
+                    us = (int)(fus - 5.0);
+                    if(lastus != -1 && i>0)
+                        gr.DrawLine(penyl, i/2+15, 76-lastus, i/2+1+15, 76-us); // 15 istead of 16 to get it in exact position
+                    lastus = us;
+                }
+            }
+            uq_fft.Add(bm);
         }
 
         static AutoResetEvent autoEvent = new AutoResetEvent(false);
@@ -309,7 +426,6 @@ namespace oscardata
             return varr;
         }
 
-        static Byte[] lastb = new Byte[12];
         public static qpskitem UdpGetIQ()
         {
             if (uq_iq.Count() == 0) return null;
@@ -322,6 +438,13 @@ namespace oscardata
             if (uq_iq.Count() == 0) return null;
 
             return uq_iq.GetBitmap();
+        }
+
+        public static Bitmap UdpFftBitmap()
+        {
+            if (uq_fft.Count() == 0) return null;
+
+            return uq_fft.GetBitmap();
         }
 
         public static bool IQavail()

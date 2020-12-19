@@ -47,7 +47,6 @@
             this.rtb = new System.Windows.Forms.RichTextBox();
             this.tabPage_image = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.Panel();
-            this.label_nextimage = new System.Windows.Forms.Label();
             this.cb_loop = new System.Windows.Forms.CheckBox();
             this.bt_rximages = new System.Windows.Forms.Button();
             this.button_loadimage = new System.Windows.Forms.Button();
@@ -119,10 +118,14 @@
             this.cb_audioCAP = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tb_recintro = new System.Windows.Forms.TextBox();
+            this.bt_astop = new System.Windows.Forms.Button();
+            this.bt_aplay = new System.Windows.Forms.Button();
+            this.bt_arecord = new System.Windows.Forms.Button();
+            this.cb_sendIntro = new System.Windows.Forms.CheckBox();
             this.cb_stampinfo = new System.Windows.Forms.CheckBox();
             this.tb_info = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.textBox5 = new System.Windows.Forms.TextBox();
             this.cb_announcement = new System.Windows.Forms.ComboBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -145,6 +148,7 @@
             this.progressBar_fifo = new oscardata.KmProgressBar();
             this.vu_cap = new oscardata.KmProgressBar();
             this.vu_pb = new oscardata.KmProgressBar();
+            this.lb_rec = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -227,7 +231,7 @@
             // 
             // panel_constel
             // 
-            this.panel_constel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(220)))));
+            this.panel_constel.BackColor = System.Drawing.Color.AliceBlue;
             this.panel_constel.Location = new System.Drawing.Point(11, 590);
             this.panel_constel.Name = "panel_constel";
             this.panel_constel.Size = new System.Drawing.Size(75, 75);
@@ -245,12 +249,13 @@
             this.panel_txspectrum.BackColor = System.Drawing.SystemColors.ControlLight;
             this.panel_txspectrum.Location = new System.Drawing.Point(92, 590);
             this.panel_txspectrum.Name = "panel_txspectrum";
-            this.panel_txspectrum.Size = new System.Drawing.Size(441, 76);
+            this.panel_txspectrum.Size = new System.Drawing.Size(442, 76);
             this.panel_txspectrum.TabIndex = 6;
             this.panel_txspectrum.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_txspectrum_Paint);
             // 
             // tabPage_ber
             // 
+            this.tabPage_ber.BackColor = System.Drawing.Color.Transparent;
             this.tabPage_ber.Controls.Add(this.button_stopBERtest);
             this.tabPage_ber.Controls.Add(this.button_startBERtest);
             this.tabPage_ber.Controls.Add(this.rtb);
@@ -261,7 +266,6 @@
             this.tabPage_ber.Size = new System.Drawing.Size(1291, 552);
             this.tabPage_ber.TabIndex = 0;
             this.tabPage_ber.Text = "BER Test";
-            this.tabPage_ber.UseVisualStyleBackColor = true;
             // 
             // button_stopBERtest
             // 
@@ -320,6 +324,7 @@
             // 
             // tabPage_image
             // 
+            this.tabPage_image.BackColor = System.Drawing.Color.Transparent;
             this.tabPage_image.Controls.Add(this.groupBox1);
             this.tabPage_image.Controls.Add(this.label_rximage);
             this.tabPage_image.Controls.Add(this.label_tximage);
@@ -332,11 +337,9 @@
             this.tabPage_image.Size = new System.Drawing.Size(1291, 552);
             this.tabPage_image.TabIndex = 1;
             this.tabPage_image.Text = "Image";
-            this.tabPage_image.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.label_nextimage);
             this.groupBox1.Controls.Add(this.cb_loop);
             this.groupBox1.Controls.Add(this.bt_rximages);
             this.groupBox1.Controls.Add(this.button_loadimage);
@@ -349,15 +352,6 @@
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(1277, 42);
             this.groupBox1.TabIndex = 12;
-            // 
-            // label_nextimage
-            // 
-            this.label_nextimage.AutoSize = true;
-            this.label_nextimage.Location = new System.Drawing.Point(641, 19);
-            this.label_nextimage.Name = "label_nextimage";
-            this.label_nextimage.Size = new System.Drawing.Size(81, 13);
-            this.label_nextimage.TabIndex = 12;
-            this.label_nextimage.Text = "next image in ...";
             // 
             // cb_loop
             // 
@@ -483,7 +477,7 @@
             // 
             // pictureBox_rximage
             // 
-            this.pictureBox_rximage.BackgroundImage = global::oscardata.Properties.Resources.hintergrundxcf;
+            this.pictureBox_rximage.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox_rximage.BackgroundImage")));
             this.pictureBox_rximage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.pictureBox_rximage.Location = new System.Drawing.Point(642, 27);
             this.pictureBox_rximage.Name = "pictureBox_rximage";
@@ -494,7 +488,7 @@
             // 
             // pictureBox_tximage
             // 
-            this.pictureBox_tximage.BackgroundImage = global::oscardata.Properties.Resources.hintergrundxcf;
+            this.pictureBox_tximage.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox_tximage.BackgroundImage")));
             this.pictureBox_tximage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.pictureBox_tximage.Location = new System.Drawing.Point(1, 27);
             this.pictureBox_tximage.Name = "pictureBox_tximage";
@@ -519,6 +513,7 @@
             // 
             // tabPage_file
             // 
+            this.tabPage_file.BackColor = System.Drawing.Color.Transparent;
             this.tabPage_file.Controls.Add(this.pictureBox1);
             this.tabPage_file.Controls.Add(this.button2);
             this.tabPage_file.Controls.Add(this.bt_openrxfile);
@@ -536,11 +531,10 @@
             this.tabPage_file.Size = new System.Drawing.Size(1291, 552);
             this.tabPage_file.TabIndex = 2;
             this.tabPage_file.Text = "File";
-            this.tabPage_file.UseVisualStyleBackColor = true;
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackgroundImage = global::oscardata.Properties.Resources.text_big;
+            this.pictureBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.BackgroundImage")));
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pictureBox1.Location = new System.Drawing.Point(17, 371);
             this.pictureBox1.Name = "pictureBox1";
@@ -669,6 +663,7 @@
             // 
             // tabPage_audio
             // 
+            this.tabPage_audio.BackColor = System.Drawing.Color.Transparent;
             this.tabPage_audio.Controls.Add(this.groupBox7);
             this.tabPage_audio.Controls.Add(this.groupBox6);
             this.tabPage_audio.Controls.Add(this.groupBox5);
@@ -678,7 +673,6 @@
             this.tabPage_audio.Size = new System.Drawing.Size(1291, 552);
             this.tabPage_audio.TabIndex = 5;
             this.tabPage_audio.Text = "Voice Audio";
-            this.tabPage_audio.UseVisualStyleBackColor = true;
             // 
             // groupBox7
             // 
@@ -695,16 +689,18 @@
             // rb_codec2
             // 
             this.rb_codec2.AutoSize = true;
+            this.rb_codec2.Checked = true;
             this.rb_codec2.Location = new System.Drawing.Point(92, 50);
             this.rb_codec2.Name = "rb_codec2";
-            this.rb_codec2.Size = new System.Drawing.Size(342, 17);
+            this.rb_codec2.Size = new System.Drawing.Size(427, 17);
             this.rb_codec2.TabIndex = 23;
-            this.rb_codec2.Text = "CODEC-2 parametric audio codec. For QPSK. Audio rate: 3200 bps";
+            this.rb_codec2.TabStop = true;
+            this.rb_codec2.Text = "CODEC-2 parametric audio codec. For BPSK/QPSK. Audio rate: 700/1600/3200 bps";
             this.rb_codec2.UseVisualStyleBackColor = true;
             // 
             // pictureBox2
             // 
-            this.pictureBox2.BackgroundImage = global::oscardata.Properties.Resources.voice_big;
+            this.pictureBox2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox2.BackgroundImage")));
             this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pictureBox2.Location = new System.Drawing.Point(6, 13);
             this.pictureBox2.Name = "pictureBox2";
@@ -715,13 +711,11 @@
             // rb_opus
             // 
             this.rb_opus.AutoSize = true;
-            this.rb_opus.Checked = true;
             this.rb_opus.Location = new System.Drawing.Point(92, 27);
             this.rb_opus.Name = "rb_opus";
-            this.rb_opus.Size = new System.Drawing.Size(348, 17);
+            this.rb_opus.Size = new System.Drawing.Size(345, 17);
             this.rb_opus.TabIndex = 0;
-            this.rb_opus.TabStop = true;
-            this.rb_opus.Text = "OPUS rate adaptive codec. For 8APSK. Audio rate: 84% of data rate";
+            this.rb_opus.Text = "OPUS rate adaptive codec. For 8APSK. Audio rate: 4600..6000 bps";
             this.rb_opus.UseVisualStyleBackColor = true;
             // 
             // groupBox6
@@ -825,7 +819,7 @@
             // 
             // pb_voiceCAPstatus
             // 
-            this.pb_voiceCAPstatus.BackgroundImage = global::oscardata.Properties.Resources.ok;
+            this.pb_voiceCAPstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_voiceCAPstatus.BackgroundImage")));
             this.pb_voiceCAPstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pb_voiceCAPstatus.Location = new System.Drawing.Point(387, 58);
             this.pb_voiceCAPstatus.Name = "pb_voiceCAPstatus";
@@ -835,7 +829,7 @@
             // 
             // pb_voicePBstatus
             // 
-            this.pb_voicePBstatus.BackgroundImage = global::oscardata.Properties.Resources.ok;
+            this.pb_voicePBstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_voicePBstatus.BackgroundImage")));
             this.pb_voicePBstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pb_voicePBstatus.Location = new System.Drawing.Point(387, 25);
             this.pb_voicePBstatus.Name = "pb_voicePBstatus";
@@ -927,6 +921,7 @@
             // 
             // tabPage_setup
             // 
+            this.tabPage_setup.BackColor = System.Drawing.Color.Transparent;
             this.tabPage_setup.Controls.Add(this.groupBox4);
             this.tabPage_setup.Controls.Add(this.groupBox3);
             this.tabPage_setup.Controls.Add(this.groupBox2);
@@ -936,7 +931,6 @@
             this.tabPage_setup.Size = new System.Drawing.Size(1291, 552);
             this.tabPage_setup.TabIndex = 4;
             this.tabPage_setup.Text = "Setup";
-            this.tabPage_setup.UseVisualStyleBackColor = true;
             // 
             // groupBox4
             // 
@@ -949,7 +943,7 @@
             this.groupBox4.Controls.Add(this.tb_shutdown);
             this.groupBox4.Controls.Add(this.bt_resetmodem);
             this.groupBox4.Controls.Add(this.textBox3);
-            this.groupBox4.Location = new System.Drawing.Point(12, 259);
+            this.groupBox4.Location = new System.Drawing.Point(12, 257);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(674, 121);
             this.groupBox4.TabIndex = 15;
@@ -1025,6 +1019,7 @@
             // 
             // tb_shutdown
             // 
+            this.tb_shutdown.BackColor = System.Drawing.SystemColors.Control;
             this.tb_shutdown.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tb_shutdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tb_shutdown.ForeColor = System.Drawing.Color.Red;
@@ -1043,11 +1038,11 @@
             this.bt_resetmodem.TabIndex = 6;
             this.bt_resetmodem.Text = "Reset RX Modem";
             this.bt_resetmodem.UseVisualStyleBackColor = true;
-            this.bt_resetmodem.Visible = false;
             this.bt_resetmodem.Click += new System.EventHandler(this.bt_resetmodem_Click);
             // 
             // textBox3
             // 
+            this.textBox3.BackColor = System.Drawing.SystemColors.Control;
             this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox3.ForeColor = System.Drawing.Color.Black;
@@ -1072,7 +1067,7 @@
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.cb_audioCAP);
             this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Location = new System.Drawing.Point(12, 146);
+            this.groupBox3.Location = new System.Drawing.Point(12, 144);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(674, 107);
             this.groupBox3.TabIndex = 14;
@@ -1081,7 +1076,7 @@
             // 
             // pb_audioCAPstatus
             // 
-            this.pb_audioCAPstatus.BackgroundImage = global::oscardata.Properties.Resources.ok;
+            this.pb_audioCAPstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioCAPstatus.BackgroundImage")));
             this.pb_audioCAPstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 63);
             this.pb_audioCAPstatus.Name = "pb_audioCAPstatus";
@@ -1091,7 +1086,7 @@
             // 
             // pb_audioPBstatus
             // 
-            this.pb_audioPBstatus.BackgroundImage = global::oscardata.Properties.Resources.ok;
+            this.pb_audioPBstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioPBstatus.BackgroundImage")));
             this.pb_audioPBstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pb_audioPBstatus.Location = new System.Drawing.Point(375, 19);
             this.pb_audioPBstatus.Name = "pb_audioPBstatus";
@@ -1185,10 +1180,15 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.lb_rec);
+            this.groupBox2.Controls.Add(this.tb_recintro);
+            this.groupBox2.Controls.Add(this.bt_astop);
+            this.groupBox2.Controls.Add(this.bt_aplay);
+            this.groupBox2.Controls.Add(this.bt_arecord);
+            this.groupBox2.Controls.Add(this.cb_sendIntro);
             this.groupBox2.Controls.Add(this.cb_stampinfo);
             this.groupBox2.Controls.Add(this.tb_info);
             this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Controls.Add(this.textBox5);
             this.groupBox2.Controls.Add(this.cb_announcement);
             this.groupBox2.Controls.Add(this.textBox4);
             this.groupBox2.Controls.Add(this.textBox1);
@@ -1197,17 +1197,81 @@
             this.groupBox2.Controls.Add(this.cb_stampcall);
             this.groupBox2.Location = new System.Drawing.Point(12, 13);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(674, 126);
+            this.groupBox2.Size = new System.Drawing.Size(674, 127);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Personal Settings";
+            // 
+            // tb_recintro
+            // 
+            this.tb_recintro.BackColor = System.Drawing.SystemColors.Control;
+            this.tb_recintro.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tb_recintro.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_recintro.ForeColor = System.Drawing.Color.Black;
+            this.tb_recintro.Location = new System.Drawing.Point(256, 100);
+            this.tb_recintro.Multiline = true;
+            this.tb_recintro.Name = "tb_recintro";
+            this.tb_recintro.Size = new System.Drawing.Size(121, 19);
+            this.tb_recintro.TabIndex = 28;
+            this.tb_recintro.Text = "record intro audio:";
+            // 
+            // bt_astop
+            // 
+            this.bt_astop.BackgroundImage = global::oscardata.Properties.Resources.stopplay;
+            this.bt_astop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bt_astop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_astop.ForeColor = System.Drawing.SystemColors.Control;
+            this.bt_astop.Location = new System.Drawing.Point(449, 89);
+            this.bt_astop.Name = "bt_astop";
+            this.bt_astop.Size = new System.Drawing.Size(32, 36);
+            this.bt_astop.TabIndex = 27;
+            this.bt_astop.UseVisualStyleBackColor = true;
+            this.bt_astop.Click += new System.EventHandler(this.bt_astop_Click);
+            // 
+            // bt_aplay
+            // 
+            this.bt_aplay.BackgroundImage = global::oscardata.Properties.Resources.playback;
+            this.bt_aplay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bt_aplay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_aplay.ForeColor = System.Drawing.SystemColors.Control;
+            this.bt_aplay.Location = new System.Drawing.Point(411, 89);
+            this.bt_aplay.Name = "bt_aplay";
+            this.bt_aplay.Size = new System.Drawing.Size(32, 36);
+            this.bt_aplay.TabIndex = 26;
+            this.bt_aplay.UseVisualStyleBackColor = true;
+            this.bt_aplay.Click += new System.EventHandler(this.bt_aplay_Click);
+            // 
+            // bt_arecord
+            // 
+            this.bt_arecord.BackgroundImage = global::oscardata.Properties.Resources.record;
+            this.bt_arecord.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bt_arecord.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_arecord.ForeColor = System.Drawing.SystemColors.Control;
+            this.bt_arecord.Location = new System.Drawing.Point(373, 89);
+            this.bt_arecord.Name = "bt_arecord";
+            this.bt_arecord.Size = new System.Drawing.Size(32, 36);
+            this.bt_arecord.TabIndex = 25;
+            this.bt_arecord.UseVisualStyleBackColor = true;
+            this.bt_arecord.Click += new System.EventHandler(this.bt_arecord_Click);
+            // 
+            // cb_sendIntro
+            // 
+            this.cb_sendIntro.AutoSize = true;
+            this.cb_sendIntro.Checked = true;
+            this.cb_sendIntro.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_sendIntro.Location = new System.Drawing.Point(71, 104);
+            this.cb_sendIntro.Name = "cb_sendIntro";
+            this.cb_sendIntro.Size = new System.Drawing.Size(105, 17);
+            this.cb_sendIntro.TabIndex = 24;
+            this.cb_sendIntro.Text = "Send Intro Audio";
+            this.cb_sendIntro.UseVisualStyleBackColor = true;
             // 
             // cb_stampinfo
             // 
             this.cb_stampinfo.AutoSize = true;
             this.cb_stampinfo.Checked = true;
             this.cb_stampinfo.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_stampinfo.Location = new System.Drawing.Point(71, 82);
+            this.cb_stampinfo.Location = new System.Drawing.Point(71, 84);
             this.cb_stampinfo.Name = "cb_stampinfo";
             this.cb_stampinfo.Size = new System.Drawing.Size(128, 17);
             this.cb_stampinfo.TabIndex = 23;
@@ -1231,18 +1295,6 @@
             this.label7.TabIndex = 21;
             this.label7.Text = "Info:";
             // 
-            // textBox5
-            // 
-            this.textBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox5.ForeColor = System.Drawing.Color.Black;
-            this.textBox5.Location = new System.Drawing.Point(261, 92);
-            this.textBox5.Multiline = true;
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(34, 19);
-            this.textBox5.TabIndex = 20;
-            this.textBox5.Text = "every";
-            // 
             // cb_announcement
             // 
             this.cb_announcement.FormattingEnabled = true;
@@ -1258,7 +1310,7 @@
             "8",
             "9",
             "10"});
-            this.cb_announcement.Location = new System.Drawing.Point(296, 90);
+            this.cb_announcement.Location = new System.Drawing.Point(453, 60);
             this.cb_announcement.Name = "cb_announcement";
             this.cb_announcement.Size = new System.Drawing.Size(56, 21);
             this.cb_announcement.TabIndex = 19;
@@ -1266,10 +1318,11 @@
             // 
             // textBox4
             // 
+            this.textBox4.BackColor = System.Drawing.SystemColors.Control;
             this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox4.ForeColor = System.Drawing.Color.Black;
-            this.textBox4.Location = new System.Drawing.Point(361, 92);
+            this.textBox4.Location = new System.Drawing.Point(518, 62);
             this.textBox4.Multiline = true;
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(75, 19);
@@ -1278,15 +1331,16 @@
             // 
             // textBox1
             // 
+            this.textBox1.BackColor = System.Drawing.SystemColors.Control;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.ForeColor = System.Drawing.Color.Black;
-            this.textBox1.Location = new System.Drawing.Point(259, 68);
+            this.textBox1.Location = new System.Drawing.Point(259, 64);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(253, 19);
+            this.textBox1.Size = new System.Drawing.Size(196, 19);
             this.textBox1.TabIndex = 17;
-            this.textBox1.Text = "send announcement before pic/file transfer";
+            this.textBox1.Text = "send announcement before TX every";
             // 
             // tb_callsign
             // 
@@ -1341,6 +1395,8 @@
             // 
             this.cb_speed.FormattingEnabled = true;
             this.cb_speed.Items.AddRange(new object[] {
+            "1200 BPSK BW: 1300 Hz",
+            "2400 BPSK BW: 2500 Hz",
             "3000 QPSK BW: 1700 Hz ",
             "4000 QPSK BW: 2400 Hz ",
             "4410 QPSK BW: 2500 Hz (QO-100 Standard)",
@@ -1418,7 +1474,7 @@
             // 
             // pb_rxsync
             // 
-            this.pb_rxsync.BackgroundImage = global::oscardata.Properties.Resources.redmarker;
+            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
             this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pb_rxsync.Location = new System.Drawing.Point(1155, 636);
             this.pb_rxsync.Name = "pb_rxsync";
@@ -1428,7 +1484,7 @@
             // 
             // pb_rxsignal
             // 
-            this.pb_rxsignal.BackgroundImage = global::oscardata.Properties.Resources.redmarker;
+            this.pb_rxsignal.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsignal.BackgroundImage")));
             this.pb_rxsignal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pb_rxsignal.Location = new System.Drawing.Point(1047, 636);
             this.pb_rxsignal.Name = "pb_rxsignal";
@@ -1471,10 +1527,22 @@
             this.vu_pb.Size = new System.Drawing.Size(100, 10);
             this.vu_pb.TabIndex = 19;
             // 
+            // lb_rec
+            // 
+            this.lb_rec.AutoSize = true;
+            this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lb_rec.ForeColor = System.Drawing.Color.Red;
+            this.lb_rec.Location = new System.Drawing.Point(498, 101);
+            this.lb_rec.Name = "lb_rec";
+            this.lb_rec.Size = new System.Drawing.Size(23, 13);
+            this.lb_rec.TabIndex = 29;
+            this.lb_rec.Text = "....";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1293, 691);
             this.Controls.Add(this.lb_rxsync);
             this.Controls.Add(this.pb_rxsync);
@@ -1494,7 +1562,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.51 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.52 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -1584,7 +1652,6 @@
         private System.Windows.Forms.Button bt_rximages;
         private System.Windows.Forms.Button bt_openrxfile;
         private System.Windows.Forms.CheckBox cb_loop;
-        private System.Windows.Forms.Label label_nextimage;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TabPage tabPage_setup;
         private System.Windows.Forms.TextBox tb_callsign;
@@ -1607,7 +1674,6 @@
         private KmProgressBar progressBar_fifo;
         private System.Windows.Forms.Label label_fifo;
         private System.Windows.Forms.CheckBox cb_autostart;
-        private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.ComboBox cb_announcement;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox textBox1;
@@ -1658,6 +1724,12 @@
         private KmProgressBar vu_cap;
         private KmProgressBar vu_pb;
         private System.Windows.Forms.ToolStripStatusLabel toolStrip_Type;
+        private System.Windows.Forms.CheckBox cb_sendIntro;
+        private System.Windows.Forms.Button bt_arecord;
+        private System.Windows.Forms.Button bt_astop;
+        private System.Windows.Forms.Button bt_aplay;
+        private System.Windows.Forms.TextBox tb_recintro;
+        private System.Windows.Forms.Label lb_rec;
     }
 }
 

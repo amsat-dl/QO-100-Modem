@@ -205,3 +205,65 @@ void shiftleft(uint8_t *data, int shiftnum, int len)
         }
     }
 }
+
+void rotateBPSKsyms(uint8_t* src, uint8_t* dst, int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        if (src[i] == 0) dst[i] = 1;
+        else dst[i] = 0;
+    }
+}
+
+uint8_t BPSK_backbuf[UDPBLOCKLEN * 8 / 1];
+uint8_t* rotateBackBPSK(uint8_t* buf, int len, int rotations)
+{
+    memcpy(BPSK_backbuf, buf, len);
+
+    if (rotations == 1)
+    {
+        for (unsigned int i = 0; i < (unsigned int)len; i++)
+        {
+            if (BPSK_backbuf[i] == 1) BPSK_backbuf[i] = 0;
+            else BPSK_backbuf[i] = 1;
+        }
+    }
+
+    return BPSK_backbuf;
+}
+
+uint8_t* convertBPSKSymToBytes(uint8_t* rxsymbols)
+{
+    int sidx = 0;
+    for (int i = 0; i < UDPBLOCKLEN; i++)
+    {
+        rxbytebuf[i]  = rxsymbols[sidx++] << (bitsPerSymbol * 7);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 6);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 5);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 4);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 3);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 2);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 1);
+        rxbytebuf[i] |= rxsymbols[sidx++] << (bitsPerSymbol * 0);
+    }
+    return rxbytebuf;
+}
+
+void convertBytesToSyms_BPSK(uint8_t* bytes, uint8_t* syms, int bytenum)
+{
+    unsigned int symidx = 0;
+    for (int i = 0; i < bytenum; i++)
+    {
+        // 1 sym per 1 bit:
+        // convert next byte to 8 syms
+        syms[symidx++] = (bytes[i] >> 7) & 1;
+        syms[symidx++] = (bytes[i] >> 6) & 1;
+        syms[symidx++] = (bytes[i] >> 5) & 1;
+        syms[symidx++] = (bytes[i] >> 4) & 1;
+        syms[symidx++] = (bytes[i] >> 3) & 1;
+        syms[symidx++] = (bytes[i] >> 2) & 1;
+        syms[symidx++] = (bytes[i] >> 1) & 1;
+        syms[symidx++] = bytes[i] & 1;
+    }
+}
+

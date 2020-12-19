@@ -78,7 +78,8 @@ namespace oscardata
         public static int RXinSync = 0;
         public static int maxRXlevel = 0;
         public static int maxTXlevel = 0;
-
+        public static Color WindowBackColor;
+        public static String[] langstr;
 
         public static String[] getOwnIPs()
         {
@@ -205,31 +206,21 @@ namespace oscardata
 
         public static String getHomePath(String subpath, String filename)
         {
-            String home = Application.UserAppDataPath;
             String deli = "/";
+            if (statics.ostype == 0)deli = "\\";
 
-            if (statics.ostype == 0)
-                deli = "\\";
+            //String home = Application.UserAppDataPath;
+            String home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
+            home = home + deli + DataStorage + deli;
+            try { Directory.CreateDirectory(home); } catch { }
 
-            if(subpath.Length == 0)
-                home = home + deli + DataStorage + deli;
-            else
-                home = home + deli + DataStorage + deli + subpath + deli;
-
-            try
-            {
-                Directory.CreateDirectory(home);
-            }
-            catch { }
-
-
-            try
-            {
-                if (Directory.Exists(home) == false)
-                    Console.WriteLine("create:" + home);
-            }
-            catch { }
+            // if not exists, create subfolder "oscardata"
+            if (subpath.Length > 0)
+                try {
+                    home += subpath + deli;
+                    Directory.CreateDirectory(home); 
+                } catch { }
 
             return home + filename;
         }

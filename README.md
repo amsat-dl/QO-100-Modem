@@ -2,7 +2,7 @@
 The purpose of this project is to transfer data (pictures...) via a 2,7kHz SSB channel on the narrow band transponder as fast as possible.
 
 # this is work in progress
-Version 0.4 is working on:
+Version 0.52
 Windows 10 (should work on Win7, not tested)
 linux Desktop PC, 
 Odroid SBC
@@ -63,21 +63,10 @@ then you find the program under the program group "amsat" in the Window's start 
 * QO-100 via IC-9700, IC-7300 or IC-7100 ... working
 * Short Wave 6m band via IC-7300, IC-7100 ... working. In case of significant noise, use the lowest bit rate (3000 bit/s)
 
+# Manual
 
-# usage
-
-In the IC-9700 activate the DATA mode and the RX filter FIL1 to full range of 3.6kHz.
-
-In oscardata.exe go to the "BER" tab. Then click START. If you change the bitrate, wait a few seconds before starting again.
-
-The program is now sending test data frames to the default sound card. If your sound card is properly connected to the transceiver then switch the transceiver to TX and the data will be sent to QO-100.
-Receive your transmission, feed it to the default soundcard. As soon as oscardata.exe detects a correct data frame it will display status messages on the screen.
-
-(For testing purposes you can just connect Line-Out of your soundcard with Line-IN with a cable.)
-
-To assign the soundcard to the modem I recommend to use pavucontrol. Using the TX volume set a signal level of about 20 to 24 dB over noise floor. You will need about -10dB compared to the BPSK400 beacon. The received audio volume can be adjusted with help of the spectrum display in oscardata.exe-
-
-Now as the transmission is OK, you can go to the "Image RX/TX" tab. First, select a picture quality then load a picture and finally press SEND to send it to QO-100. When you correctly receive your own transmission the RX picture will be displayed line by line.
+complete documentation see:
+https://hsmodem.dj0abr.de
 
 vy 73, DJ0ABR
 

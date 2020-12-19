@@ -31,7 +31,7 @@
 CRITICAL_SECTION io_mic_crit_sec;
 CRITICAL_SECTION io_ls_crit_sec;
 #define IO_MIC_LOCK	EnterCriticalSection(&io_mic_crit_sec)
-#define IO_LS_LOCK	    EnterCriticalSection(&io_ls_crit_sec)
+#define IO_LS_LOCK	EnterCriticalSection(&io_ls_crit_sec)
 void IO_MIC_UNLOCK()
 {
     if (&io_mic_crit_sec != NULL)

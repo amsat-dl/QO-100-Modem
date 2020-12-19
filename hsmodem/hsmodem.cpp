@@ -55,7 +55,7 @@ int UdpDataPort_ModemToApp = 40133;
 
 // op mode depending values
 // default mode if not set by the app
-int speedmode = 2;
+int speedmode = 4;
 int bitsPerSymbol = 2;      // QPSK=2, 8PSK=3
 int constellationSize = 4;  // QPSK=4, 8PSK=8
 
@@ -65,6 +65,7 @@ char appIP[20] = { 0 };
 int fixappIP = 0;
 int restart_modems = 0;
 int trigger_resetmodem = 0;
+char homepath[1000] = { 0 };
 
 int caprate = 44100;
 int physcaprate = 44100;
@@ -90,6 +91,7 @@ int init_audio_result = 0;
 int init_voice_result = 0;
 
 int safemode = 0;
+int sendIntro = 0;
 
 int main(int argc, char* argv[])
 {
@@ -150,10 +152,47 @@ int main(int argc, char* argv[])
         }
     }
 #endif
-    
+
+// get user home path
+#ifdef _WIN32_
+    strcpy(homepath, getenv("USERPROFILE"));
+
+    char nd[1000];
+    sprintf(nd, "%s/oscardata", homepath);
+    if (CreateDirectory(nd, NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+    {
+        sprintf(nd, "%s\\oscardata\\intro", homepath);
+        CreateDirectory(nd, NULL);
+    }
+#endif
+#ifdef _LINUX_
+    char* ph;
+
+    if ((ph = getenv("HOME")) == NULL) 
+    {
+        ph = getpwuid(getuid())->pw_dir;
+    }
+    if (ph != NULL)
+        strcpy(homepath, ph);
+    else
+        *homepath = 0;
+
+    struct stat st = { 0 };
+
+    char nd[1000];
+    sprintf(nd, "%s/oscardata", homepath);
+    if (stat(nd, &st) == -1) 
+    {
+        mkdir(nd, 0755);
+        sprintf(nd, "%s/oscardata/intro", homepath);
+        if (stat(nd, &st) == -1)
+            mkdir(nd, 0755);
+    }
+#endif
+    printf("user home path:<%s>\n", homepath);
+
     init_packer();
     initFEC();
-    init_fft();
 
     // start udp RX to listen for broadcast search message from Application
     UdpRxInit(&BC_sock_AppToModem, UdpBCport_AppToModem, &bc_rxdata, &keeprunning);
@@ -178,8 +217,25 @@ int main(int argc, char* argv[])
             float f;
             while (io_mic_read_fifo(&f))
             {
-                 io_ls_write_fifo(f);
+                io_ls_write_fifo(f);
             }
+        }
+
+        if (VoiceAudioMode == VOICEMODE_RECORD)
+        {
+            // loop voice mic to LS, and record into PCM file
+            float f;
+            while (io_mic_read_fifo(&f))
+            {
+                io_saveStream(f);
+                io_ls_write_fifo(f);
+            }
+        }
+
+        if (VoiceAudioMode == VOICEMODE_PLAYBACK)
+        {
+            playIntro();
+            VoiceAudioMode = VOICEMODE_OFF;
         }
 
         if (VoiceAudioMode == VOICEMODE_CODECLOOP || VoiceAudioMode == VOICEMODE_DV_FULLDUPLEX)
@@ -194,8 +250,8 @@ int main(int argc, char* argv[])
         
         // demodulate incoming audio data stream
         static int old_tm = 0;
-        int tm = getus();
-        if (tm >= (old_tm + 1000000))
+        int tm = getms();
+        if (tm >= (old_tm + 1000))
         {
             // read Audio device list every 1s
             io_readAudioDevices();
@@ -205,9 +261,9 @@ int main(int argc, char* argv[])
         if (dret == 0)
         {
             // no new data in fifo
-            // not important how long to sleep, 10ms is fine
 #ifdef _LINUX_
-            sleep_ms(10);   
+            // not important how long to sleep, 10ms is fine
+            sleep_ms(10);
 #endif
         }
     }
@@ -235,7 +291,11 @@ typedef struct {
 } SPEEDRATE;
 
 // AudioRate, TX-Resampler, RX-Resampler/4, bit/symbol, Codec-Rate
-SPEEDRATE sr[8] = {
+SPEEDRATE sr[10] = {
+    // BPSK modes
+    {48000, 40,10, 1, 1200, 800},
+    {48000, 20, 5, 1, 2400, 2000},
+
     // QPSK modes
     {48000, 32, 8, 2, 3000, 2400}, 
     {48000, 24, 6, 2, 4000, 3200},
@@ -246,7 +306,7 @@ SPEEDRATE sr[8] = {
     {44100, 24, 6, 3, 5500, 4400},
     {48000, 24, 6, 3, 6000, 4800},
     {44100, 20, 5, 3, 6600, 5200},
-    {48000, 20, 5, 3, 7200, 6000}
+    {48000, 20, 5, 3, 7200, 6000},
 };
 
 void startModem()
@@ -263,6 +323,7 @@ void startModem()
     // int TX audio and modulator
     close_dsp();
     init_audio_result = io_init_sound(playbackDeviceName, captureDeviceName);
+    _init_fft();
     init_dsp();
 }
 
@@ -290,6 +351,9 @@ void io_setAudioDevices(uint8_t pbvol, uint8_t capvol, uint8_t announce, uint8_t
 // called from UDP RX thread for Broadcast-search from App
 void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
+    static int lastms = 0;  // time of last received BC message
+    int actms = getms();
+
     if (len > 0 && pdata[0] == 0x3c)
     {
         /* searchmodem message received
@@ -302,7 +366,8 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         * 4 ... DV loudspeaker volume
         * 5 ... DV mic volume
         * 6 ... safe mode number
-        * 7..9 ... unused
+        * 7 ... send Intro
+        * 8..9 ... unused
         * 10 .. 109 ... PB device name
         * 110 .. 209 ... CAP device name
         */
@@ -314,7 +379,16 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         {
             if (strcmp(appIP, rxip))
             {
-                printf("new app IP: %s, restarting modems\n", rxip);
+                if (appIP[0] != 0)
+                {
+                    // there was an appIP already
+                    // before accepting this new one, wait 3 seconds
+                    int ts = actms - lastms;
+                    printf("new app IP: %s since %d, restarting modems\n", rxip,ts);
+                    if (ts < 3000)
+                        return;
+                }
+                printf("first app IP: %s, restarting modems\n", rxip);
                 restart_modems = 1;
             }
             strcpy(appIP, rxip);
@@ -344,6 +418,9 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
         io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char*)(pdata + 10), (char*)(pdata + 110));
         safemode = pdata[6];
+        sendIntro = pdata[7];
+
+        lastms = actms;
     }
 }
 
@@ -357,7 +434,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     if (type == 16)
     {
         // Byte 1 contains the resampler ratio for TX and RX modem
-        if (pdata[1] >= 8)
+        if (pdata[1] >= 12)
         {
             printf("wrong speedmode %d, ignoring\n", pdata[1]);
             return;
@@ -406,6 +483,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     {
         // reset liquid RX modem
         resetModem();
+        io_clear_audio_fifos();
         return;
     }
 
@@ -458,8 +536,9 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         printf("LS:<%s> MIC:<%s> Mode:%d codec:%d\n", lsDeviceName, micDeviceName, VoiceAudioMode, codec);
 
         // init voice audio
-        if (VoiceAudioMode == 0)
+        if (VoiceAudioMode == VOICEMODE_OFF)
         {
+            io_saveStream(0.0f);    // close recording
             close_voiceproc();
             io_close_voice();
         }
@@ -554,7 +633,8 @@ void toGR_sendData(uint8_t* data, int type, int status, int repeat)
 // called by liquid demodulator for received data
 void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
-    static int fnd = 0;
+    static int lasttime = -1;
+    static int triggertime = 0;
 
     // raw symbols
     uint8_t* pl = unpack_data(pdata, len);
@@ -573,27 +653,63 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
             if (*(pl + 3) != 0) // minfo=0 ... just a filler, ignore
                 toCodecDecoder(pl + 10, PAYLOADLEN);
         }
-        fnd = 0;
         trigger_resetmodem = 0;
         rx_in_sync = 1;
+        lasttime = getms();
     }
     else
     {
         // no frame found
         // if longer ws seconds nothing found, reset liquid RX modem
         // comes here with symbol rate, i.e. 4000 S/s
-        int ws = 5; 
-        int wt = sr[speedmode].audio / sr[speedmode].tx;
-        if (++fnd >= (wt * ws) || trigger_resetmodem)
+        int bps = sr[speedmode].linespeed;
+        // time for one frame [ms]
+        int frmlen = UDPBLOCKLEN * 8;
+        int tmfrm_ms = (frmlen * 1000) / bps;
+        
+        int acttm = getms();
+        if (lasttime == -1)
         {
-            fnd = 0;
+            lasttime = acttm;
+            return;
+        }
+        int tdiff = (acttm - lasttime); //ms
+        int elapsed_frames = tdiff / tmfrm_ms;
+        //printf("difft:%d  elfrm:%d\n", tdiff, elapsed_frames);
+
+        if (trigger_resetmodem == 1)
+        {
+            trigger_resetmodem = 2;
+            //printf("set triggertime\n");
+            triggertime = getms();
+        }
+
+        if ((getms() - triggertime) > 1000 && trigger_resetmodem == 2)
+        {
+            printf("signal detected, reset RX modem\n");
             trigger_resetmodem = 0;
             rx_in_sync = 0;
-            //printf("no signal detected %d, reset RX modem\n", wt);
             resetModem();
+            lasttime = acttm;
         }
-        else if (fnd >= wt)
+
+        if (tdiff > 5)
         {
+            // in any case, only every 5s or longer
+            if (elapsed_frames > 2)
+            {
+                // reset modem if more than 2 frames have not been received
+                trigger_resetmodem = 0;
+                rx_in_sync = 0;
+                //printf("no signal detected, reset RX modem\n");
+                resetModem();
+                lasttime = acttm;
+            }
+        }
+
+        if (elapsed_frames > 5)
+        {
+            // if > 5 frames not recieved, mark "not in sync"
             rx_in_sync = 0;
         }
     }

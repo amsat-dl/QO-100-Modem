@@ -35,6 +35,8 @@ struct SoundIoInStream* inmicstream = NULL;
 bool lsrawdev = true;
 bool micrawdev = true;
 
+float latency = 0.1f;
+
 void read_voicecallback(struct SoundIoInStream* instream, int frame_count_min, int frame_count_max)
 {
     int err;
@@ -241,10 +243,18 @@ int io_init_voice(char* lsname, char* micname)
     }
 
     char* lsdevid = getDevID(lsname, 1);
-    if (lsdevid == NULL) return 0;
+    if (lsdevid == NULL)
+    {
+        printf("no lsdevid for %s\n",lsname);
+        return 0;
+    }
 
     char* micdevid = getDevID(micname, 0);
-    if (micdevid == NULL) return 0;
+    if (micdevid == NULL) 
+    {
+        printf("no micdevid for %s\n", micname);
+        return 0;
+    }
 
     soundio_flush_events(voice_soundio);
     // under Windows we usually use raw devices. This does not work with 
@@ -304,7 +314,7 @@ int io_init_voice(char* lsname, char* micname)
         else
             inmicstream->format = SoundIoFormatFloat32NE;
         inmicstream->sample_rate = VOICE_SAMPRATE;
-        inmicstream->software_latency = 0.0;
+        inmicstream->software_latency = latency;
         inmicstream->read_callback = read_voicecallback;
         inmicstream->overflow_callback = overflow_voicecallback;
         inmicstream->userdata = NULL;
@@ -315,7 +325,7 @@ int io_init_voice(char* lsname, char* micname)
         }
 
         if ((err = soundio_instream_start(inmicstream))) {
-            fprintf(stderr, "unable to start voice input device: %s", soundio_strerror(err));
+            printf("unable to start voice input device: %s", soundio_strerror(err));
             return 0;
         }
         init_voice_result |= 2;
@@ -354,8 +364,6 @@ int io_init_voice(char* lsname, char* micname)
         return 0;
     }
 
-    printf("pb raw: %s\n", io_ls_device->is_raw ? "raw" : "---");
-
     // create playback callback
     outlsstream = soundio_outstream_create(io_ls_device);
     if (!outlsstream) {
@@ -369,7 +377,7 @@ int io_init_voice(char* lsname, char* micname)
     else
         outlsstream->format = SoundIoFormatFloat32NE;
     outlsstream->sample_rate = VOICE_SAMPRATE;
-    outlsstream->software_latency = 0.0;
+    outlsstream->software_latency = latency;
     outlsstream->write_callback = write_voicecallback;
     outlsstream->underflow_callback = underflow_voicecallback;
     outlsstream->userdata = NULL;
@@ -410,4 +418,45 @@ void io_close_voice()
     if (voice_soundio) soundio_destroy(voice_soundio);
     voice_soundio = NULL;
 
+}
+
+void io_saveStream(float f)
+{
+    static FILE* fw = NULL;
+    static int old_VoiceAudioMode = 0;
+    if (VoiceAudioMode != old_VoiceAudioMode)
+    {
+        if (old_VoiceAudioMode == VOICEMODE_OFF && VoiceAudioMode == VOICEMODE_RECORD)
+        {
+            char fn[500];
+            snprintf(fn, 499, "%s/oscardata/intro/intro.pcm", homepath);
+            fn[499] = 0;
+
+            // audio was switched on, open file to save PCM stream
+            if (fw) fclose(fw);
+            fw = fopen(fn, "wb");
+            if (!fw) printf("cannot open pcm file:%s\n",fn);
+            else printf("AUDIO RECORDING:%s ...\n Speak, then switch off\n",fn);
+        }
+
+        if (VoiceAudioMode == VOICEMODE_OFF)
+        {
+            // audio was switched off, stop recording
+            if (fw)
+            {
+                fclose(fw);
+                printf("AUDIO RECORDING off\n");
+            }
+            fw = NULL;
+        }
+        old_VoiceAudioMode = VoiceAudioMode;
+    }
+
+    if (fw)
+    {
+        if (f > 1) f = 1;
+        if (f < -1) f = -1;
+        int16_t sh = (int16_t)(f * 32768.0f);
+        fwrite(&sh, sizeof(int16_t), 1, fw);
+    }
 }

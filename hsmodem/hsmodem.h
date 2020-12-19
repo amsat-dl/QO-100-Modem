@@ -14,6 +14,7 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -84,7 +85,9 @@ enum _VOICEMODES_ {
     VOICEMODE_INTERNALLOOP,
     VOICEMODE_CODECLOOP,
     VOICEMODE_DV_FULLDUPLEX,
-    VOICEMODE_DV_RXONLY
+    VOICEMODE_DV_RXONLY,
+    VOICEMODE_RECORD,
+    VOICEMODE_PLAYBACK
 };
 
 void init_packer();
@@ -97,6 +100,10 @@ void convertBytesToSyms_8PSK(uint8_t* bytes, uint8_t* syms, int bytenum);
 uint8_t* convertQPSKSymToBytes(uint8_t* rxsymbols);
 uint8_t* convert8PSKSymToBytes(uint8_t* rxsymbols, int len);
 
+uint8_t* rotateBackBPSK(uint8_t* buf, int len, int rotations);
+uint8_t* convertBPSKSymToBytes(uint8_t* rxsymbols);
+void convertBytesToSyms_BPSK(uint8_t* bytes, uint8_t* syms, int bytenum);
+void rotateBPSKsyms(uint8_t* src, uint8_t* dst, int len);
 
 void rotateQPSKsyms(uint8_t* src, uint8_t* dst, int len);
 void rotate8PSKsyms(uint8_t* src, uint8_t* dst, int len);
@@ -140,7 +147,7 @@ void setVolume_voice(int pbcap, int v);
 void sendAnnouncement();
 
 void sleep_ms(int ms);
-int getus();
+int getms();
 void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
 void toGR_sendData(uint8_t* data, int type, int status, int repeat);
 
@@ -151,8 +158,8 @@ int demodulator();
 void sendToModulator(uint8_t* d, int len);
 void resetModem();
 void close_dsp();
-void init_fft();
-void exit_fft();
+void _init_fft();
+void _exit_fft();
 void showbytestringf(char* title, float* data, int totallen, int anz);
 uint16_t* make_waterfall(float fre, int* retlen);
 
@@ -193,6 +200,10 @@ void km_symtrack_cccf_reset(int mode);
 void km_symtrack_cccf_set_bandwidth(float      _bw);
 void km_symtrack_execute(liquid_float_complex _x, liquid_float_complex* _y, unsigned int* _ny, unsigned int* psym_out);
 
+void io_saveStream(float f);
+void playIntro();
+void io_clear_voice_fifos();
+
 
 extern int speedmode;
 extern int bitsPerSymbol;
@@ -229,6 +240,8 @@ extern float softwareLSvolume;
 extern int physcaprate;
 extern int restart_modems;
 extern int safemode;
+extern char homepath[];
+extern int sendIntro;
 
 #ifdef _LINUX_
 int isRunning(char* prgname);

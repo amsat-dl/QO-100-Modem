@@ -36,6 +36,8 @@ struct SoundIoDevice* io_cap_device = NULL;
 struct SoundIoInStream* instream = NULL;
 struct SoundIoOutStream* outstream = NULL;
 
+float latenz = 0.1f;
+
 
 typedef struct _AUDIODEV_ {
     int     in_out = 0;         // 0=in, 1=out
@@ -529,7 +531,7 @@ int io_init_sound(char *pbname, char *capname)
         instream->sample_rate = AUDIO_SAMPRATE;
         physcaprate = AUDIO_SAMPRATE;
     }
-    instream->software_latency = 0.0;
+    instream->software_latency = latenz;
     instream->read_callback = read_callback;
     instream->overflow_callback = overflow_callback;
     instream->userdata = NULL;
@@ -593,7 +595,7 @@ int io_init_sound(char *pbname, char *capname)
         outstream->format = SoundIoFormatFloat32NE;
 
     outstream->sample_rate = caprate;
-    outstream->software_latency = 1.0;
+    outstream->software_latency = latenz;
     outstream->write_callback = write_callback;
     outstream->underflow_callback = underflow_callback;
     outstream->userdata = NULL;

@@ -27,7 +27,7 @@
 void Insert(uint8_t bit);
 uint8_t* getPayload(uint8_t* rxb);
 
-uint8_t rxbuffer[UDPBLOCKLEN*8/2+100]; // 3...bits per symbol QPSK, enough space also for QPSK and 8PSK, +100 ... reserve, just to be sure
+uint8_t rxbuffer[UDPBLOCKLEN*8/1+100]; // 3...bits per symbol QPSK, enough space also for QPSK and 8PSK, +100 ... reserve, just to be sure
 uint8_t rx_status = 0;
 
 int framecounter = 0;
@@ -38,20 +38,27 @@ int getPayload_error = 0;
 uint8_t TXheaderbytes[HEADERLEN] = {0x53, 0xe1, 0xa6};
 // corresponds to these QPSK symbols:
 // bits: 01010011 11100001 10100110
+// BPSK:
+// syms: 01010011 11100001 10100110
 // QPSK:
 // syms:  1 1 0 3  3 2 0 1  2 2 1 2
 // 8PSK:
 // syms:   2  4   7  6  0   6  4  6
 
+// BPSK
+// each header has 24 symbols
+// we have 2 constellations 
+uint8_t BPSK_headertab[2][HEADERLEN * 8 / 1];
+
 // QPSK
 // each header has 12 symbols
 // we have 4 constellations 
-uint8_t QPSK_headertab[4][HEADERLEN*8/2];
+uint8_t QPSK_headertab[4][HEADERLEN * 8 / 2];
 
 // 8PSK
 // each header has 8 symbols
 // we have 8 constellations 
-uint8_t _8PSK_headertab[8][HEADERLEN*8/3];
+uint8_t _8PSK_headertab[8][HEADERLEN * 8 / 3];
 
 /*
 8CONST: . Len 8: 02 04 07 06 00 06 04 06 
@@ -67,6 +74,12 @@ uint8_t _8PSK_headertab[8][HEADERLEN*8/3];
 // init header tables
 void init_packer()
 {
+    // create the BPSK symbol table for the HEADER
+    // in all possible rotations
+    convertBytesToSyms_BPSK(TXheaderbytes, BPSK_headertab[0], 3);
+    for (int i = 1; i < 2; i++)
+        rotateBPSKsyms(BPSK_headertab[i - 1], BPSK_headertab[i], 24);
+
     // create the QPSK symbol table for the HEADER
     // in all possible rotations
     convertBytesToSyms_QPSK(TXheaderbytes, QPSK_headertab[0], 3);
@@ -77,9 +90,7 @@ void init_packer()
     // in all possible rotations
     convertBytesToSyms_8PSK(TXheaderbytes, _8PSK_headertab[0], 3);
     for(int i=1; i<8; i++)
-    {
         rotate8APSKsyms(_8PSK_headertab[i-1], _8PSK_headertab[i], 8);
-    }
     
     /*for(int i=0; i<8; i++)
         showbytestring((char*)"8CONST: ",_8PSK_headertab[i],8);*/
@@ -160,7 +171,25 @@ int seekHeadersyms(int symnum)
 
     int maxerr = MAXHEADERRS;
 
-    if(constellationSize == 4)
+    if (constellationSize == 2)
+    {
+        // BPSK
+        for (int tab = 0; tab < 2; tab++)
+        {
+            errs = 0;
+            for (int i = 0; i < HEADERLEN * 8 / 1; i++)
+            {
+                if (rxbuffer[i] != BPSK_headertab[tab][i])
+                    errs++;
+            }
+            if (errs <= maxerr)
+            {
+                ret = tab;
+                break;
+            }
+        }
+    }
+    else if(constellationSize == 4)
     {
         // QPSK
         for(int tab=0; tab<4; tab++)
@@ -199,7 +228,7 @@ int seekHeadersyms(int symnum)
 
     if (ret != -1)
     {
-        //printf("header detected at symbol:%d, headererrors:%d\n", symnum,errs);
+        //printf("header detected at symbol:%d, headererrors:%d rotation:%d\n", symnum,errs,ret);
         return ret;
     }
 
@@ -230,21 +259,26 @@ uint8_t *unpack_data(uint8_t *rxd, int len)
         rxbuffer[frmlen-1] = rxd[sym];
         symnum++;
         
-        //showbytestring((char*)"rx: ",rxbuffer,30);
+        
         
         int rotations = seekHeadersyms(symnum);
         if(rotations != -1) 
         {
-        
+            //showbytestring((char*)"rx: ", rxbuffer, 30,30);
             // rxbuffer contains all symbols of the received frame
             // convert to bytes
             uint8_t *rxbytes = NULL;
-            if(constellationSize == 4)
+            if (constellationSize == 2)
+            {
+                uint8_t* backbuf = rotateBackBPSK(rxbuffer, frmlen, rotations);
+                rxbytes = convertBPSKSymToBytes(backbuf);
+            }
+            else if(constellationSize == 4)
             {
                 uint8_t *backbuf = rotateBackQPSK(rxbuffer,frmlen,rotations);
                 rxbytes = convertQPSKSymToBytes(backbuf);
             }
-            else 
+            else if (constellationSize == 8)
             {
                 uint8_t *backbuf = rotateBack8APSK(rxbuffer,frmlen,rotations);
                 rxbytes = convert8PSKSymToBytes(backbuf,UDPBLOCKLEN);
@@ -301,7 +335,6 @@ uint8_t *getPayload(uint8_t *rxb)
     //showbytestring((char *)"orig: ",rxb+HEADERLEN,30);    
     // unscramble
     uint8_t *rxarray = RX_Scramble(rxb+HEADERLEN, FECBLOCKLEN);
-
             
     // calculate the FEC over the received data
     // and fill a frame structure

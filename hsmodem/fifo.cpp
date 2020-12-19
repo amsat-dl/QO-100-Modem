@@ -85,17 +85,14 @@ void io_cap_write_fifo(float sample)
 {
     if (((io_cap_wridx + 1) % AUDIO_CAPTURE_BUFLEN) == io_cap_rdidx)
     {
-        printf("cap fifo full\n");
+        //printf("cap fifo full\n");
+        return;
     }
 
     IO_CAP_LOCK;
     io_cap_buffer[io_cap_wridx] = sample;
     if (++io_cap_wridx >= AUDIO_CAPTURE_BUFLEN) io_cap_wridx = 0;
     IO_CAP_UNLOCK();
-
-    // if monitoring is activated then write it also to the voice fifo
-    /*if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
-        toVoice(sample);*/
 }
 
 int io_cap_read_fifo(float* data)

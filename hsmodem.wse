@@ -685,6 +685,21 @@ item: Install File
   Flags=0000000010000010
 end
 item: Install File
+  Source=c:\tmp\WinRelease\audio\1200.pcm
+  Destination=%MAINDIR%\audio\1200.pcm
+  Flags=0000000010000010
+end
+item: Install File
+  Source=c:\tmp\WinRelease\audio\2400.pcm
+  Destination=%MAINDIR%\audio\2400.pcm
+  Flags=0000000010000010
+end
+item: Install File
+  Source=c:\tmp\WinRelease\audio\bpsk.pcm
+  Destination=%MAINDIR%\audio\bpsk.pcm
+  Flags=0000000010000010
+end
+item: Install File
   Source=c:\tmp\WinRelease\audio\3000.pcm
   Destination=%MAINDIR%\audio\3000.pcm
   Flags=0000000010000010
@@ -745,14 +760,9 @@ item: Install File
   Flags=0000000010000010
 end
 item: Install File
-  Source=c:\tmp\WinRelease\bass.dll
-  Destination=%MAINDIR%\bass.dll
-  Flags=0000000010000011
-end
-item: Install File
-  Source=c:\tmp\WinRelease\basswasapi.dll
-  Destination=%MAINDIR%\basswasapi.dll
-  Flags=0000000010000011
+  Source=c:\tmp\WinRelease\libsoundio.dll
+  Destination=%MAINDIR%\libsoundio.dll
+  Flags=0000000010000010
 end
 item: Install File
   Source=c:\tmp\WinRelease\hsmodem.exe

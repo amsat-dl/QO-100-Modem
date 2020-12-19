@@ -31,22 +31,29 @@ void sendCodecToModulator(uint8_t* pdata, int len);
 struct CODEC2 *pc2 = NULL;
 int samplesPerPacket = 160;
 int bytesPerPacket = 8;
+firdecim_crcf decim48_8 = NULL;
+firinterp_crcf interp8_48;
+const int decfactor = 6;
 
 void init_codec2()
 {
 	close_codec2();
 
-	if (speedmode == 0)
-		pc2 = codec2_create(CODEC2_MODE_1600);
-	else if(speedmode == 1)
-		pc2 = codec2_create(CODEC2_MODE_2400);
-	else
-		pc2 = codec2_create(CODEC2_MODE_3200);
+	// create pre-decimator
+	decim48_8 = firdecim_crcf_create_kaiser(decfactor, 7, 40.0f);
+	firdecim_crcf_set_scale(decim48_8, 1.0f / (float)decfactor);
 
-	if (pc2 == NULL)
+	// create post-interpolator
+	interp8_48 = firinterp_crcf_create_kaiser(decfactor, 7, 40.0f);
+
+	switch (speedmode)
 	{
-		printf("cannot create CODEC2\n");
+	case 0: pc2 = codec2_create(CODEC2_MODE_700C); break;
+	case 1: pc2 = codec2_create(CODEC2_MODE_1600); break;
+	case 2: pc2 = codec2_create(CODEC2_MODE_2400); break;
+	default: pc2 = codec2_create(CODEC2_MODE_3200); break;
 	}
+
 	codec2_set_natural_or_gray(pc2, 0);
 	bytesPerPacket = codec2_bits_per_frame(pc2) / 8;
 	samplesPerPacket = codec2_samples_per_frame(pc2);
@@ -56,10 +63,16 @@ void init_codec2()
 void close_codec2()
 {
 	if (pc2 != NULL)
-	{
 		codec2_destroy(pc2);
-	}
 	pc2 = NULL;
+
+	if (decim48_8 != NULL)
+		firdecim_crcf_destroy(decim48_8);
+	decim48_8 = NULL;
+
+	if (interp8_48 != NULL)
+		firinterp_crcf_destroy(interp8_48);
+	interp8_48 = NULL;
 }
 
 // encode 160 voice samples (8kS/s) into 64 bits output
@@ -69,18 +82,24 @@ void encode_codec2(float f)
 	static int16_t sbuf[500];	// this is easily more than "samplesPerPacket" in any cases
 	static int fbuf_idx = 0;
 	uint8_t outbuf[50];			// this is easily more than "bytesPerPacket" in any cases
+	static liquid_float_complex fdec[decfactor];
 
-	if (pc2 == NULL) return;
+	if (pc2 == NULL || decim48_8 == NULL) return;
 
 	// this encoder is called with a sound card sample rate of 48000
 	// codec2 needs 8 kS/s, so we have to decimate by 6
+	fdec[decim].real = f;
+	fdec[decim].imag = 0;
 	if (++decim >= 6)
 	{
 		decim = 0;
 
+		liquid_float_complex y;
+		firdecim_crcf_execute(decim48_8, fdec, &y);
+
 		// here we have a sample rate of 8 kS/s
 		// one encoding call needs 160 samples
-		sbuf[fbuf_idx] = (int16_t)(f * 32768);	// convert to short
+		sbuf[fbuf_idx] = (int16_t)(y.real * 32768);	// convert to short
 		if (++fbuf_idx >= samplesPerPacket)
 		{
 			fbuf_idx = 0;
@@ -109,8 +128,15 @@ void encode_codec2(float f)
 					float f = (float)spbbuf[i];
 					f /= 32768;
 					// here we have 8kS/s, need to interpolate to 48 kS/s
-					for(int x=0; x<6; x++)
-						io_ls_write_fifo(f);
+					liquid_float_complex inp;
+					inp.real = f;
+					inp.imag = 0;
+					liquid_float_complex outp[decfactor];
+
+					firinterp_crcf_execute(interp8_48, inp, outp);
+
+					for (int x = 0; x < decfactor; x++)
+						io_ls_write_fifo(outp[x].real);
 				}
 			}
 		}
@@ -147,10 +173,9 @@ void toCodecDecoder_codec2(uint8_t* pdata, int len)
 
 		if (mfound)
 		{
-			//showbytestring("OPUS:", chunk + 1, opusPacketSize, opusPacketSize);
-
 			// codec loop mode: decode and play it
 			int16_t spbbuf[500];
+			//showbytestring("CODEC2:", chunk + 1, 3, 3);
 			codec2_decode(pc2, spbbuf, chunk+1);
 
 			for (int i = 0; i < samplesPerPacket; i++)
@@ -158,8 +183,15 @@ void toCodecDecoder_codec2(uint8_t* pdata, int len)
 				float f = (float)spbbuf[i];
 				f /= 32768;
 				// here we have 8kS/s, need to interpolate to 48 kS/s
-				for (int x = 0; x < 6; x++)
-					io_ls_write_fifo(f);
+				liquid_float_complex inp;
+				inp.real = f;
+				inp.imag = 0;
+				liquid_float_complex outp[decfactor];
+
+				firinterp_crcf_execute(interp8_48, inp, outp);
+
+				for (int x = 0; x < decfactor; x++)
+					io_ls_write_fifo(outp[x].real);
 			}
 		}
 	}

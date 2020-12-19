@@ -30,60 +30,50 @@
 #include <fftw3.h>
 #endif
 
-#define FFT_AUDIOSAMPLERATE 8000
+uint16_t* mean(uint16_t* f);
+
+#define FFT_AUDIOSAMPLERATE 800
 
 double *din = NULL;		// input data for  fft
 fftw_complex *cpout = NULL;	    // ouput data from fft
 fftw_plan plan = NULL;
-#define fft_rate  (FFT_AUDIOSAMPLERATE / 10)       // resolution: 10 Hz
 int fftidx = 0;
-int fftcnt = fft_rate/2+1;      // number of output values
-uint16_t fftout[FFT_AUDIOSAMPLERATE / 10/2+1];
-float f_fftout[FFT_AUDIOSAMPLERATE / 10 / 2 + 1];
+int fftcount; // number of output values
+uint16_t fftout[FFT_AUDIOSAMPLERATE / 2 + 1];
+float f_fftout[FFT_AUDIOSAMPLERATE / 2 + 1];
 int downsamp = 0;
 int downphase = 0;
 int rxlevel_deteced = 0;
 int rx_in_sync = 0;
+msresamp_crcf fftdecim = NULL;
 
 uint16_t *make_waterfall(float fre, int *retlen)
 {
-    // Downsampling:
-    // needed 8000 bit/s
-    // caprate 48k: downsample by 6
-    // caprate 44,1k: downsample by 5,5
-
-    if (physcaprate == 48000)
-        if (++downsamp < 6) return NULL;
-
-    // TODO: the following simple resamp results in double peeks in fft
-    if (physcaprate == 44100)
-    {
-        if (downphase <= 1100)
-        {
-            if (++downsamp < 5) return NULL;
-        }
-        else
-        {
-            if (++downsamp < 6) return NULL;
-        }
-        if(++downphase >= 2000) downphase = 0;
-    }
-    downsamp = 0;
-
     int fftrdy = 0;
+
+    // data come with 44.1k or 48k sample rate
+    // downsample to 800 to get 0-4k in 10 Hz steps
+    unsigned int num_written = 0;
+    liquid_float_complex in;
+    liquid_float_complex out;
+    in.real = fre;
+    in.imag = 0;
+    msresamp_crcf_execute(fftdecim, &in, 1, &out, &num_written);
+    if (num_written != 1) return NULL;
+    fre = out.real;
         
     // fre are the float samples
     // fill into the fft input buffer
     din[fftidx++] = fre;
         
-    if(fftidx == fft_rate)
+    if(fftidx == FFT_AUDIOSAMPLERATE)
     {
         fftidx = 0;
 
         // the fft buffer is full, execute the FFT 
         fftw_execute(plan);
             
-        for (int j = 0; j < fftcnt; j++)
+        for (int j = 0; j < fftcount; j++)
         {
             // calculate absolute value (magnitute without phase)
             float fre = (float)cpout[j][0];
@@ -111,9 +101,9 @@ uint16_t *make_waterfall(float fre, int *retlen)
 
             // measure level at mid band
             float midlevel = 0;
-            for (int e = 100; e < 300; e++)
+            for (int e = 100; e < 200; e++)
                 midlevel += f_fftout[e];
-            midlevel /= 200;
+            midlevel /= 100;
 
             //calc difference in %
             int idiff = (int)((edgelevel * 100) / midlevel);
@@ -145,7 +135,7 @@ uint16_t *make_waterfall(float fre, int *retlen)
                 {
                     if (sig == 1)
                     {
-                        printf("===>>> level detected, reset modem\n");
+                        //printf("===>>> level detected, reset modem\n");
                         trigger_resetmodem = 1;
                     }
                 }
@@ -155,33 +145,82 @@ uint16_t *make_waterfall(float fre, int *retlen)
     
     if(fftrdy == 1)
     {
-        *retlen = fftcnt;
-        return fftout;
+        *retlen = fftcount;
+        return mean(fftout);
     }
     
     return NULL;
 }
 
-void init_fft()
+// smooth fft output
+const int smoothX = 6; // must be an even number !
+const int smoothY = 3;
+int yidx = 0;
+
+uint16_t* mean(uint16_t* f)
 {
-	/* 
-char fn[300];
-    * storing to a file in the working directory may be a problem under Windows, so we do not use wisdom files
-    sprintf(fn, "capture_fft_%d", fft_rate);	// wisdom file for each capture rate
+    static uint16_t fa[FFT_AUDIOSAMPLERATE / 2 + 1];
+    // first smooth X values
+    for (int x = 0; x < smoothX / 2; x++)
+        fa[x] = f[x];
 
-	fftw_import_wisdom_from_filename(fn);*/
+    for (int x = smoothX / 2; x < fftcount - smoothX / 2; x++)
+    {
+        fa[x] = 0;
+        for (int i = -smoothX/2; i < smoothX/2; i++)
+            fa[x] += f[x+i];
+        fa[x] /= smoothX;
+    }
 
-	din = (double *)fftw_malloc(sizeof(double) * fft_rate);
-	cpout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * fft_rate);
+    for (int x = fftcount - smoothX / 2; x < fftcount; x++)
+        fa[x] = f[x];
 
-	plan = fftw_plan_dft_r2c_1d(fft_rate, din, cpout, FFTW_MEASURE);
-	
-	//fftw_export_wisdom_to_filename(fn);
+    // smooth Y values
+    static uint16_t yarr[smoothY][FFT_AUDIOSAMPLERATE / 2 + 1];
+    for (int i = 0; i < fftcount; i++)
+        yarr[yidx][i] = fa[i];
+    if (++yidx >= smoothY) yidx = 0;
+
+    memset(fa, 0, FFT_AUDIOSAMPLERATE / 2 + 1);
+    for (int i = 0; i < fftcount; i++)
+    {
+        for (int j = 0; j < smoothY; j++)
+            fa[i] += yarr[j][i];
+        fa[i] /= smoothY;
+    }
+
+    return fa;
 }
 
-void exit_fft()
+void _init_fft()
+{
+    fftcount = FFT_AUDIOSAMPLERATE / 2 + 1;     // number of output samples
+    // the FFT outputs 400 values from 0 to 4kHz with a resolution of 10 Hz
+
+    _exit_fft();
+	din = (double *)fftw_malloc(sizeof(double) * FFT_AUDIOSAMPLERATE);
+	cpout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * fftcount);
+
+	plan = fftw_plan_dft_r2c_1d(FFT_AUDIOSAMPLERATE, din, cpout, FFTW_MEASURE);
+
+    // create arbitrary pre decimator
+    // decimate 44.1k or 48k down to 8000Hz
+    // the FFT rate is 800, but we feed it with 8000 Samplerate
+    // this results in a new fft every 100ms with a resolution of 10 Hz
+    float ratio = 10.0f * (float)FFT_AUDIOSAMPLERATE / (float)caprate;
+    fftdecim = msresamp_crcf_create(ratio, 40.0f);
+
+}
+
+void _exit_fft()
 {
     if(plan) fftw_destroy_plan(plan);
 	if(din) fftw_free(din);
 	if(cpout) fftw_free(cpout);
+    plan = NULL;
+    din = NULL;
+    cpout = NULL;
+
+    if (fftdecim) msresamp_crcf_destroy(fftdecim);
+    fftdecim = NULL;
 }

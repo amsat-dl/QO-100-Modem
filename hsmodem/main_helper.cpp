@@ -43,7 +43,7 @@ int isRunning(char *prgname)
 void sighandler(int signum)
 {
     printf("program stopped by signal\n");
-    exit_fft();
+    _exit_fft();
     keeprunning = 0;
     close(BC_sock_AppToModem);
 }
@@ -77,7 +77,7 @@ void closeAllandTerminate()
     io_close_audio();
     io_close_voice();
     // close fft
-    exit_fft();
+    _exit_fft();
     // close codec2 and opus
     close_codec2();
     close_voiceproc();

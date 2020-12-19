@@ -31,16 +31,18 @@ int spdarr[MAXSPDARR];
 int spdarrbps[MAXSPDARR];
 
 #ifdef _LINUX_
-int getus()
+int getms()
 {
     struct timeval  tv;
  	gettimeofday(&tv, NULL);
-	return tv.tv_sec * 1000000 + tv.tv_usec;
+    uint64_t at = tv.tv_sec * 1000000 + tv.tv_usec;
+    at = at / 1000;
+    return (int)at;
 }
 #endif
 
 #ifdef _WIN32_
-int getus()
+int getms()
 {
     int actms;
 
@@ -48,7 +50,7 @@ int getus()
     GetSystemTime(&st);
 
     actms = st.wSecond * 1000 + (int)st.wMilliseconds;
-    return actms * 1000;
+    return actms;
 }
 #endif
 
@@ -115,7 +117,7 @@ void measure_speed_syms(int len)
     static int lasttim = 0;
     static int elems = 0;
     
-    int tim = getus();
+    int tim = getms();
     int timespan = tim - lasttim;
     if(timespan < 0) 
     {
@@ -125,10 +127,10 @@ void measure_speed_syms(int len)
     
     
     elems += len;
-    if(timespan < 1000000) return;
+    if(timespan < 1000) return;
     
     double dspd = elems;
-    dspd = dspd * 1e6 / timespan;
+    dspd = dspd * 1e3 / timespan;
     speed = meanval((int)dspd) * bitsPerSymbol;
     
     // here we have number of elements after 1s
@@ -143,7 +145,7 @@ void measure_speed_bps(int len)
     static int lasttim = 0;
     static int elems = 0;
 
-    int tim = getus();
+    int tim = getms();
     int timespan = tim - lasttim;
     if (timespan < 0)
     {
@@ -153,14 +155,14 @@ void measure_speed_bps(int len)
 
 
     elems += len;
-    if (timespan < 1000000) return;
+    if (timespan < 1000) return;
 
     double dspd = elems;
-    dspd = dspd * 1e6 / timespan;
+    dspd = dspd * 1e3 / timespan;
     speed = meanvalbps((int)dspd);
 
     // here we have number of elements after 1s
-    //printf(" ======================= %d bit/s\n", speed);
+    printf(" ======================= %d bit/s\n", speed);
 
     elems = 0;
     lasttim = tim;

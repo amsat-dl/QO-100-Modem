@@ -143,6 +143,13 @@
     <None Include="Properties\greenmarker.png" />
     <None Include="Properties\redmarker.png" />
     <None Include="Properties\hintergrundxcf.png" />
+    <None Include="Properties\rahmen.png" />
+    <None Include="Properties\screen.png" />
+    <None Include="Properties\schraube.png" />
+    <None Include="Properties\osci.png" />
+    <None Include="Properties\record.png" />
+    <None Include="Properties\stopplay.png" />
+    <None Include="Properties\playback.png" />
     <Content Include="Satellite-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
