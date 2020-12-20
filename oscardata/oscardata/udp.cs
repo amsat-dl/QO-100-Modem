@@ -207,13 +207,14 @@ namespace oscardata
                 gr.FillRectangle(bgcol, 0,0, panelw, panelh);
                 // oscilloscope screen
                 gr.DrawImage(new Bitmap(Properties.Resources.screen), 2, 1);
+                /*
                 // screws at the 4 corners
                 Bitmap screw = new Bitmap(Properties.Resources.schraube);
                 gr.DrawImage(screw, 2, 2);
                 gr.DrawImage(screw, panelw - 2-screw.Width, 2);
                 gr.DrawImage(screw, 2, panelh - 2 - screw.Height);
                 gr.DrawImage(screw, panelw - 2 - screw.Width, panelh - 2 - screw.Height);
-
+                */
                 // draw constellation points
                 for (int i = 0; i < sumidx; i++)
                 {
@@ -297,12 +298,14 @@ namespace oscardata
                 gr.FillRectangle(bgcol, 0, 0, bm.Width, bm.Height);
                 // scala
                 gr.DrawImage(bmskala,16,2);
+                /*
                 // screws at the 4 corners
                 Bitmap screw = new Bitmap(Properties.Resources.schraube);
                 gr.DrawImage(screw, 2, 2);
                 gr.DrawImage(screw, 442 - 2 - screw.Width, 2);
                 gr.DrawImage(screw, 2, 76 - 2 - screw.Height);
                 gr.DrawImage(screw, 442 - 2 - screw.Width, 76 - 2 - screw.Height);
+                */
                 // spectrum
                 int lastus = -1;
                 // values

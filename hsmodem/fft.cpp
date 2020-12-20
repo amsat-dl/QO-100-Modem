@@ -135,7 +135,7 @@ uint16_t *make_waterfall(float fre, int *retlen)
                 {
                     if (sig == 1)
                     {
-                        //printf("===>>> level detected, reset modem\n");
+                        printf("===>>> level detected, reset modem\n");
                         trigger_resetmodem = 1;
                     }
                 }

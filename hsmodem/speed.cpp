@@ -31,26 +31,30 @@ int spdarr[MAXSPDARR];
 int spdarrbps[MAXSPDARR];
 
 #ifdef _LINUX_
-int getms()
+uint64_t getms()
 {
     struct timeval  tv;
  	gettimeofday(&tv, NULL);
     uint64_t at = tv.tv_sec * 1000000 + tv.tv_usec;
     at = at / 1000;
-    return (int)at;
+    return at;
 }
 #endif
 
 #ifdef _WIN32_
-int getms()
+uint64_t getms()
 {
-    int actms;
+    // get time in 100ns resolution
+    FILETIME ft_now;
+    GetSystemTimeAsFileTime(&ft_now);
 
-    SYSTEMTIME st;
-    GetSystemTime(&st);
+    // convert to full 64 bit time
+    uint64_t ll_now = (uint64_t)ft_now.dwLowDateTime + ((uint64_t)(ft_now.dwHighDateTime) << 32LL);
 
-    actms = st.wSecond * 1000 + (int)st.wMilliseconds;
-    return actms;
+    // convert to Milliseconds
+    ll_now /= (10 * 1000);      // still needs 64 bit integer
+
+    return ll_now;
 }
 #endif
 
@@ -114,11 +118,11 @@ int meanvalbps(int v)
 // measures and calculates the speed in bit / s
 void measure_speed_syms(int len)
 {
-    static int lasttim = 0;
+    static uint64_t lasttim = 0;
     static int elems = 0;
     
-    int tim = getms();
-    int timespan = tim - lasttim;
+    uint64_t tim = getms();
+    int timespan = (int)(tim - lasttim);
     if(timespan < 0) 
     {
         lasttim = tim;
@@ -142,11 +146,11 @@ void measure_speed_syms(int len)
 
 void measure_speed_bps(int len)
 {
-    static int lasttim = 0;
+    static uint64_t lasttim = 0;
     static int elems = 0;
 
-    int tim = getms();
-    int timespan = tim - lasttim;
+    uint64_t tim = getms();
+    int timespan = (int)(tim - lasttim);
     if (timespan < 0)
     {
         lasttim = tim;

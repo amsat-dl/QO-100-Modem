@@ -147,7 +147,7 @@ void setVolume_voice(int pbcap, int v);
 void sendAnnouncement();
 
 void sleep_ms(int ms);
-int getms();
+uint64_t getms();
 void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
 void toGR_sendData(uint8_t* data, int type, int status, int repeat);
 

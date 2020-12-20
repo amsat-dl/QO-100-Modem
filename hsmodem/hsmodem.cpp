@@ -249,8 +249,8 @@ int main(int argc, char* argv[])
         }
         
         // demodulate incoming audio data stream
-        static int old_tm = 0;
-        int tm = getms();
+        static uint64_t old_tm = 0;
+        uint64_t tm = getms();
         if (tm >= (old_tm + 1000))
         {
             // read Audio device list every 1s
@@ -351,8 +351,8 @@ void io_setAudioDevices(uint8_t pbvol, uint8_t capvol, uint8_t announce, uint8_t
 // called from UDP RX thread for Broadcast-search from App
 void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
-    static int lastms = 0;  // time of last received BC message
-    int actms = getms();
+    static uint64_t lastms = 0;  // time of last received BC message
+    uint64_t actms = getms();
 
     if (len > 0 && pdata[0] == 0x3c)
     {
@@ -383,7 +383,7 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                 {
                     // there was an appIP already
                     // before accepting this new one, wait 3 seconds
-                    int ts = actms - lastms;
+                    int ts = (int)(actms - lastms);
                     printf("new app IP: %s since %d, restarting modems\n", rxip,ts);
                     if (ts < 3000)
                         return;
@@ -633,8 +633,8 @@ void toGR_sendData(uint8_t* data, int type, int status, int repeat)
 // called by liquid demodulator for received data
 void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
-    static int lasttime = -1;
-    static int triggertime = 0;
+    static int64_t lasttime = -1;
+    static uint64_t triggertime = 0;
 
     // raw symbols
     uint8_t* pl = unpack_data(pdata, len);
@@ -665,43 +665,46 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         int bps = sr[speedmode].linespeed;
         // time for one frame [ms]
         int frmlen = UDPBLOCKLEN * 8;
-        int tmfrm_ms = (frmlen * 1000) / bps;
+        int tmfrm_ms = (frmlen * 1000) / bps;   // ms for one frame
         
-        int acttm = getms();
+        uint64_t acttm = getms();
         if (lasttime == -1)
         {
             lasttime = acttm;
             return;
         }
-        int tdiff = (acttm - lasttime); //ms
+        int tdiff = (int)(acttm - lasttime); // elapsed time in ms
         int elapsed_frames = tdiff / tmfrm_ms;
-        //printf("difft:%d  elfrm:%d\n", tdiff, elapsed_frames);
+        //if((tdiff%1000)==0) printf("elapsed time:%d  frames:%d\n", tdiff, elapsed_frames);
 
         if (trigger_resetmodem == 1)
         {
+            // reset requested by FFT level detector
             trigger_resetmodem = 2;
             //printf("set triggertime\n");
-            triggertime = getms();
+            triggertime = acttm;
         }
 
-        if ((getms() - triggertime) > 1000 && trigger_resetmodem == 2)
+        if ((acttm - triggertime) > 1000 && trigger_resetmodem == 2)
         {
-            printf("signal detected, reset RX modem\n");
+            // reset rx 1 second after level detection
+            //printf("reset RX modem, 1s since signal detection\n");
             trigger_resetmodem = 0;
             rx_in_sync = 0;
             resetModem();
             lasttime = acttm;
         }
 
-        if (tdiff > 5)
+        if (tdiff > 5000)
         {
             // in any case, only every 5s or longer
+            //printf("5s elapsed\n");
             if (elapsed_frames > 2)
             {
                 // reset modem if more than 2 frames have not been received
                 trigger_resetmodem = 0;
                 rx_in_sync = 0;
-                //printf("no signal detected, reset RX modem\n");
+                printf("no signal detected, reset RX modem\n");
                 resetModem();
                 lasttime = acttm;
             }

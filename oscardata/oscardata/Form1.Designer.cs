@@ -118,6 +118,7 @@
             this.cb_audioCAP = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lb_rec = new System.Windows.Forms.Label();
             this.tb_recintro = new System.Windows.Forms.TextBox();
             this.bt_astop = new System.Windows.Forms.Button();
             this.bt_aplay = new System.Windows.Forms.Button();
@@ -148,7 +149,6 @@
             this.progressBar_fifo = new oscardata.KmProgressBar();
             this.vu_cap = new oscardata.KmProgressBar();
             this.vu_pb = new oscardata.KmProgressBar();
-            this.lb_rec = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -1202,6 +1202,17 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Personal Settings";
             // 
+            // lb_rec
+            // 
+            this.lb_rec.AutoSize = true;
+            this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lb_rec.ForeColor = System.Drawing.Color.Red;
+            this.lb_rec.Location = new System.Drawing.Point(498, 101);
+            this.lb_rec.Name = "lb_rec";
+            this.lb_rec.Size = new System.Drawing.Size(23, 13);
+            this.lb_rec.TabIndex = 29;
+            this.lb_rec.Text = "....";
+            // 
             // tb_recintro
             // 
             this.tb_recintro.BackColor = System.Drawing.SystemColors.Control;
@@ -1527,17 +1538,6 @@
             this.vu_pb.Size = new System.Drawing.Size(100, 10);
             this.vu_pb.TabIndex = 19;
             // 
-            // lb_rec
-            // 
-            this.lb_rec.AutoSize = true;
-            this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lb_rec.ForeColor = System.Drawing.Color.Red;
-            this.lb_rec.Location = new System.Drawing.Point(498, 101);
-            this.lb_rec.Name = "lb_rec";
-            this.lb_rec.Size = new System.Drawing.Size(23, 13);
-            this.lb_rec.TabIndex = 29;
-            this.lb_rec.Text = "....";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1562,7 +1562,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.52 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.53 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
