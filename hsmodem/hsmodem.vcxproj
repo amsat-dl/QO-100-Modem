@@ -255,6 +255,7 @@
     <ClCompile Include="soundio.cpp" />
     <ClCompile Include="speed.cpp" />
     <ClCompile Include="symboltracker.cpp" />
+    <ClCompile Include="tuning.cpp" />
     <ClCompile Include="udp.cpp" />
     <ClCompile Include="voiceio.cpp" />
     <ClCompile Include="voiceprocessor.cpp" />

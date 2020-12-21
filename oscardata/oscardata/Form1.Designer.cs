@@ -41,6 +41,8 @@
             this.timer_qpsk = new System.Windows.Forms.Timer(this.components);
             this.panel_txspectrum = new System.Windows.Forms.Panel();
             this.tabPage_ber = new System.Windows.Forms.TabPage();
+            this.bt_allf = new System.Windows.Forms.Button();
+            this.lb_tuningqrgs = new System.Windows.Forms.Label();
             this.button_stopBERtest = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.button_startBERtest = new System.Windows.Forms.Button();
@@ -149,6 +151,7 @@
             this.progressBar_fifo = new oscardata.KmProgressBar();
             this.vu_cap = new oscardata.KmProgressBar();
             this.vu_pb = new oscardata.KmProgressBar();
+            this.cb_marker = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -256,6 +259,8 @@
             // tabPage_ber
             // 
             this.tabPage_ber.BackColor = System.Drawing.Color.Transparent;
+            this.tabPage_ber.Controls.Add(this.bt_allf);
+            this.tabPage_ber.Controls.Add(this.lb_tuningqrgs);
             this.tabPage_ber.Controls.Add(this.button_stopBERtest);
             this.tabPage_ber.Controls.Add(this.button_startBERtest);
             this.tabPage_ber.Controls.Add(this.rtb);
@@ -263,9 +268,29 @@
             this.tabPage_ber.Location = new System.Drawing.Point(4, 23);
             this.tabPage_ber.Name = "tabPage_ber";
             this.tabPage_ber.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ber.Size = new System.Drawing.Size(1291, 552);
+            this.tabPage_ber.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_ber.TabIndex = 0;
             this.tabPage_ber.Text = "BER Test";
+            // 
+            // bt_allf
+            // 
+            this.bt_allf.Location = new System.Drawing.Point(537, 18);
+            this.bt_allf.Name = "bt_allf";
+            this.bt_allf.Size = new System.Drawing.Size(95, 23);
+            this.bt_allf.TabIndex = 25;
+            this.bt_allf.Text = "150..2850 Hz";
+            this.bt_allf.UseVisualStyleBackColor = true;
+            this.bt_allf.Click += new System.EventHandler(this.bt_allf_Click);
+            // 
+            // lb_tuningqrgs
+            // 
+            this.lb_tuningqrgs.AutoSize = true;
+            this.lb_tuningqrgs.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lb_tuningqrgs.Location = new System.Drawing.Point(436, 22);
+            this.lb_tuningqrgs.Name = "lb_tuningqrgs";
+            this.lb_tuningqrgs.Size = new System.Drawing.Size(84, 13);
+            this.lb_tuningqrgs.TabIndex = 21;
+            this.lb_tuningqrgs.Text = "Frequency Test:";
             // 
             // button_stopBERtest
             // 
@@ -318,7 +343,7 @@
             this.rtb.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rtb.Location = new System.Drawing.Point(6, 51);
             this.rtb.Name = "rtb";
-            this.rtb.Size = new System.Drawing.Size(1270, 494);
+            this.rtb.Size = new System.Drawing.Size(1266, 494);
             this.rtb.TabIndex = 0;
             this.rtb.Text = "";
             // 
@@ -334,7 +359,7 @@
             this.tabPage_image.Location = new System.Drawing.Point(4, 23);
             this.tabPage_image.Name = "tabPage_image";
             this.tabPage_image.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_image.Size = new System.Drawing.Size(1291, 552);
+            this.tabPage_image.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_image.TabIndex = 1;
             this.tabPage_image.Text = "Image";
             // 
@@ -508,7 +533,7 @@
             this.tabControl1.Location = new System.Drawing.Point(5, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1299, 579);
+            this.tabControl1.Size = new System.Drawing.Size(1288, 579);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage_file
@@ -528,7 +553,7 @@
             this.tabPage_file.ImageIndex = 9;
             this.tabPage_file.Location = new System.Drawing.Point(4, 23);
             this.tabPage_file.Name = "tabPage_file";
-            this.tabPage_file.Size = new System.Drawing.Size(1291, 552);
+            this.tabPage_file.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_file.TabIndex = 2;
             this.tabPage_file.Text = "File";
             // 
@@ -670,7 +695,7 @@
             this.tabPage_audio.ImageIndex = 11;
             this.tabPage_audio.Location = new System.Drawing.Point(4, 23);
             this.tabPage_audio.Name = "tabPage_audio";
-            this.tabPage_audio.Size = new System.Drawing.Size(1291, 552);
+            this.tabPage_audio.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_audio.TabIndex = 5;
             this.tabPage_audio.Text = "Voice Audio";
             // 
@@ -928,7 +953,7 @@
             this.tabPage_setup.ImageIndex = 6;
             this.tabPage_setup.Location = new System.Drawing.Point(4, 23);
             this.tabPage_setup.Name = "tabPage_setup";
-            this.tabPage_setup.Size = new System.Drawing.Size(1291, 552);
+            this.tabPage_setup.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_setup.TabIndex = 4;
             this.tabPage_setup.Text = "Setup";
             // 
@@ -943,9 +968,9 @@
             this.groupBox4.Controls.Add(this.tb_shutdown);
             this.groupBox4.Controls.Add(this.bt_resetmodem);
             this.groupBox4.Controls.Add(this.textBox3);
-            this.groupBox4.Location = new System.Drawing.Point(12, 257);
+            this.groupBox4.Location = new System.Drawing.Point(12, 313);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(674, 121);
+            this.groupBox4.Size = new System.Drawing.Size(743, 121);
             this.groupBox4.TabIndex = 15;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Maintenance";
@@ -1038,6 +1063,7 @@
             this.bt_resetmodem.TabIndex = 6;
             this.bt_resetmodem.Text = "Reset RX Modem";
             this.bt_resetmodem.UseVisualStyleBackColor = true;
+            this.bt_resetmodem.Visible = false;
             this.bt_resetmodem.Click += new System.EventHandler(this.bt_resetmodem_Click);
             // 
             // textBox3
@@ -1055,6 +1081,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.cb_marker);
             this.groupBox3.Controls.Add(this.vu_cap);
             this.groupBox3.Controls.Add(this.vu_pb);
             this.groupBox3.Controls.Add(this.pb_audioCAPstatus);
@@ -1069,7 +1096,7 @@
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Location = new System.Drawing.Point(12, 144);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(674, 107);
+            this.groupBox3.Size = new System.Drawing.Size(743, 163);
             this.groupBox3.TabIndex = 14;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Transceiver Audio";
@@ -1197,7 +1224,7 @@
             this.groupBox2.Controls.Add(this.cb_stampcall);
             this.groupBox2.Location = new System.Drawing.Point(12, 13);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(674, 127);
+            this.groupBox2.Size = new System.Drawing.Size(734, 127);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Personal Settings";
@@ -1388,7 +1415,7 @@
             this.tabPage_about.ImageIndex = 12;
             this.tabPage_about.Location = new System.Drawing.Point(4, 23);
             this.tabPage_about.Name = "tabPage_about";
-            this.tabPage_about.Size = new System.Drawing.Size(1291, 552);
+            this.tabPage_about.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_about.TabIndex = 6;
             this.tabPage_about.Text = "About";
             this.tabPage_about.UseVisualStyleBackColor = true;
@@ -1538,6 +1565,18 @@
             this.vu_pb.Size = new System.Drawing.Size(100, 10);
             this.vu_pb.TabIndex = 19;
             // 
+            // cb_marker
+            // 
+            this.cb_marker.AutoSize = true;
+            this.cb_marker.Location = new System.Drawing.Point(605, 21);
+            this.cb_marker.Name = "cb_marker";
+            this.cb_marker.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.cb_marker.Size = new System.Drawing.Size(123, 17);
+            this.cb_marker.TabIndex = 27;
+            this.cb_marker.Text = "3kHz Tuning Marker";
+            this.cb_marker.UseVisualStyleBackColor = true;
+            this.cb_marker.CheckedChanged += new System.EventHandler(this.cb_marker_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1562,11 +1601,12 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.53 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.55 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.tabPage_ber.ResumeLayout(false);
+            this.tabPage_ber.PerformLayout();
             this.tabPage_image.ResumeLayout(false);
             this.tabPage_image.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -1730,6 +1770,9 @@
         private System.Windows.Forms.Button bt_aplay;
         private System.Windows.Forms.TextBox tb_recintro;
         private System.Windows.Forms.Label lb_rec;
+        private System.Windows.Forms.Label lb_tuningqrgs;
+        private System.Windows.Forms.Button bt_allf;
+        private System.Windows.Forms.CheckBox cb_marker;
     }
 }
 

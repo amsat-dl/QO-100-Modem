@@ -193,7 +193,7 @@ void modulator(uint8_t sym_in)
     {
         // move sample to 1,5kHz carrier
         nco_crcf_step(upnco);
-        
+
         liquid_float_complex c;
         nco_crcf_mix_up(upnco,y[i],&c);
         float usb = c.real + c.imag;
@@ -207,7 +207,10 @@ void modulator(uint8_t sym_in)
             if(fs > 20000) break;
             sleep_ms(10);
         }
-        
+
+        if(marker)
+            usb += singleFrequency() / 10.0f;
+
         io_pb_write_fifo(usb * 0.2f); // reduce volume and send to soundcard
     }
 }

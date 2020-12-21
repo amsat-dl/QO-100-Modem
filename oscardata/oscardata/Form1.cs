@@ -48,6 +48,7 @@ namespace oscardata
         int last_initVoiceStatus;
         int recordStatus = 0;
         int recPhase = 0;
+        
 
         public Form1()
         {
@@ -635,6 +636,13 @@ namespace oscardata
             else
             {
                 lb_rec.Visible = false;
+            }
+
+            if (statics.tuning_active == 1 && txcommand != statics.noTX)
+            {
+                // stop tuning
+                bt_resetmodem_Click(null, null);
+                statics.tuning_active = 0;
             }
         }
 
@@ -1443,6 +1451,8 @@ namespace oscardata
 
             // and transmit it
             Udp.UdpSendCtrl(txdata);
+
+            statics.tuning_active = 0;
         }
 
         int setPBvolume = -1;
@@ -1734,6 +1744,8 @@ namespace oscardata
                 lb_rxsync.Text = "RX Sync:";
                 cb_sendIntro.Text = "send introduction";
                 tb_recintro.Text = "record introduction";
+                lb_tuningqrgs.Text = "Frequency Test";
+                cb_marker.Text = "3kHz Tuning Marker";
             }
 
             if (language == 1)
@@ -1790,6 +1802,8 @@ namespace oscardata
                 tb_shutdown.Text = "Vor dem Ausschalten eines SBC diesen hier herunterfahren";
                 cb_sendIntro.Text = "sende Vorstellung";
                 tb_recintro.Text = "Vorstellung aufnehmen";
+                lb_tuningqrgs.Text = "Frequenz Test:";
+                cb_marker.Text = "3kHz Tuning Markierung";
             }
         }
 
@@ -1894,6 +1908,44 @@ namespace oscardata
             }
         }
 
+        int acttuning = 0;
+        private void bt_tuning(int fr)
+        {
+            if (statics.tuning_active == 0 || fr != acttuning)
+            {
+                label_rximage.ForeColor = Color.Black;
+                pictureBox_rximage.Image = null;
+                ArraySend.stopSending();
+                bt_resetmodem_Click(null, null);
+                txcommand = statics.noTX;
+
+                Byte[] txdata = new byte[2];
+                txdata[0] = statics.tuning;
+                txdata[1] = (Byte)fr;
+                Udp.UdpSendCtrl(txdata);
+                statics.tuning_active = 1;
+            }
+            else
+            {
+                txcommand = statics.noTX;
+                bt_resetmodem_Click(null, null);
+                statics.tuning_active = 0;
+            }
+            acttuning = fr;
+        }
+
+        private void bt_allf_Click(object sender, EventArgs e)
+        {
+            bt_tuning(1);
+        }
+
+        private void cb_marker_CheckedChanged(object sender, EventArgs e)
+        {
+            Byte[] txdata = new byte[2];
+            txdata[0] = statics.marker;
+            txdata[1] = (Byte)(cb_marker.Checked ? 1 : 0);
+            Udp.UdpSendCtrl(txdata);
+        }
     }
 
 }

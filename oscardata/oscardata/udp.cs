@@ -269,6 +269,7 @@ namespace oscardata
                     gr.DrawLine(penred, 150, yl, 150, yh);
                     gr.DrawLine(pensolid, 20, yl, 20, yh);
                     gr.DrawLine(pensolid, 280, yl, 280, yh);
+                    gr.DrawLine(penred, 300, yl, 300, yh);
                     gr.DrawLine(pensolid, 360, yl, 360, yh);
 
                     gr.DrawRectangle(penred, 15, yh, 270, yl-yh);
@@ -327,19 +328,10 @@ namespace oscardata
             uq_fft.Add(bm);
         }
 
-        static AutoResetEvent autoEvent = new AutoResetEvent(false);
-
         // Udp TX Loop runs in its own thread
         static void Udptxloop()
         {
             UdpClient udpc = new UdpClient();
-
-            // calculate cycle time for the requested data rate
-            // time in ms for one bit:  1000/statics.datarate
-
-            //int actdatarate = statics.getDatarate();
-            //int wait_datarate = (int)(((double)statics.UdpBlocklen * 8.0 * 1000.0 / (double)(statics.getDatarate())));
-            //Timer TTimer = new Timer(new TimerCallback(TXTickTimer), autoEvent, 0, wait_datarate);
 
             while (statics.running)
             {
@@ -352,7 +344,7 @@ namespace oscardata
                     wait = false;
                 }
 
-                if(statics.PBfifousage < 2)
+                if(statics.PBfifousage < 3)
                 {
                     // we need to send more payload data
                     if (uq_tx.Count() > 0)
@@ -371,13 +363,6 @@ namespace oscardata
             UdpClient udpc = new UdpClient();
             udpc.EnableBroadcast = true;
             udpc.Send(b, b.Length, ip, port);
-        }
-
-        static void TXTickTimer(object stateInfo)
-        {
-            autoEvent = (AutoResetEvent)stateInfo;
-
-            autoEvent.Set();
         }
 
         // send a Byte array via UDP

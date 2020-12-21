@@ -72,6 +72,9 @@
     <ClCompile Include="voiceio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tuning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hsmodem.h">

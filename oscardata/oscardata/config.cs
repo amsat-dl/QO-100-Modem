@@ -36,6 +36,8 @@ namespace oscardata
         public static Byte SetMICvolume = 24;
         public static Byte SetVoiceMode = 25;
         public static Byte terminate = 26;
+        public static Byte tuning = 27;
+        public static Byte marker = 28;
 
         // frame sequence, modem needs that for i.e. sending a preamble
         public static Byte FirstFrame = 0;
@@ -80,6 +82,7 @@ namespace oscardata
         public static int maxTXlevel = 0;
         public static Color WindowBackColor;
         public static String[] langstr;
+        public static int tuning_active = 0;
 
         public static String[] getOwnIPs()
         {

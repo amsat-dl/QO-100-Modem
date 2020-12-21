@@ -203,6 +203,9 @@ void km_symtrack_execute(liquid_float_complex _x, liquid_float_complex* _y, unsi
 void io_saveStream(float f);
 void playIntro();
 void io_clear_voice_fifos();
+float do_tuning(int send);
+void init_tune();
+float singleFrequency();
 
 
 extern int speedmode;
@@ -242,6 +245,9 @@ extern int restart_modems;
 extern int safemode;
 extern char homepath[];
 extern int sendIntro;
+extern int tuning;
+extern uint32_t tuning_runtime;
+extern int marker;
 
 #ifdef _LINUX_
 int isRunning(char* prgname);

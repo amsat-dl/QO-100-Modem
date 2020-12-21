@@ -86,6 +86,8 @@ float softwareLSvolume = 1;
 int announcement = 0;
 int VoiceAudioMode = VOICEMODE_OFF;
 int codec = 1;  // 0=opus, 1=codec2
+int tuning = 0;
+int marker = 0;
 
 int init_audio_result = 0;
 int init_voice_result = 0;
@@ -246,6 +248,11 @@ int main(int argc, char* argv[])
             {
                 encode(f);
             }
+        }
+
+        if (tuning != 0)
+        {
+            do_tuning(tuning);
         }
         
         // demodulate incoming audio data stream
@@ -482,6 +489,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     if (type == 20)
     {
         // reset liquid RX modem
+        tuning = 0;
         resetModem();
         io_clear_audio_fifos();
         return;
@@ -555,6 +563,24 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         // GUI requests termination of this hsmodem
         printf("shut down hsmodem\n");
         closeAllandTerminate();
+        return;
+    }
+
+    if (type == 27)
+    {
+        // send Tuning tones
+        printf("Tuning mode active\n");
+        VoiceAudioMode = VOICEMODE_OFF;
+        tuning_runtime = 0;
+        tuning = minfo;
+        return;
+    }
+
+    if (type == 28)
+    {
+        printf("marker:%d\n",minfo);
+        marker = minfo;
+        return;
     }
 
     // here we are with payload data to be sent via the modulator

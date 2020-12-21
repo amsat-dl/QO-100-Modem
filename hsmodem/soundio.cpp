@@ -615,6 +615,8 @@ int io_init_sound(char *pbname, char *capname)
     printf("physical capture rate:%d, logical capture rate:%d\n", caprate, caprate);
     printf("format: %s\n\n", soundio_format_string(outstream->format));
     
+    init_tune();
+
 	return init_audio_result;
 }
 
