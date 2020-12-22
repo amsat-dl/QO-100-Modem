@@ -109,6 +109,11 @@
             this.bt_resetmodem = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.bt_tune_plus = new System.Windows.Forms.Button();
+            this.bt_tune_minus = new System.Windows.Forms.Button();
+            this.cb_marker = new System.Windows.Forms.CheckBox();
             this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
             this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -116,9 +121,7 @@
             this.tb_CAPvol = new System.Windows.Forms.TrackBar();
             this.tb_PBvol = new System.Windows.Forms.TrackBar();
             this.cb_audioPB = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.cb_audioCAP = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lb_rec = new System.Windows.Forms.Label();
             this.tb_recintro = new System.Windows.Forms.TextBox();
@@ -151,7 +154,6 @@
             this.progressBar_fifo = new oscardata.KmProgressBar();
             this.vu_cap = new oscardata.KmProgressBar();
             this.vu_pb = new oscardata.KmProgressBar();
-            this.cb_marker = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -174,6 +176,8 @@
             this.tabPage_setup.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_audioCAPstatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_audioPBstatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_CAPvol)).BeginInit();
@@ -274,11 +278,11 @@
             // 
             // bt_allf
             // 
-            this.bt_allf.Location = new System.Drawing.Point(537, 18);
+            this.bt_allf.Location = new System.Drawing.Point(561, 18);
             this.bt_allf.Name = "bt_allf";
-            this.bt_allf.Size = new System.Drawing.Size(95, 23);
+            this.bt_allf.Size = new System.Drawing.Size(71, 23);
             this.bt_allf.TabIndex = 25;
-            this.bt_allf.Text = "150..2850 Hz";
+            this.bt_allf.Text = "1500 Hz";
             this.bt_allf.UseVisualStyleBackColor = true;
             this.bt_allf.Click += new System.EventHandler(this.bt_allf_Click);
             // 
@@ -987,11 +991,11 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(253, 23);
+            this.label12.Location = new System.Drawing.Point(221, 23);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(54, 13);
+            this.label12.Size = new System.Drawing.Size(103, 13);
             this.label12.TabIndex = 26;
-            this.label12.Text = "language:";
+            this.label12.Text = "Language/Sprache:";
             // 
             // cb_safemode
             // 
@@ -1081,6 +1085,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.pictureBox4);
+            this.groupBox3.Controls.Add(this.pictureBox3);
+            this.groupBox3.Controls.Add(this.bt_tune_plus);
+            this.groupBox3.Controls.Add(this.bt_tune_minus);
             this.groupBox3.Controls.Add(this.cb_marker);
             this.groupBox3.Controls.Add(this.vu_cap);
             this.groupBox3.Controls.Add(this.vu_pb);
@@ -1091,9 +1099,7 @@
             this.groupBox3.Controls.Add(this.tb_CAPvol);
             this.groupBox3.Controls.Add(this.tb_PBvol);
             this.groupBox3.Controls.Add(this.cb_audioPB);
-            this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.cb_audioCAP);
-            this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Location = new System.Drawing.Point(12, 144);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(743, 163);
@@ -1101,11 +1107,70 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Transceiver Audio";
             // 
+            // pictureBox4
+            // 
+            this.pictureBox4.BackgroundImage = global::oscardata.Properties.Resources.captureicon;
+            this.pictureBox4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pictureBox4.Location = new System.Drawing.Point(0, 61);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(132, 87);
+            this.pictureBox4.TabIndex = 16;
+            this.pictureBox4.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox3.BackgroundImage")));
+            this.pictureBox3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pictureBox3.Location = new System.Drawing.Point(5, -7);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(127, 85);
+            this.pictureBox3.TabIndex = 16;
+            this.pictureBox3.TabStop = false;
+            // 
+            // bt_tune_plus
+            // 
+            this.bt_tune_plus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bt_tune_plus.Location = new System.Drawing.Point(602, 79);
+            this.bt_tune_plus.Name = "bt_tune_plus";
+            this.bt_tune_plus.Size = new System.Drawing.Size(24, 23);
+            this.bt_tune_plus.TabIndex = 22;
+            this.bt_tune_plus.Text = "+";
+            this.bt_tune_plus.UseVisualStyleBackColor = true;
+            this.bt_tune_plus.Visible = false;
+            this.bt_tune_plus.Click += new System.EventHandler(this.bt_tune_plus_Click);
+            // 
+            // bt_tune_minus
+            // 
+            this.bt_tune_minus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bt_tune_minus.Location = new System.Drawing.Point(602, 55);
+            this.bt_tune_minus.Name = "bt_tune_minus";
+            this.bt_tune_minus.Size = new System.Drawing.Size(24, 23);
+            this.bt_tune_minus.TabIndex = 21;
+            this.bt_tune_minus.Text = "-";
+            this.bt_tune_minus.UseVisualStyleBackColor = true;
+            this.bt_tune_minus.Visible = false;
+            this.bt_tune_minus.Click += new System.EventHandler(this.bt_tune_minus_Click);
+            // 
+            // cb_marker
+            // 
+            this.cb_marker.AutoSize = true;
+            this.cb_marker.Checked = true;
+            this.cb_marker.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_marker.Location = new System.Drawing.Point(605, 23);
+            this.cb_marker.Name = "cb_marker";
+            this.cb_marker.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.cb_marker.Size = new System.Drawing.Size(129, 17);
+            this.cb_marker.TabIndex = 27;
+            this.cb_marker.Text = "100Hz Tuning Marker";
+            this.cb_marker.UseVisualStyleBackColor = true;
+            this.cb_marker.Visible = false;
+            this.cb_marker.CheckedChanged += new System.EventHandler(this.cb_marker_CheckedChanged);
+            // 
             // pb_audioCAPstatus
             // 
             this.pb_audioCAPstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioCAPstatus.BackgroundImage")));
             this.pb_audioCAPstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 63);
+            this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 87);
             this.pb_audioCAPstatus.Name = "pb_audioCAPstatus";
             this.pb_audioCAPstatus.Size = new System.Drawing.Size(21, 21);
             this.pb_audioCAPstatus.TabIndex = 18;
@@ -1115,7 +1180,7 @@
             // 
             this.pb_audioPBstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioPBstatus.BackgroundImage")));
             this.pb_audioPBstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_audioPBstatus.Location = new System.Drawing.Point(375, 19);
+            this.pb_audioPBstatus.Location = new System.Drawing.Point(375, 21);
             this.pb_audioPBstatus.Name = "pb_audioPBstatus";
             this.pb_audioPBstatus.Size = new System.Drawing.Size(21, 21);
             this.pb_audioPBstatus.TabIndex = 17;
@@ -1124,7 +1189,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(428, 65);
+            this.label6.Location = new System.Drawing.Point(428, 89);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(45, 13);
             this.label6.TabIndex = 16;
@@ -1133,7 +1198,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(428, 23);
+            this.label5.Location = new System.Drawing.Point(428, 25);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(45, 13);
             this.label5.TabIndex = 15;
@@ -1142,7 +1207,7 @@
             // tb_CAPvol
             // 
             this.tb_CAPvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.tb_CAPvol.Location = new System.Drawing.Point(479, 61);
+            this.tb_CAPvol.Location = new System.Drawing.Point(479, 85);
             this.tb_CAPvol.Maximum = 100;
             this.tb_CAPvol.MaximumSize = new System.Drawing.Size(0, 24);
             this.tb_CAPvol.Minimum = 1;
@@ -1157,7 +1222,7 @@
             // tb_PBvol
             // 
             this.tb_PBvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.tb_PBvol.Location = new System.Drawing.Point(479, 19);
+            this.tb_PBvol.Location = new System.Drawing.Point(479, 21);
             this.tb_PBvol.Maximum = 100;
             this.tb_PBvol.MaximumSize = new System.Drawing.Size(0, 24);
             this.tb_PBvol.Minimum = 1;
@@ -1172,38 +1237,20 @@
             // cb_audioPB
             // 
             this.cb_audioPB.FormattingEnabled = true;
-            this.cb_audioPB.Location = new System.Drawing.Point(138, 19);
+            this.cb_audioPB.Location = new System.Drawing.Point(138, 21);
             this.cb_audioPB.Name = "cb_audioPB";
             this.cb_audioPB.Size = new System.Drawing.Size(230, 21);
             this.cb_audioPB.TabIndex = 7;
             this.cb_audioPB.Text = "Default";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 23);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(121, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Audio Playback Device:";
-            // 
             // cb_audioCAP
             // 
             this.cb_audioCAP.FormattingEnabled = true;
-            this.cb_audioCAP.Location = new System.Drawing.Point(138, 63);
+            this.cb_audioCAP.Location = new System.Drawing.Point(138, 87);
             this.cb_audioCAP.Name = "cb_audioCAP";
             this.cb_audioCAP.Size = new System.Drawing.Size(230, 21);
             this.cb_audioCAP.TabIndex = 9;
             this.cb_audioCAP.Text = "Default";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 67);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(112, 13);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "Audio Record Device:";
             // 
             // groupBox2
             // 
@@ -1224,7 +1271,7 @@
             this.groupBox2.Controls.Add(this.cb_stampcall);
             this.groupBox2.Location = new System.Drawing.Point(12, 13);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(734, 127);
+            this.groupBox2.Size = new System.Drawing.Size(743, 127);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Personal Settings";
@@ -1234,7 +1281,7 @@
             this.lb_rec.AutoSize = true;
             this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lb_rec.ForeColor = System.Drawing.Color.Red;
-            this.lb_rec.Location = new System.Drawing.Point(498, 101);
+            this.lb_rec.Location = new System.Drawing.Point(576, 101);
             this.lb_rec.Name = "lb_rec";
             this.lb_rec.Size = new System.Drawing.Size(23, 13);
             this.lb_rec.TabIndex = 29;
@@ -1246,7 +1293,7 @@
             this.tb_recintro.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tb_recintro.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tb_recintro.ForeColor = System.Drawing.Color.Black;
-            this.tb_recintro.Location = new System.Drawing.Point(256, 100);
+            this.tb_recintro.Location = new System.Drawing.Point(334, 100);
             this.tb_recintro.Multiline = true;
             this.tb_recintro.Name = "tb_recintro";
             this.tb_recintro.Size = new System.Drawing.Size(121, 19);
@@ -1259,7 +1306,7 @@
             this.bt_astop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bt_astop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bt_astop.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_astop.Location = new System.Drawing.Point(449, 89);
+            this.bt_astop.Location = new System.Drawing.Point(527, 89);
             this.bt_astop.Name = "bt_astop";
             this.bt_astop.Size = new System.Drawing.Size(32, 36);
             this.bt_astop.TabIndex = 27;
@@ -1272,7 +1319,7 @@
             this.bt_aplay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bt_aplay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bt_aplay.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_aplay.Location = new System.Drawing.Point(411, 89);
+            this.bt_aplay.Location = new System.Drawing.Point(489, 89);
             this.bt_aplay.Name = "bt_aplay";
             this.bt_aplay.Size = new System.Drawing.Size(32, 36);
             this.bt_aplay.TabIndex = 26;
@@ -1285,7 +1332,7 @@
             this.bt_arecord.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bt_arecord.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bt_arecord.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_arecord.Location = new System.Drawing.Point(373, 89);
+            this.bt_arecord.Location = new System.Drawing.Point(451, 89);
             this.bt_arecord.Name = "bt_arecord";
             this.bt_arecord.Size = new System.Drawing.Size(32, 36);
             this.bt_arecord.TabIndex = 25;
@@ -1504,7 +1551,7 @@
             // lb_rxsync
             // 
             this.lb_rxsync.AutoSize = true;
-            this.lb_rxsync.Location = new System.Drawing.Point(1094, 643);
+            this.lb_rxsync.Location = new System.Drawing.Point(984, 596);
             this.lb_rxsync.Name = "lb_rxsync";
             this.lb_rxsync.Size = new System.Drawing.Size(52, 13);
             this.lb_rxsync.TabIndex = 20;
@@ -1514,7 +1561,7 @@
             // 
             this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
             this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsync.Location = new System.Drawing.Point(1155, 636);
+            this.pb_rxsync.Location = new System.Drawing.Point(1047, 591);
             this.pb_rxsync.Name = "pb_rxsync";
             this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
             this.pb_rxsync.TabIndex = 19;
@@ -1553,29 +1600,17 @@
             // 
             // vu_cap
             // 
-            this.vu_cap.Location = new System.Drawing.Point(479, 87);
+            this.vu_cap.Location = new System.Drawing.Point(479, 111);
             this.vu_cap.Name = "vu_cap";
             this.vu_cap.Size = new System.Drawing.Size(100, 10);
             this.vu_cap.TabIndex = 20;
             // 
             // vu_pb
             // 
-            this.vu_pb.Location = new System.Drawing.Point(479, 45);
+            this.vu_pb.Location = new System.Drawing.Point(479, 47);
             this.vu_pb.Name = "vu_pb";
             this.vu_pb.Size = new System.Drawing.Size(100, 10);
             this.vu_pb.TabIndex = 19;
-            // 
-            // cb_marker
-            // 
-            this.cb_marker.AutoSize = true;
-            this.cb_marker.Location = new System.Drawing.Point(605, 21);
-            this.cb_marker.Name = "cb_marker";
-            this.cb_marker.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.cb_marker.Size = new System.Drawing.Size(123, 17);
-            this.cb_marker.TabIndex = 27;
-            this.cb_marker.Text = "3kHz Tuning Marker";
-            this.cb_marker.UseVisualStyleBackColor = true;
-            this.cb_marker.CheckedChanged += new System.EventHandler(this.cb_marker_CheckedChanged);
             // 
             // Form1
             // 
@@ -1601,7 +1636,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.55 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.56 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -1635,6 +1670,8 @@
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_audioCAPstatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_audioPBstatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_CAPvol)).EndInit();
@@ -1700,9 +1737,7 @@
         private System.Windows.Forms.TextBox tb_shutdown;
         private System.Windows.Forms.Button bt_shutdown;
         private System.Windows.Forms.Button bt_resetmodem;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox cb_audioCAP;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cb_audioPB;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.GroupBox groupBox3;
@@ -1773,6 +1808,10 @@
         private System.Windows.Forms.Label lb_tuningqrgs;
         private System.Windows.Forms.Button bt_allf;
         private System.Windows.Forms.CheckBox cb_marker;
+        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.Button bt_tune_minus;
+        private System.Windows.Forms.Button bt_tune_plus;
     }
 }
 

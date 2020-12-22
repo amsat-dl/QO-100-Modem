@@ -206,6 +206,10 @@ void io_clear_voice_fifos();
 float do_tuning(int send);
 void init_tune();
 float singleFrequency();
+void rtty_tx();
+int rtty_rx();
+void modifyRXfreq(float fr);
+void showbytestring16(char* title, uint16_t* data, int anz);
 
 
 extern int speedmode;
@@ -240,7 +244,7 @@ extern int rxlevel_deteced;
 extern int rx_in_sync;
 extern float softwareMICvolume;
 extern float softwareLSvolume;
-extern int physcaprate;
+extern int physRXcaprate;
 extern int restart_modems;
 extern int safemode;
 extern char homepath[];

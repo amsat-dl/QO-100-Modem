@@ -68,7 +68,7 @@ int trigger_resetmodem = 0;
 char homepath[1000] = { 0 };
 
 int caprate = 44100;
-int physcaprate = 44100;
+int physRXcaprate = 44100;
 int txinterpolfactor = 20;
 int rxPreInterpolfactor = 5;
 int linespeed = 4410;
@@ -87,7 +87,7 @@ int announcement = 0;
 int VoiceAudioMode = VOICEMODE_OFF;
 int codec = 1;  // 0=opus, 1=codec2
 int tuning = 0;
-int marker = 0;
+int marker = 1;
 
 int init_audio_result = 0;
 int init_voice_result = 0;
@@ -382,6 +382,8 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         char rxip[20];
         strcpy(rxip, inet_ntoa(rxsock->sin_addr));
 
+        //printf("GUI search received:%s\n",rxip);
+
         if (fixappIP == 0)
         {
             if (strcmp(appIP, rxip))
@@ -391,13 +393,14 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                     // there was an appIP already
                     // before accepting this new one, wait 3 seconds
                     int ts = (int)(actms - lastms);
-                    printf("new app IP: %s since %d, restarting modems\n", rxip,ts);
+                    //printf("new app IP: %s since %d, restarting modems\n", rxip,ts);
                     if (ts < 3000)
                         return;
                 }
-                printf("first app IP: %s, restarting modems\n", rxip);
+                //printf("first app IP: %s, restarting modems\n", rxip);
                 restart_modems = 1;
             }
+
             strcpy(appIP, rxip);
             //printf("app (%s) is searching modem. Sending modem IP to the app\n",appIP);
             // App searches for the modem IP, mirror the received messages
@@ -569,8 +572,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     if (type == 27)
     {
         // send Tuning tones
-        printf("Tuning mode active\n");
-        VoiceAudioMode = VOICEMODE_OFF;
+        printf("Tuning mode active:%d\n",minfo);
         tuning_runtime = 0;
         tuning = minfo;
         return;
@@ -580,6 +582,15 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     {
         printf("marker:%d\n",minfo);
         marker = minfo;
+        return;
+    }
+
+    if (type == 29)
+    {
+        int v = minfo;
+        if (v > 128) 
+            v = v - 255;
+        modifyRXfreq(float(v));
         return;
     }
 

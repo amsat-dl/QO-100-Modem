@@ -150,6 +150,8 @@
     <None Include="Properties\record.png" />
     <None Include="Properties\stopplay.png" />
     <None Include="Properties\playback.png" />
+    <None Include="Properties\playbackicon.png" />
+    <None Include="Properties\captureicon.png" />
     <Content Include="Satellite-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

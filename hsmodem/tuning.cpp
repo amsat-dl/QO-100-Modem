@@ -26,11 +26,8 @@
 
 #include "hsmodem.h"
 
-
-
-
-#define NUMFREQ 12
-int tunefreq[NUMFREQ] = { 150,420,690,960,1230,1500,1770,2040,2310,2580,2850,3000 };
+#define NUMFREQ 13
+int tunefreq[NUMFREQ] = { 150,420,690,960,1230,1500,1770,2040,2310,2580,2850,2890,100 };
 nco_crcf tunenco[NUMFREQ];
 uint32_t tuning_runtime = 0;
 
@@ -49,7 +46,6 @@ void init_tune()
         if (tunenco[i] != NULL) nco_crcf_destroy(tunenco[i]);
 
         // create NCO for frequency
-        printf("tuning: physcaprate:%d\n", physcaprate);
         float rad_per_sample = ((2.0f * (float)M_PI * (float)tunefreq[i]) / (float)caprate);
         tunenco[i] = nco_crcf_create(LIQUID_NCO);
         nco_crcf_set_phase(tunenco[i], 0.0f);
@@ -62,7 +58,7 @@ void init_tune()
 float do_tuning(int send)
 {
     if (tunenco == NULL) return 0.0f;
-    if (send < 0 || send > 4) return 0.0f;
+    if (send < 0 || send > 11) return 0.0f;
 
     float f = 0;
     if (send == 1)
@@ -77,8 +73,8 @@ float do_tuning(int send)
     }
     else
     {
-        nco_crcf_step(tunenco[send-2]);
-        f = nco_crcf_sin(tunenco[send-2]);
+        nco_crcf_step(tunenco[send]);
+        f = nco_crcf_sin(tunenco[send]);
     }
 
     // adapt speed to soundcard samplerate
@@ -104,10 +100,15 @@ float do_tuning(int send)
 
 float singleFrequency()
 {
-    int i = 11; // 3000 Hz
-
+    int /*i = 11; // 2900 Hz
     if (tunenco[i] == NULL) return 0.0f;
-
     nco_crcf_step(tunenco[i]);
-    return nco_crcf_sin(tunenco[i]);
+    float f = nco_crcf_sin(tunenco[i]);*/
+
+    i = 12; // 2930 Hz
+    if (tunenco[i] == NULL) return 0.0f;
+    nco_crcf_step(tunenco[i]);
+    float f = nco_crcf_sin(tunenco[i]);
+
+    return f;
 }

@@ -1100,10 +1100,15 @@ namespace oscardata
             String ip = "255.255.255.255";
             String[] myips = statics.getOwnIPs();
             //Console.WriteLine("BClen: " + myips.Length.ToString());
-            // nur wenn der PC eine IP hat
-            // hat er mehr, dann wissen wir nicht in welchem Netz wird broadcasten sollen, nehmen also die 255.255.255.255
-            if (myips.Length == 1)
+            // if PC has multiple IPs then use 255.255.255.255
+            /*for (int i = 0; i < myips.Length; i++)
             {
+                Console.WriteLine("ip:" + myips[i]);
+            }*/
+            if (myips.Length >= 1)
+            {
+                statics.MyIP = myips[0];
+                // PC has one IP, make it to a broadcast IP by adding 255
                 int idx = myips[0].LastIndexOf('.');
                 if (idx >= 0)
                 {
@@ -1173,11 +1178,22 @@ namespace oscardata
                     txb[i + 110] = bcap[i];
             }
 
-            Udp.UdpBCsend(txb, GetMyBroadcastIP(), statics.UdpBCport_AppToModem);
+            if (statics.ModemIP == "1.2.3.4")
+            {
+                // still searching a modem
+                //Console.WriteLine("1: send BCsearch to: " + GetMyBroadcastIP());
+                Udp.UdpBCsend(txb, GetMyBroadcastIP(), statics.UdpBCport_AppToModem);
+            }
+            else
+            {
+                // modem IP is known, send to it directly, no broadcast
+                //Console.WriteLine("2: send BCsearch to: " + statics.ModemIP);
+                Udp.UdpBCsend(txb, statics.ModemIP, statics.UdpBCport_AppToModem);
+            }
 
             Udp.searchtimeout++;
             if (Udp.searchtimeout >= 3)
-                statics.ModemIP = "1.2.3.4";
+                statics.ModemIP = "1.2.3.4"; // which means: no IP known
         }
 
         private void bt_file_send_Click(object sender, EventArgs e)
@@ -1229,7 +1245,9 @@ namespace oscardata
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            bool b = cb_switchtoLS.Checked;
             allVoiceModesOff();
+            cb_switchtoLS.Checked = b;
 
             if (cb_speed.Text.Contains("3000")) statics.real_datarate = 3000;
             if (cb_speed.Text.Contains("4000")) statics.real_datarate = 4000;
@@ -1388,6 +1406,14 @@ namespace oscardata
 
             if (cb_audioPB.Text.Length <= 1) cb_audioPB.Text = "Default";
             if (cb_audioCAP.Text.Length <= 1) cb_audioCAP.Text = "Default";
+
+            if (tb_callsign.Text == "DJ0ABR")
+            {
+                bt_resetmodem.Visible = true;
+                bt_tune_minus.Visible = true;
+                bt_tune_plus.Visible = true;
+                cb_marker.Visible = true;
+            }
         }
 
         void save_Setup()
@@ -1727,8 +1753,6 @@ namespace oscardata
                 groupBox3.Text = "Transceiver Audio";
                 label6.Text = "Volume:";
                 label5.Text = "Volume:";
-                label3.Text = "Audio Playback Device:";
-                label4.Text = "Audio Record Device:";
                 groupBox2.Text = "Personal Settings";
                 cb_stampinfo.Text = "Insert Info into picture";
                 textBox4.Text = "transmissions";
@@ -1742,10 +1766,11 @@ namespace oscardata
                 label_capfifo.Text = "RX Buffer:";
                 lb_rxsignal.Text = "RX Signal:";
                 lb_rxsync.Text = "RX Sync:";
-                cb_sendIntro.Text = "send introduction";
+                cb_sendIntro.Text = "send introduction before TX";
                 tb_recintro.Text = "record introduction";
-                lb_tuningqrgs.Text = "Frequency Test";
-                cb_marker.Text = "3kHz Tuning Marker";
+                lb_tuningqrgs.Text = "Send Mid-Frequency:";
+                cb_marker.Text = "2.9kHz Tuning Marker";
+                label13.Text = "Data Security:";
             }
 
             if (language == 1)
@@ -1793,17 +1818,16 @@ namespace oscardata
                 cb_stampinfo.Text = "Füge Infotext ins Bild ein";
                 textBox1.Text = "sende Ansagetext vor TX, alle";
                 textBox4.Text = "Aussendungen";
-                label3.Text = "Audio Wiedergabe";
-                label4.Text = "Audio Eingang";
                 label5.Text = "Lautst.:";
                 label6.Text = "Lautst.:";
                 groupBox4.Text = "Wartung";
                 textBox3.Text = "Ausschalten wenn hsmodem auf separatem PC läuft";
                 tb_shutdown.Text = "Vor dem Ausschalten eines SBC diesen hier herunterfahren";
-                cb_sendIntro.Text = "sende Vorstellung";
+                cb_sendIntro.Text = "sende Vorstellung vor TX";
                 tb_recintro.Text = "Vorstellung aufnehmen";
-                lb_tuningqrgs.Text = "Frequenz Test:";
-                cb_marker.Text = "3kHz Tuning Markierung";
+                lb_tuningqrgs.Text = "Sende Mittenfrequenz:";
+                cb_marker.Text = "2,9kHz Tuning Markierung";
+                label13.Text = "Datensicherheit:";
             }
         }
 
@@ -1936,7 +1960,7 @@ namespace oscardata
 
         private void bt_allf_Click(object sender, EventArgs e)
         {
-            bt_tuning(1);
+            bt_tuning(5);
         }
 
         private void cb_marker_CheckedChanged(object sender, EventArgs e)
@@ -1944,6 +1968,22 @@ namespace oscardata
             Byte[] txdata = new byte[2];
             txdata[0] = statics.marker;
             txdata[1] = (Byte)(cb_marker.Checked ? 1 : 0);
+            Udp.UdpSendCtrl(txdata);
+        }
+
+        private void bt_tune_minus_Click(object sender, EventArgs e)
+        {
+            Byte[] txdata = new byte[2];
+            txdata[0] = statics.setfreq;
+            txdata[1] = 10;
+            Udp.UdpSendCtrl(txdata);
+        }
+
+        private void bt_tune_plus_Click(object sender, EventArgs e)
+        {
+            Byte[] txdata = new byte[2];
+            txdata[0] = statics.setfreq;
+            txdata[1] = 255 - 10;
             Udp.UdpSendCtrl(txdata);
         }
     }

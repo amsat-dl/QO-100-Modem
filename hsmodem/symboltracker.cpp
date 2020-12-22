@@ -166,8 +166,7 @@ void km_symtrack_execute(liquid_float_complex _x, liquid_float_complex* _y, unsi
 
     /*float fr = nco_crcf_get_frequency(q->nco);
     float ph = nco_crcf_get_phase(q->nco);
-
-    printf("%10.6f  %10.6f  %10.6f  %10.6f\n", fr, ph, _x.real, _x.imag);*/
+    printf("f:%10.6f  ph:%10.6f\n", fr, ph);*/
 
     * _ny = num_outputs;
 }

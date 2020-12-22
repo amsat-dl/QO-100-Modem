@@ -38,6 +38,7 @@ namespace oscardata
         public static Byte terminate = 26;
         public static Byte tuning = 27;
         public static Byte marker = 28;
+        public static Byte setfreq = 29;
 
         // frame sequence, modem needs that for i.e. sending a preamble
         public static Byte FirstFrame = 0;
@@ -54,6 +55,7 @@ namespace oscardata
         // global static variables
         public static bool running = true;
         public static String ModemIP = "1.2.3.4";
+        public static String MyIP = "1.2.3.4";
         public static int UdpBCport_AppToModem = 40131;          // broadcast port for modem search
         public static int UdpTXport = 40132;                     // to modem
         public static int UdpRXport = 40133;                     // from modem

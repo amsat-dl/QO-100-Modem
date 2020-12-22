@@ -61,8 +61,11 @@ namespace oscardata
         }
 
         // Udp RX Loop runs in its own thread
+        
         static void Udprxloop()
         {
+            int extIPcnt = 0;
+
             // define UDP port
             UdpClient udpc = new UdpClient(statics.UdpRXport);
             udpc.Client.ReceiveTimeout = 100;
@@ -95,7 +98,27 @@ namespace oscardata
                         // Broadcast response
                         if (rxtype == statics.udp_bc)
                         {
-                            statics.ModemIP = RemoteEndpoint.Address.ToString();
+                            String ModIP = RemoteEndpoint.Address.ToString();
+                            if (ModIP != statics.MyIP)
+                            {
+                                // this is not the local IP
+                                // wait for 3 Receptions before accepting it
+                                if (extIPcnt < 3)
+                                {
+                                    //Console.WriteLine("myIP:"+statics.MyIP+" modem is ext IP:"+ModIP+", waiting:" + extIPcnt);
+                                    if (extIPcnt < 4) extIPcnt++;
+                                    if (extIPcnt < 3)
+                                        continue;
+                                }
+                                //Console.WriteLine("modem is ext IP, accepted");
+                            }
+                            else
+                            {
+                                //Console.WriteLine("modem is local IP");
+                                extIPcnt = 0;
+                            }
+
+                            statics.ModemIP = ModIP;
                             searchtimeout = 0;
                             // message b contains audio devices and init status
                             statics.initAudioStatus = b[0];
@@ -266,10 +289,10 @@ namespace oscardata
                     for (int x = 10; x <= 390; x += 10)
                         gr.DrawLine(pen, x, yl, x, yh);
 
+                    gr.DrawLine(penred, 10, yl, 10, yh);
                     gr.DrawLine(penred, 150, yl, 150, yh);
                     gr.DrawLine(pensolid, 20, yl, 20, yh);
                     gr.DrawLine(pensolid, 280, yl, 280, yh);
-                    gr.DrawLine(penred, 300, yl, 300, yh);
                     gr.DrawLine(pensolid, 360, yl, 360, yh);
 
                     gr.DrawRectangle(penred, 15, yh, 270, yl-yh);

@@ -209,7 +209,7 @@ void modulator(uint8_t sym_in)
         }
 
         if(marker)
-            usb += singleFrequency() / 10.0f;
+            usb += singleFrequency() / 4.0f;
 
         io_pb_write_fifo(usb * 0.2f); // reduce volume and send to soundcard
     }
@@ -221,6 +221,7 @@ nco_crcf dnnco = NULL;
 symtrack_cccf symtrack = NULL;
 firdecim_crcf decim = NULL;
 msresamp_crcf adecim = NULL;
+msresamp_crcf lsresamp = NULL;
 
 // decimator parameters
 unsigned int m_predec = 8;  // filter delay
@@ -240,16 +241,27 @@ float        bandwidth_st   = 0.9f;  // loop filter bandwidth
 uint8_t maxLevel = 0;   // maximum RXlevel over the last x samples in %
 uint8_t maxTXLevel = 0; // maximum TXlevel over the last x samples in %
 
+float radians_per_sample = ((2.0f * (float)M_PI * (float)FREQUENCY) / (float)caprate);
+float last_radians_per_sample = 0;
+float actfrequency = (float)FREQUENCY;
+
+void modifyRXfreq(float diff_Hz)
+{
+    actfrequency += diff_Hz;
+    printf("set:%f Hz\n", actfrequency);
+    radians_per_sample = ((2.0f * (float)M_PI * actfrequency) / (float)caprate);
+}
+
 void init_demodulator()
 {
     printf("init RX demodulator\n");
     
     // downmixer oscillator
-    float RADIANS_PER_SAMPLE   = ((2.0f*(float)M_PI*(float)FREQUENCY)/(float)caprate);
+    radians_per_sample = ((2.0f*(float)M_PI*(float)FREQUENCY)/(float)caprate);
     
     dnnco = nco_crcf_create(LIQUID_NCO);
     nco_crcf_set_phase(dnnco, 0.0f);
-    nco_crcf_set_frequency(dnnco, RADIANS_PER_SAMPLE);
+    nco_crcf_set_frequency(dnnco, radians_per_sample);
     
     // create pre-decimator
     decim = firdecim_crcf_create_kaiser(rxPreInterpolfactor, m_predec, As_predec);
@@ -259,6 +271,8 @@ void init_demodulator()
     // if Audio SR is 48000 but caprate is 44100
     r_OutDivInRatio = (float)((float)caprate / 48000.0);
     adecim = msresamp_crcf_create(r_OutDivInRatio, As_adecim);
+
+    lsresamp = msresamp_crcf_create((float)(48000.0/44100.0), As_adecim);
     
     // create symbol tracking synchronizer
     km_symtrack_cccf_create(ftype_st, k_st, m_st, beta_st, getMod());
@@ -268,10 +282,15 @@ void init_demodulator()
 void close_demodulator()
 {
     if(decim != NULL) firdecim_crcf_destroy(decim);
-    if(adecim) msresamp_crcf_destroy(adecim);
-    symtrack = NULL;
     decim = NULL;
+    if(adecim) msresamp_crcf_destroy(adecim);
     adecim = NULL;
+    if (lsresamp) msresamp_crcf_destroy(lsresamp);
+    lsresamp = NULL;
+    if (symtrack != NULL) symtrack_cccf_destroy(symtrack);
+    symtrack = NULL;
+    if (dnnco != NULL) nco_crcf_destroy(dnnco);
+    dnnco = NULL;
 }
 
 void resetModem()
@@ -288,6 +307,33 @@ void make_FFTdata(float f)
     uint16_t* fft = make_waterfall(f, &fftlen);
     if (fft != NULL)
     {
+        // fft data are in fft[] size: 0..fftlen
+        // 10 Hz per value
+        float fdiff = (float)FREQUENCY - actfrequency;
+        // shift spectrum if we are off 1500 Hz
+        int diff10Hz = (int)(fdiff / 10.0);
+        if (diff10Hz != 0)
+        {
+            //printf("%d %f %f %d\n", FREQUENCY, actfrequency, fdiff, diff10Hz);
+            if (diff10Hz < 0)
+            {
+                diff10Hz = -diff10Hz;
+                for (int i = 0; i < (fftlen-diff10Hz); i++)
+                    fft[i] = fft[i + diff10Hz];
+
+                for (int i = (fftlen - diff10Hz); i < fftlen; i++)
+                    fft[i] = 0;
+            }
+            else
+            {
+                for (int i = fftlen-1; i >= diff10Hz; i--)
+                    fft[i] = fft[i - diff10Hz];
+                
+                for (int i = 0; i < diff10Hz; i++)
+                    fft[i] = 0;
+            }
+        }
+
         uint8_t txpl[10000];
         if (fftlen > (10000 * 2 + 1))
         {
@@ -367,7 +413,29 @@ static int const_idx = 0;
     if(ret == 0) return 0;
 
     if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
-        io_ls_write_fifo(f);
+    {
+        if (physRXcaprate == 44100)
+        {
+            // Loudspeaker Audio "ls" works only with 48k
+            // so we have to resample 44k1 to 48k
+            unsigned int num_written = 0;
+            liquid_float_complex in;
+            liquid_float_complex out[100];
+            in.real = f;
+            in.imag = 0;
+            msresamp_crcf_execute(lsresamp, &in, 1, out, &num_written);
+            if (num_written != 0)
+            {
+                for (unsigned int i = 0; i < num_written; i++)
+                {
+                    float fout = out[i].real;
+                    io_ls_write_fifo(fout);
+                }
+            }
+        }
+        else
+            io_ls_write_fifo(f);
+    }
 
     // input volume
     f *= softwareCAPvolume;
@@ -375,7 +443,7 @@ static int const_idx = 0;
     getMax(f);
     make_FFTdata(f * 100);
 
-    if (caprate == 44100 && physcaprate == 48000)
+    if (caprate == 44100 && physRXcaprate == 48000)
     {
         // the sound card capture for a VAC always works with 48000 because
         // a VAC cannot be set to a specific cap rate in shared mode
@@ -389,7 +457,15 @@ static int const_idx = 0;
         if (num_written == 0) return 1;
         f = out.real;
     }
-    
+
+    // if user changed frequency
+    if (radians_per_sample != last_radians_per_sample)
+    {
+        //printf("new QRG. Rad:%f\n", radians_per_sample);
+        nco_crcf_set_frequency(dnnco, radians_per_sample);
+        last_radians_per_sample = radians_per_sample;
+    }
+
     // downconvert 1,5kHz into baseband, still at soundcard sample rate
     nco_crcf_step(dnnco);
     

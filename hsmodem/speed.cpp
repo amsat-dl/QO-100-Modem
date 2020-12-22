@@ -157,13 +157,12 @@ void measure_speed_bps(int len)
         return;
     }
 
-
     elems += len;
     if (timespan < 1000) return;
 
     double dspd = elems;
     dspd = dspd * 1e3 / timespan;
-    speed = meanvalbps((int)dspd);
+    speed = (int)dspd;
 
     // here we have number of elements after 1s
     printf(" ======================= %d bit/s\n", speed);

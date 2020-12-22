@@ -251,6 +251,7 @@
     <ClCompile Include="hsmodem.cpp" />
     <ClCompile Include="liquid_if.cpp" />
     <ClCompile Include="main_helper.cpp" />
+    <ClCompile Include="rtty.cpp" />
     <ClCompile Include="scrambler.cpp" />
     <ClCompile Include="soundio.cpp" />
     <ClCompile Include="speed.cpp" />

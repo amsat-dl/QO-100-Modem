@@ -153,8 +153,8 @@ uint16_t *make_waterfall(float fre, int *retlen)
 }
 
 // smooth fft output
-const int smoothX = 6; // must be an even number !
-const int smoothY = 3;
+const int smoothX = 2; // must be an even number !
+const int smoothY = 10;
 int yidx = 0;
 
 uint16_t* mean(uint16_t* f)
@@ -164,7 +164,7 @@ uint16_t* mean(uint16_t* f)
 
     if (tuning)
         return f;
-
+    
     // first smooth X values
     for (int x = 0; x < smoothX / 2; x++)
         fa[x] = f[x];
@@ -179,8 +179,9 @@ uint16_t* mean(uint16_t* f)
 
     for (int x = fftcount - smoothX / 2; x < fftcount; x++)
         fa[x] = f[x];
-
+    
     // smooth Y values
+    
     static uint16_t yarr[smoothY][FFT_AUDIOSAMPLERATE / 2 + 1];
     for (int i = 0; i < fftcount; i++)
         yarr[yidx][i] = fa[i];
@@ -193,10 +194,6 @@ uint16_t* mean(uint16_t* f)
             fa[i] += yarr[j][i];
         fa[i] /= smoothY;
     }
-
-    // do not smooth 2950 to 3050 Hz
-    for (int i = 295; i < 305; i++)
-        fa[i] = f[i];
 
     return fa;
 }
@@ -216,7 +213,7 @@ void _init_fft()
     // decimate 44.1k or 48k down to 8000Hz
     // the FFT rate is 800, but we feed it with 8000 Samplerate
     // this results in a new fft every 100ms with a resolution of 10 Hz
-    float ratio = 10.0f * (float)FFT_AUDIOSAMPLERATE / (float)physcaprate;
+    float ratio = 10.0f * (float)FFT_AUDIOSAMPLERATE / (float)physRXcaprate;
     fftdecim = msresamp_crcf_create(ratio, 40.0f);
 
 }

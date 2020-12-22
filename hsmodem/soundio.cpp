@@ -522,14 +522,14 @@ int io_init_sound(char *pbname, char *capname)
     {
         instream->format = SoundIoFormatS16NE;
         instream->sample_rate = caprate;
-        physcaprate = caprate;
+        physRXcaprate = caprate;
     }
     else 
     {
         // a VAC needs these settings or it will not work with 44100
         instream->format = SoundIoFormatFloat32NE;
         instream->sample_rate = AUDIO_SAMPRATE;
-        physcaprate = AUDIO_SAMPRATE;
+        physRXcaprate = AUDIO_SAMPRATE;
     }
     instream->software_latency = latenz;
     instream->read_callback = read_callback;
@@ -548,7 +548,7 @@ int io_init_sound(char *pbname, char *capname)
     init_audio_result |= 2;
 
     printf("selected CAPTURE device:\nname:%s\nid  :%s\n", capname, capdevid);
-    printf("physical capture rate:%d, logical capture rate:%d\n", physcaprate, caprate);
+    printf("physical capture rate:%d, logical capture rate:%d\n", physRXcaprate, caprate);
     printf("format: %s\n\n", soundio_format_string(instream->format));
 
     // the CAP callback is running now

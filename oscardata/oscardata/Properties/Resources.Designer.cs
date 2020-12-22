@@ -83,6 +83,16 @@ namespace oscardata.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap captureicon {
+            get {
+                object obj = ResourceManager.GetObject("captureicon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap cdc_codecloop {
             get {
                 object obj = ResourceManager.GetObject("cdc_codecloop", resourceCulture);
@@ -246,6 +256,16 @@ namespace oscardata.Properties {
         internal static System.Drawing.Bitmap playback {
             get {
                 object obj = ResourceManager.GetObject("playback", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap playbackicon {
+            get {
+                object obj = ResourceManager.GetObject("playbackicon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
