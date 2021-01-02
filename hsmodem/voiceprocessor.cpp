@@ -168,7 +168,7 @@ void sendCodecToModulator(uint8_t *pdata, int len)
             toGR_sendData(payload, 6, 1 ,0);   // 6 ... voice data, 1 ... valid voice data
         }
 
-        while (1)
+        while (keeprunning)
         {
             // we have to check if the TX fifo has enough data. In case of an underrun the Q(8A)PSK signal will be distorted
             int us = io_pb_fifo_usedspace();

@@ -223,6 +223,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="baudot.h" />
     <ClInclude Include="codec2.h" />
     <ClInclude Include="endian.h" />
     <ClInclude Include="fec.h" />

@@ -48,12 +48,16 @@ namespace oscardata
         int last_initVoiceStatus;
         int recordStatus = 0;
         int recPhase = 0;
+        const int Rtty_deftext_anz = 20;
+        String[] Rtty_deftext = new string[Rtty_deftext_anz];
         
 
         public Form1()
         {
             // init GUI
             InitializeComponent();
+
+            //showSSTV();
 
             // needed for ARM mono, which cannot load a picbox directly from file
             var bmp = new Bitmap(Resources.hintergrundxcf);
@@ -122,6 +126,10 @@ namespace oscardata
         // TX timer
         private void timer1_Tick(object sender, EventArgs e)
         {
+            // cancel high speed TX in RTTY mode
+            if(statics.real_datarate == 45)
+                txcommand = statics.noTX;
+
             // BER testdata
             if (txcommand == statics.BERtest)
             {
@@ -596,7 +604,10 @@ namespace oscardata
                 pb_rxsignal.BackgroundImage = Resources.redmarker;
                 showType(-1);
             }
-            if (statics.RXinSync == 1) pb_rxsync.BackgroundImage = Resources.greenmarker; else pb_rxsync.BackgroundImage = Resources.redmarker;
+            if (statics.real_datarate == 45)
+                if (rtty_sync == 1 && statics.RXlevelDetected == 1) pb_rxsync.BackgroundImage = Resources.greenmarker; else pb_rxsync.BackgroundImage = Resources.redmarker;
+            else
+                if (statics.RXinSync == 1) pb_rxsync.BackgroundImage = Resources.greenmarker; else pb_rxsync.BackgroundImage = Resources.redmarker;
 
             // update rx,tx level progress bar
             int factor = 1;
@@ -644,6 +655,72 @@ namespace oscardata
                 bt_resetmodem_Click(null, null);
                 statics.tuning_active = 0;
             }
+
+            Byte[] ba = Udp.getRTTYrx();
+            if (ba != null)
+            {
+                int rtty_val = ba[0];
+                rtty_txon = ba[1];
+                rtty_sync = ba[2];
+                if (rtty_val != 0)
+                {
+                    if (rtty_val == 0x08)
+                    {
+                        // backspace
+                        tb_rtty_RX.Text = tb_rtty_RX.Text.Trim(new char[] { '\r', '\n' });
+                        if (tb_rtty_RX.Text.Length > 0)
+                            tb_rtty_RX.Text = tb_rtty_RX.Text.Substring(0, tb_rtty_RX.Text.Length - 1);
+                    }
+                    else if (rtty_val != '\r')
+                    {
+                        String s = "";
+                        s += (char)rtty_val;
+                        if (rtty_val == '\n')
+                            s = "\r" + s;
+                        if(statics.RXlevelDetected == 1)    // do not print if no signal detected
+                            tb_rtty_RX.AppendText(s);
+                    }
+                }
+            }
+            if (rtty_txon == 1)
+            {
+                bt_rtty_tx.BackColor = Color.Red;
+                tb_rtty_TX.Enabled = true;
+            }
+            else
+            {
+                bt_rtty_tx.BackColor = Color.LightGreen;
+                tb_rtty_TX.Enabled = false;
+            }
+        }
+
+        // click into RTTY RX Textbox
+        Point RTTYmousepos = new Point(0, 0);
+        private void tb_rtty_RX_MouseDown(object sender, MouseEventArgs e)
+        {
+            RTTYmousepos.X = e.X;
+            RTTYmousepos.Y = e.Y;
+            int cidx = tb_rtty_RX.GetCharIndexFromPosition(RTTYmousepos);
+
+            // get the word under this position
+            // text after pos
+            String ls = tb_rtty_RX.Text.Substring(cidx);
+            ls = ls.Trim(new char[] { ' ', '\r', '\n' });
+            int lidx = ls.IndexOfAny(new char[] {' ', '\r', '\n' });
+            if (lidx != -1)
+                ls = tb_rtty_RX.Text.Substring(0, lidx + cidx);
+            else
+                ls = tb_rtty_RX.Text.Trim(new char[] { ' ', '\r', '\n' });
+            int fidx = ls.LastIndexOf(' ');
+            if (fidx != -1)
+                ls = ls.Substring(fidx).Trim();
+
+            // ls is the word under the caret
+            // check if it is a name or callsign
+            if (ls.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }) == -1)
+                tb_urname.Text = ls;
+            else
+                tb_urcall.Text = ls;
         }
 
         private void panel_constel_Paint(object sender, PaintEventArgs e)
@@ -719,6 +796,11 @@ namespace oscardata
             AppendTextOnce(rtb, new Font("Courier New", (float)8), Color.Blue, Color.White, s);
         }
 
+        void printTextnoFont(RichTextBox rtb, String s)
+        {
+            AppendTextOnce(rtb, null, Color.Blue, Color.FromArgb(255, 255, 230), s);
+        }
+
         void AppendTextOnce(RichTextBox rtb, Font selfont, Color color, Color bcolor, string text)
         {
             try
@@ -746,7 +828,7 @@ namespace oscardata
                 // Textbox may transform chars, so (end-start) != text.Length
                 rtb.Select(start, end - start);
                 rtb.SelectionColor = color;
-                rtb.SelectionFont = selfont;
+                if(selfont != null) rtb.SelectionFont = selfont;
                 rtb.SelectionBackColor = bcolor;
                 rtb.Select(end, 0);
 
@@ -1075,24 +1157,19 @@ namespace oscardata
             label_txfile.Location = new Point(rtb_TXfile.Location.X, ly);
             label_rxfile.Location = new Point(rtb_RXfile.Location.X, ly);
 
-            label_speed.Location = new Point(panel_txspectrum.Location.X + panel_txspectrum.Size.Width + 15,panel_txspectrum.Location.Y+10);
-            cb_speed.Location = new Point(label_speed.Location.X + label_speed.Size.Width + 10, label_speed.Location.Y-5);
+            pn1.Location = new Point(panel_txspectrum.Location.X + panel_txspectrum.Size.Width + 10, panel_txspectrum.Location.Y +0);
 
-            int y = 26;
-            label_fifo.Location = new Point(label_speed.Location.X, label_speed.Location.Y + y);
-            progressBar_fifo.Location = new Point(cb_speed.Location.X, cb_speed.Location.Y + y+5);
-            progressBar_fifo.Size = new Size(progressBar_fifo.Width, 18);
+            tb_rtty_RX.Location = new Point(9, 35);
+            tb_rtty_RX.Size = new Size(675, 348);
 
-            y = 20;
-            label_capfifo.Location = new Point(label_fifo.Location.X, label_fifo.Location.Y + y);
-            progressBar_capfifo.Location = new Point(progressBar_fifo.Location.X, progressBar_fifo.Location.Y + y);
-            progressBar_capfifo.Size = new Size(progressBar_capfifo.Width, 18);
+            tb_rtty_TX.Location = new Point(9, 416);
+            tb_rtty_TX.Size = new Size(675, 103);
 
-            lb_rxsignal.Location = new Point(progressBar_capfifo.Location.X + progressBar_capfifo.Size.Width + 15, label_fifo.Location.Y-15);
-            pb_rxsignal.Location = new Point(lb_rxsignal.Location.X + lb_rxsignal.Size.Width + 2, label_fifo.Location.Y-5-15);
+            label4.Location = new Point(13, 393);
 
-            lb_rxsync.Location = new Point(progressBar_capfifo.Location.X + progressBar_capfifo.Size.Width + 15, label_capfifo.Location.Y);
-            pb_rxsync.Location = new Point(lb_rxsignal.Location.X + lb_rxsignal.Size.Width + 2, label_capfifo.Location.Y-5);
+            panel1.Location = new Point(696,8);
+
+            tb_rtty_deftext.Size = new Size(522, 160);
         }
 
         public String GetMyBroadcastIP()
@@ -1157,7 +1234,7 @@ namespace oscardata
             txb[5] = (Byte)tb_mic.Value;
             txb[6] = safemode;
             txb[7] = (Byte)(cb_sendIntro.Checked?1:0);
-            txb[8] = (Byte)0;   // unused
+            txb[8] = (Byte)(cb_rx_autosync.Checked ? 1 : 0);
             txb[9] = (Byte)0;   // unused
 
             Byte[] bpb = statics.StringToByteArrayUtf8(cb_audioPB.Text);
@@ -1243,11 +1320,44 @@ namespace oscardata
             }
         }
 
+        /*void removeTab(TabPage tb)
+        {
+            if (tabControl1.TabPages.IndexOf(tb) != -1)
+                tabControl1.TabPages.Remove(tb);
+        }
+
+        void addTab(int idx, TabPage tb)
+        {
+            if (tabControl1.TabPages.IndexOf(tb) == -1)
+                tabControl1.TabPages.Insert(idx,tb);
+        }*/
+
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             bool b = cb_switchtoLS.Checked;
             allVoiceModesOff();
             cb_switchtoLS.Checked = b;
+
+            if (cb_speed.Text.Contains("45"))
+            {
+                txcommand = statics.noTX;
+                panel_constel.Visible = false;
+                statics.real_datarate = 45;
+                /*removeTab(tabPage_image);
+                removeTab(tabPage_file);
+                removeTab(tabPage_audio);
+                removeTab(tabPage_ber);
+                addTab(0,tabPage_rtty);*/
+            }
+            else
+            {
+                panel_constel.Visible = true;
+                /*addTab(0,tabPage_image);
+                addTab(1,tabPage_file);
+                addTab(2,tabPage_audio);
+                addTab(3,tabPage_ber);
+                removeTab(tabPage_rtty);*/
+            }
 
             if (cb_speed.Text.Contains("3000")) statics.real_datarate = 3000;
             if (cb_speed.Text.Contains("4000")) statics.real_datarate = 4000;
@@ -1366,7 +1476,9 @@ namespace oscardata
         {
             try
             {
-                using (StreamReader sr = new StreamReader(statics.getHomePath("", "od.cfg")))
+                String fn = statics.getHomePath("", "od.cfg");
+                label_cfgpath.Text = fn;
+                using (StreamReader sr = new StreamReader(fn))
                 {
                     tb_callsign.Text = ReadString(sr);
                     cb_speed.Text = ReadString(sr);
@@ -1397,6 +1509,32 @@ namespace oscardata
                     catch { }
                     try { cb_language.Text = ReadString(sr); } catch { }
                     try { s = ReadString(sr); cb_sendIntro.Checked = (s == "1"); } catch { }
+                    for (int i = 0; i < Rtty_deftext_anz; i++)
+                    {
+                        String sx = "";
+                        try 
+                        { 
+                            sx = ReadString(sr).Trim(); 
+                            if(sx.Length == 0) 
+                                initRttyDefString(i);
+                            else
+                                Rtty_deftext[i] = ParagrToCRLF(sx);
+                        }
+                        catch
+                        {
+                            initRttyDefString(i);
+                            break;
+                        }
+                    }
+                    tb_myname.Text = ReadString(sr);
+                    tb_myqth.Text = ReadString(sr);
+                    tb_myqthloc.Text = ReadString(sr);
+                    Font fnt1 = FontDeserialize(ReadString(sr));
+                    if (fnt1 != null) tb_rtty_RX.Font = fnt1;
+                    fnt1 = FontDeserialize(ReadString(sr));
+                    if (fnt1 != null) tb_rtty_TX.Font = fnt1;
+                    s = ReadString(sr);
+                    cb_rx_autosync.Checked = (s == "1");
                 }
             }
             catch
@@ -1441,9 +1579,108 @@ namespace oscardata
                     sw.WriteLine(rb_opus.Checked ? "1" : "0");
                     sw.WriteLine(cb_language.Text);
                     sw.WriteLine(cb_sendIntro.Checked ? "1" : "0");
+                    for(int i=0; i < Rtty_deftext_anz; i++)
+                    {
+                        if (Rtty_deftext[i] == null)
+                            Rtty_deftext[i] = " ";
+                        sw.WriteLine(CRLFtoParagr(Rtty_deftext[i]));
+                    }
+                    sw.WriteLine(tb_myname.Text.Trim());
+                    sw.WriteLine(tb_myqth.Text.Trim());
+                    sw.WriteLine(tb_myqthloc.Text.Trim());
+                    sw.WriteLine(FontSerialize(tb_rtty_RX.Font));
+                    sw.WriteLine(FontSerialize(tb_rtty_TX.Font));
+                    sw.WriteLine(cb_rx_autosync.Checked ? "1" : "0");
                 }
             }
             catch { }
+        }
+
+        String FontSerialize(Font value)
+        {
+            String str;
+
+            str = value.Name + "," + value.Size.ToString() + ",";
+            if (value.Style == FontStyle.Regular)
+            {
+                str += "R";
+            }
+            else
+            {
+                if (value.Bold) str += "B";
+                if (value.Italic) str += "I";
+                if (value.Underline) str += "U";
+            }
+
+            return str;
+        }
+
+        Font FontDeserialize(String s)
+        {
+            String[] sa = s.Split(',');
+
+            FontStyle fs = FontStyle.Regular;
+            if (sa[2] == "B") fs = FontStyle.Bold;
+            if (sa[2] == "I") fs = FontStyle.Italic;
+            if (sa[2] == "U") fs = FontStyle.Underline;
+
+            FontFamily ff = new FontFamily(sa[0]);
+            float size = (float)statics.MyToDouble(sa[1]);
+
+            Font fnt = new Font(ff, size, fs);
+
+            return fnt;
+        }
+
+        String CRLFtoParagr(String s)
+        {
+            s = s.Replace('\n', '§');
+            s = s.Replace("\r", String.Empty);
+            // make String 200 chars long, for exact storage position in cfg file
+            s = s.PadRight(210);
+            s = s.Substring(0, 200);
+            return s;
+        }
+
+        String ParagrToCRLF(String s)
+        {
+            s = s.Replace("§", "\r\n").TrimEnd(new char[] {' '});
+            return s;
+        }
+
+
+        void initRttyDefString(int i)
+        {
+            switch(i)
+            {
+                case 0: 
+                    Rtty_deftext[0] = "\r\n\r\nCQ CQ CQ de %m CQ CQ CQ de %m pse k k k\r\n%r";    // CQ call
+                    break;
+                case 1: 
+                    Rtty_deftext[1] = "\r\n\r\n%c de %m pse k k k\r\n%r";                         // answer CQ call
+                    break;
+                case 2:
+                    Rtty_deftext[2] = "\r\n\r\n%c de %m\r\n";                                     // start TX
+                    break;
+                case 3:
+                    Rtty_deftext[3] = "\r\nbtu dr %n %c de %m pse k k k\r\n%r";                  // end TX
+                    break;
+                case 4:
+                    Rtty_deftext[4] = "\r\nmany thanks for the nice QSO dr %n.\r\nHpe to see you agn. gl es mny 73 %c de %m bye bye ar sk\r\n%r"; // end QSO
+                    break;
+                case 5:
+                    Rtty_deftext[5] = "\r\nName: %i\r\nQTH: %s\r\nQTHLOC: %q\r\n";
+                    break;
+                case 6:
+                    Rtty_deftext[6] = "\r\n%m station:\r\n";                                  // my station
+                    break;
+                case 7:
+                    Rtty_deftext[7] = "RYRYRYRYRYRYRYRYRYRY";
+                    break;
+                default:
+                    Rtty_deftext[i] = " ";
+                    break;
+            }
         }
 
         private void bt_shutdown_Click(object sender, EventArgs e)
@@ -1492,27 +1729,6 @@ namespace oscardata
         private void tb_CAPvol_Scroll(object sender, EventArgs e)
         {
             setCAPvolume = tb_CAPvol.Value;
-        }
-
-        private void bt_blockinfo_Click(object sender, EventArgs e)
-        {
-            String s;
-            int[] d = new int[2];
-            recfile.oldblockinfo(d);
-            int failed = d[0] - d[1];
-
-            s = statics.langstr[25] +
-                "---------------\n" +
-                "total : " + d[0] + "\n" +
-                statics.langstr[26] + d[1] + "\n" +
-                statics.langstr[27] + failed + "\n";
-            if(failed > 1)
-            {
-                s += statics.langstr[28];
-            }
-
-            Form2_showtext sf = new Form2_showtext("Block Info",s);
-            sf.ShowDialog();
         }
 
         void setVoiceAudio(Byte opmode = 0)
@@ -1762,7 +1978,6 @@ namespace oscardata
                 tabPage_about.Text = "About";
                 label_speed.Text = "Speed [bit/s]:";
                 label_fifo.Text = "TX Buffer:";
-                bt_blockinfo.Text = "Block Info";
                 label_capfifo.Text = "RX Buffer:";
                 lb_rxsignal.Text = "RX Signal:";
                 lb_rxsync.Text = "RX Sync:";
@@ -1771,6 +1986,29 @@ namespace oscardata
                 lb_tuningqrgs.Text = "Send Mid-Frequency:";
                 cb_marker.Text = "2.9kHz Tuning Marker";
                 label13.Text = "Data Security:";
+                textBox5.Text = "Click on Callsign or Name in RX window";
+                textBox2.Text = @"Special Markers:
+%m... my call
+%i... my name
+%s... my city
+%q... my qthloc
+%c... ur call
+%n... ur name
+%r... switch to RX
+";
+                label_cfgpath_tit.Text = "Configuration stored in:";
+                label_urcall.Text = "Your Callsign:";
+                label_urname.Text = "Your Name:";
+                bt_rtty_tx.Text = "TX On/Off";
+                bt_rtty_default.Text = "set Default Text";
+                bt_rtty_cq.Text = "Call CQ";
+                bt_rtty_answerCQ.Text = "Answer CQ Call";
+                bt_rtty_endqso.Text = "End QSO";
+                bt_rtty_start.Text = "Start Transmission";
+                bt_rtty_end.Text = "End Transmission";
+                bt_rtty_myinfo.Text = "My Info";
+                bt_rtty_station.Text = "My Station";
+                textBox6.Text = "or double click in spectrum";
             }
 
             if (language == 1)
@@ -1828,6 +2066,29 @@ namespace oscardata
                 lb_tuningqrgs.Text = "Sende Mittenfrequenz:";
                 cb_marker.Text = "2,9kHz Tuning Markierung";
                 label13.Text = "Datensicherheit:";
+                textBox5.Text = "Klicke auf Rufzeichen und Namen im RX Fenster";
+                textBox2.Text = @"Spezialzeichen:
+%m... mein Rufzeichen
+%i... mein Name
+%s... mein Ort
+%q... mein QTHLOC
+%c... dein Rufzeichen
+%n... dein Name
+%r... schalte auf RX
+";
+                label_cfgpath_tit.Text = "Konfiguration gespeichert in:";
+                label_urcall.Text = "Dein Rufzeichen:";
+                label_urname.Text = "Dein Name:";
+                bt_rtty_tx.Text = "TX ein/aus";
+                bt_rtty_default.Text = "setze Standardtexte";
+                bt_rtty_cq.Text = "Rufe CQ";
+                bt_rtty_answerCQ.Text = "Beantworte CQ";
+                bt_rtty_endqso.Text = "Beende QSO";
+                bt_rtty_start.Text = "Start Durchgang";
+                bt_rtty_end.Text = "Beende Durchgang";
+                bt_rtty_myinfo.Text = "Meine Info";
+                bt_rtty_station.Text = "Meine Station";
+                textBox6.Text = "oder Doppelklick in Spektrum";
             }
         }
 
@@ -1873,6 +2134,8 @@ namespace oscardata
             " of ", //30
             "Bad blocks, retransmission required",
             "Bad blocks",   //32
+            "Set RTTY predefinded text messages to default values. Are you sure ?", //33
+            "Set Default Mesages",  //34
         };
 
         String[] langstr_de = new String[]{
@@ -1909,6 +2172,8 @@ namespace oscardata
             " von ", //30
             "defekte Blöcke, Datei muss nochmal empfangen werden",
             "defekte Blöcke",   //32
+            "Setze RTTY Nachrichten auf die Standardtexte zurück. Sind sie sicher?", //33
+            "Setze Standardnachrichten",  //34
         };
 
         private void cb_autostart_CheckedChanged(object sender, EventArgs e)
@@ -1986,6 +2251,316 @@ namespace oscardata
             txdata[1] = 255 - 10;
             Udp.UdpSendCtrl(txdata);
         }
-    }
 
+        bool backspace = false;
+        private void tb_rtty_TX_TextChanged(object sender, EventArgs e)
+        {
+            if (backspace)
+            {
+                backspace = false;
+                return;
+            }
+
+            if (tb_rtty_TX.Text.Length > 0)
+            {
+                char c = tb_rtty_TX.Text[tb_rtty_TX.Text.Length - 1];
+
+                c = char.ToUpper(c);
+
+                // filter allowed characters
+                bool ok = false;
+                if (c >= 'A' && c <= 'Z') ok = true;
+                if (c >= '0' && c <= '9') ok = true;
+                if (c == '\\') ok = true;
+                if (c == '(') ok = true;
+                if (c == ')') ok = true;
+                if (c == '+') ok = true;
+                if (c == '/') ok = true;
+                if (c == '-') ok = true;
+                if (c == ':') ok = true;
+                if (c == '=') ok = true;
+                if (c == '?') ok = true;
+                if (c == ',') ok = true;
+                if (c == '.') ok = true;
+                if (c == ' ') ok = true;
+                if (c == '\n') ok = true;
+
+                if (ok)
+                {
+                    Byte[] txdata = new byte[2];
+                    txdata[0] = statics.rttykey;
+                    txdata[1] = (Byte)c;
+                    Udp.UdpSendCtrl(txdata);
+                }
+            }
+        }
+
+        /*
+            %m ... my call
+            %i ... my name
+            %s ... my city
+            %q ... my qthloc
+            %c ... ur call
+            %n ... ur name
+            %r ... stop TX
+         */
+        // convert short forms into text
+        String realRTTYtext(String s)
+        {
+            String sdec = s;
+            sdec = sdec.Replace("%m", tb_callsign.Text.Trim().ToUpper());
+            sdec = sdec.Replace("%i", tb_myname.Text.Trim().ToUpper());
+            sdec = sdec.Replace("%s", tb_myqth.Text.Trim().ToUpper());
+            sdec = sdec.Replace("%q", tb_myqthloc.Text.Trim().ToUpper());
+            sdec = sdec.Replace("%c", tb_urcall.Text.Trim().ToUpper());
+            sdec = sdec.Replace("%n", tb_urname.Text.Trim().ToUpper());
+            if(tb_urname.Text.Length == 0)
+            {
+                sdec = sdec.Replace(" dr ", " ");
+            }
+            sdec = sdec.Replace("%r", "[RX]");
+
+            return sdec.ToUpper();
+        }
+
+        int selected_rtty_deftext = 0;
+
+        void ShowRTTYtext(int selnum, int nosend = 0)
+        {
+            if (selnum >= Rtty_deftext_anz) return;
+
+            selected_rtty_deftext = selnum;
+
+            if (rb_rtty_normal.Checked)
+            {
+                bt_rtty_default.Enabled = textBox2.Enabled = false;
+                tb_rtty_deftext.ReadOnly = true;
+                tb_rtty_deftext.Text = realRTTYtext(Rtty_deftext[selnum]);
+
+                if (nosend == 0)
+                {
+                    String sx = tb_rtty_deftext.Text;
+                    sx = sx.Replace("[RX]", "~");
+
+                    // print also in TX window
+                    String sxtx = sx;
+                    sxtx = sxtx.Replace('~', ' ');
+                    tb_rtty_TX.AppendText(sxtx);
+
+                    Byte[] tarr = statics.StringToByteArray(sx);
+
+                    Byte[] txdata = new byte[4 + tarr.Length];
+                    txdata[0] = statics.rttystring;
+                    int len = tarr.Length;
+                    txdata[1] = (Byte)(len >> 8);
+                    txdata[2] = (Byte)(len & 0xff);
+                    txdata[3] = (Byte)'#';  // always switch TX on before transmitting
+                    for (int i = 0; i < tarr.Length; i++)
+                        txdata[i + 4] = tarr[i];
+                    Udp.UdpSendCtrl(txdata);
+                }
+            }
+            else if (rb_rtty_real.Checked)
+            {
+                bt_rtty_default.Enabled = textBox2.Enabled = false;
+                tb_rtty_deftext.ReadOnly = true;
+                tb_rtty_deftext.Text = realRTTYtext(Rtty_deftext[selnum]);
+            }
+            else
+            {
+                bt_rtty_default.Enabled = textBox2.Enabled = true;
+                tb_rtty_deftext.ReadOnly = false;
+                tb_rtty_deftext.Text = Rtty_deftext[selnum];
+            }
+        }
+
+        private void bt_rtty_cq_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(0);
+        }
+
+        private void bt_rtty_answerCQ_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(1);
+        }
+
+        private void bt_rtty_endqso_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(4);
+        }
+
+        private void bt_rtty_start_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(2);
+        }
+
+        private void bt_rtty_end_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(3);
+        }
+
+        private void bt_rtty_myinfo_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(5);
+        }
+
+        private void bt_rtty_station_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(6);
+        }
+
+        private void bt_rtty_RY_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(7);
+        }
+
+        private void tb_rtty_deftext_TextChanged(object sender, EventArgs e)
+        {
+            if (rb_rtty_edit.Checked)
+            {
+                try
+                {
+                    Rtty_deftext[selected_rtty_deftext] = tb_rtty_deftext.Text;
+                }
+                catch
+                {
+                    Rtty_deftext[selected_rtty_deftext] = "";
+                }
+            }
+        }
+
+        private void bt_rtty_default_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(statics.langstr[33], statics.langstr[34], MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                for (int i = 0; i < Rtty_deftext_anz; i++)
+                    initRttyDefString(i);
+
+                ShowRTTYtext(selected_rtty_deftext);
+            }
+        }
+
+        private void rb_rtty_normal_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb_rtty_normal.Checked)
+                ShowRTTYtext(selected_rtty_deftext,1);
+        }
+
+        private void rb_rtty_edit_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb_rtty_edit.Checked)
+                ShowRTTYtext(selected_rtty_deftext, 0);
+        }
+
+        private void rb_rtty_real_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb_rtty_real.Checked)
+                ShowRTTYtext(selected_rtty_deftext, 0);
+        }
+
+        int rtty_txon = 0;
+        int rtty_sync = 0;
+        private void bt_rtty_tx_Click(object sender, EventArgs e)
+        {
+            Byte[] txdata = new byte[2];
+            txdata[0] = statics.txonoff;
+            txdata[1] = (Byte)((rtty_txon==1)?0:1);
+            Udp.UdpSendCtrl(txdata);
+        }
+
+        private void tb_rtty_TX_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyValue == 8)
+            {
+                // back space
+                backspace = true; // do not process text change
+                Byte[] txdata = new byte[2];
+                txdata[0] = statics.rttykey;
+                txdata[1] = 0x08;
+                Udp.UdpSendCtrl(txdata);
+            }
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            tb_rtty_RX.Text = "";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            tb_rtty_TX.Text = "";
+        }
+
+        private void bt_rxfont_Click(object sender, EventArgs e)
+        {
+            FontDialog fontDialog1 = new FontDialog();
+            fontDialog1.Font = tb_rtty_RX.Font;
+            if (fontDialog1.ShowDialog() == DialogResult.OK)
+            {
+                tb_rtty_RX.Font = fontDialog1.Font;
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            FontDialog fontDialog1 = new FontDialog();
+            fontDialog1.Font = tb_rtty_TX.Font;
+            if (fontDialog1.ShowDialog() == DialogResult.OK)
+            {
+                tb_rtty_TX.Font = fontDialog1.Font;
+            }
+        }
+
+        private void panel_txspectrum_DoubleClick(object sender, EventArgs e)
+        {
+            MouseEventArgs a = (MouseEventArgs)e;
+            Int16 freq = (Int16)(10 * (a.X - 16));
+
+            statics.tune_frequency = freq;
+
+            Byte[] txdata = new byte[3];
+            txdata[0] = statics.setfreq;
+            txdata[1] = (Byte)(freq >> 8);
+            txdata[2] = (Byte)(freq & 0xff);
+            Udp.UdpSendCtrl(txdata);
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Byte[] txdata = new byte[1];
+            txdata[0] = statics.rtty_stopTX;
+            Udp.UdpSendCtrl(txdata);
+        }
+
+        private void bt_rtty_text1_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(8);
+        }
+
+        private void bt_rtty_text2_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(9);
+        }
+
+        private void bt_rtty_text3_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(10);
+        }
+
+        private void bt_rtty_text4_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(11);
+        }
+
+        private void bt_rtty_text5_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(12);
+        }
+
+        private void bt_rtty_text6_Click(object sender, EventArgs e)
+        {
+            ShowRTTYtext(13);
+        }
+    }
 }

@@ -43,10 +43,10 @@
             this.tabPage_ber = new System.Windows.Forms.TabPage();
             this.bt_allf = new System.Windows.Forms.Button();
             this.lb_tuningqrgs = new System.Windows.Forms.Label();
+            this.rtb = new System.Windows.Forms.RichTextBox();
             this.button_stopBERtest = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.button_startBERtest = new System.Windows.Forms.Button();
-            this.rtb = new System.Windows.Forms.RichTextBox();
             this.tabPage_image = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.Panel();
             this.cb_loop = new System.Windows.Forms.CheckBox();
@@ -97,7 +97,46 @@
             this.label10 = new System.Windows.Forms.Label();
             this.cb_mic = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
+            this.tabPage_rtty = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tb_rtty_TX = new System.Windows.Forms.TextBox();
+            this.tb_rtty_RX = new System.Windows.Forms.TextBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rb_rtty_real = new System.Windows.Forms.RadioButton();
+            this.bt_rtty_text6 = new System.Windows.Forms.Button();
+            this.bt_rtty_text5 = new System.Windows.Forms.Button();
+            this.bt_rtty_text4 = new System.Windows.Forms.Button();
+            this.bt_rtty_text3 = new System.Windows.Forms.Button();
+            this.bt_rtty_text2 = new System.Windows.Forms.Button();
+            this.bt_rtty_text1 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.bt_rtty_RY = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.button4 = new System.Windows.Forms.Button();
+            this.bt_rtty_cq = new System.Windows.Forms.Button();
+            this.bt_rxfont = new System.Windows.Forms.Button();
+            this.bt_rtty_answerCQ = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.bt_rtty_start = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.bt_rtty_end = new System.Windows.Forms.Button();
+            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.bt_rtty_endqso = new System.Windows.Forms.Button();
+            this.rb_rtty_edit = new System.Windows.Forms.RadioButton();
+            this.bt_rtty_myinfo = new System.Windows.Forms.Button();
+            this.rb_rtty_normal = new System.Windows.Forms.RadioButton();
+            this.bt_rtty_station = new System.Windows.Forms.Button();
+            this.bt_rtty_default = new System.Windows.Forms.Button();
+            this.bt_rtty_tx = new System.Windows.Forms.Button();
+            this.label_urname = new System.Windows.Forms.Label();
+            this.tb_rtty_deftext = new System.Windows.Forms.TextBox();
+            this.tb_urname = new System.Windows.Forms.TextBox();
+            this.tb_urcall = new System.Windows.Forms.TextBox();
+            this.label_urcall = new System.Windows.Forms.Label();
             this.tabPage_setup = new System.Windows.Forms.TabPage();
+            this.label_cfgpath = new System.Windows.Forms.Label();
+            this.label_cfgpath_tit = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -123,6 +162,12 @@
             this.cb_audioPB = new System.Windows.Forms.ComboBox();
             this.cb_audioCAP = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tb_myqthloc = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.tb_myqth = new System.Windows.Forms.TextBox();
+            this.lb_qth = new System.Windows.Forms.Label();
+            this.tb_myname = new System.Windows.Forms.TextBox();
+            this.lb_myname = new System.Windows.Forms.Label();
             this.lb_rec = new System.Windows.Forms.Label();
             this.tb_recintro = new System.Windows.Forms.TextBox();
             this.bt_astop = new System.Windows.Forms.Button();
@@ -144,14 +189,16 @@
             this.label_speed = new System.Windows.Forms.Label();
             this.timer_searchmodem = new System.Windows.Forms.Timer(this.components);
             this.label_fifo = new System.Windows.Forms.Label();
-            this.bt_blockinfo = new System.Windows.Forms.Button();
             this.label_capfifo = new System.Windows.Forms.Label();
             this.lb_rxsignal = new System.Windows.Forms.Label();
             this.lb_rxsync = new System.Windows.Forms.Label();
-            this.pb_rxsync = new System.Windows.Forms.PictureBox();
+            this.pn1 = new System.Windows.Forms.Panel();
             this.pb_rxsignal = new System.Windows.Forms.PictureBox();
-            this.progressBar_capfifo = new oscardata.KmProgressBar();
+            this.pb_rxsync = new System.Windows.Forms.PictureBox();
+            this.cb_rx_autosync = new System.Windows.Forms.CheckBox();
+            this.textBox6 = new System.Windows.Forms.TextBox();
             this.progressBar_fifo = new oscardata.KmProgressBar();
+            this.progressBar_capfifo = new oscardata.KmProgressBar();
             this.vu_cap = new oscardata.KmProgressBar();
             this.vu_pb = new oscardata.KmProgressBar();
             this.statusStrip1.SuspendLayout();
@@ -173,6 +220,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_voicePBstatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_mic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_loadspeaker)).BeginInit();
+            this.tabPage_rtty.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.tabPage_setup.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -184,8 +233,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.tb_PBvol)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.tabPage_about.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_rxsync)).BeginInit();
+            this.pn1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_rxsignal)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_rxsync)).BeginInit();
             this.SuspendLayout();
             // 
             // timer_udpTX
@@ -204,9 +254,9 @@
             this.toolStripStatusLabel,
             this.ts_ip,
             this.RXstatus});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 669);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 671);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1293, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1296, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -259,15 +309,16 @@
             this.panel_txspectrum.Size = new System.Drawing.Size(442, 76);
             this.panel_txspectrum.TabIndex = 6;
             this.panel_txspectrum.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_txspectrum_Paint);
+            this.panel_txspectrum.DoubleClick += new System.EventHandler(this.panel_txspectrum_DoubleClick);
             // 
             // tabPage_ber
             // 
             this.tabPage_ber.BackColor = System.Drawing.Color.Transparent;
             this.tabPage_ber.Controls.Add(this.bt_allf);
             this.tabPage_ber.Controls.Add(this.lb_tuningqrgs);
+            this.tabPage_ber.Controls.Add(this.rtb);
             this.tabPage_ber.Controls.Add(this.button_stopBERtest);
             this.tabPage_ber.Controls.Add(this.button_startBERtest);
-            this.tabPage_ber.Controls.Add(this.rtb);
             this.tabPage_ber.ImageIndex = 4;
             this.tabPage_ber.Location = new System.Drawing.Point(4, 23);
             this.tabPage_ber.Name = "tabPage_ber";
@@ -295,6 +346,15 @@
             this.lb_tuningqrgs.Size = new System.Drawing.Size(84, 13);
             this.lb_tuningqrgs.TabIndex = 21;
             this.lb_tuningqrgs.Text = "Frequency Test:";
+            // 
+            // rtb
+            // 
+            this.rtb.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtb.Location = new System.Drawing.Point(6, 51);
+            this.rtb.Name = "rtb";
+            this.rtb.Size = new System.Drawing.Size(1266, 494);
+            this.rtb.TabIndex = 0;
+            this.rtb.Text = "";
             // 
             // button_stopBERtest
             // 
@@ -327,6 +387,16 @@
             this.imageList1.Images.SetKeyName(10, "transmit.png");
             this.imageList1.Images.SetKeyName(11, "voice.png");
             this.imageList1.Images.SetKeyName(12, "about.png");
+            this.imageList1.Images.SetKeyName(13, "rtty.png");
+            this.imageList1.Images.SetKeyName(14, "home-icon.png");
+            this.imageList1.Images.SetKeyName(15, "ryry-icon.png");
+            this.imageList1.Images.SetKeyName(16, "voice-icon.png");
+            this.imageList1.Images.SetKeyName(17, "user-icon.png");
+            this.imageList1.Images.SetKeyName(18, "answer.png");
+            this.imageList1.Images.SetKeyName(19, "stop-icon.png");
+            this.imageList1.Images.SetKeyName(20, "start-icon.png");
+            this.imageList1.Images.SetKeyName(21, "endqso-icon.png");
+            this.imageList1.Images.SetKeyName(22, "text-icon.png");
             // 
             // button_startBERtest
             // 
@@ -341,15 +411,6 @@
             this.button_startBERtest.Text = "START";
             this.button_startBERtest.UseVisualStyleBackColor = true;
             this.button_startBERtest.Click += new System.EventHandler(this.button_startBERtest_Click);
-            // 
-            // rtb
-            // 
-            this.rtb.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rtb.Location = new System.Drawing.Point(6, 51);
-            this.rtb.Name = "rtb";
-            this.rtb.Size = new System.Drawing.Size(1266, 494);
-            this.rtb.TabIndex = 0;
-            this.rtb.Text = "";
             // 
             // tabPage_image
             // 
@@ -531,6 +592,7 @@
             this.tabControl1.Controls.Add(this.tabPage_file);
             this.tabControl1.Controls.Add(this.tabPage_audio);
             this.tabControl1.Controls.Add(this.tabPage_ber);
+            this.tabControl1.Controls.Add(this.tabPage_rtty);
             this.tabControl1.Controls.Add(this.tabPage_setup);
             this.tabControl1.Controls.Add(this.tabPage_about);
             this.tabControl1.ImageList = this.imageList1;
@@ -948,9 +1010,490 @@
             this.label11.TabIndex = 10;
             this.label11.Text = "Microphone:";
             // 
+            // tabPage_rtty
+            // 
+            this.tabPage_rtty.Controls.Add(this.label4);
+            this.tabPage_rtty.Controls.Add(this.label3);
+            this.tabPage_rtty.Controls.Add(this.tb_rtty_TX);
+            this.tabPage_rtty.Controls.Add(this.tb_rtty_RX);
+            this.tabPage_rtty.Controls.Add(this.panel1);
+            this.tabPage_rtty.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabPage_rtty.ImageIndex = 13;
+            this.tabPage_rtty.Location = new System.Drawing.Point(4, 23);
+            this.tabPage_rtty.Name = "tabPage_rtty";
+            this.tabPage_rtty.Size = new System.Drawing.Size(1280, 552);
+            this.tabPage_rtty.TabIndex = 7;
+            this.tabPage_rtty.Text = "RTTY";
+            this.tabPage_rtty.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(13, 393);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(29, 20);
+            this.label4.TabIndex = 32;
+            this.label4.Text = "TX";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(13, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(32, 20);
+            this.label3.TabIndex = 26;
+            this.label3.Text = "RX";
+            // 
+            // tb_rtty_TX
+            // 
+            this.tb_rtty_TX.BackColor = System.Drawing.Color.AliceBlue;
+            this.tb_rtty_TX.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tb_rtty_TX.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.tb_rtty_TX.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_rtty_TX.Location = new System.Drawing.Point(9, 416);
+            this.tb_rtty_TX.Multiline = true;
+            this.tb_rtty_TX.Name = "tb_rtty_TX";
+            this.tb_rtty_TX.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tb_rtty_TX.Size = new System.Drawing.Size(675, 103);
+            this.tb_rtty_TX.TabIndex = 1;
+            this.tb_rtty_TX.TextChanged += new System.EventHandler(this.tb_rtty_TX_TextChanged);
+            this.tb_rtty_TX.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tb_rtty_TX_KeyDown);
+            // 
+            // tb_rtty_RX
+            // 
+            this.tb_rtty_RX.BackColor = System.Drawing.Color.Cornsilk;
+            this.tb_rtty_RX.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tb_rtty_RX.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.tb_rtty_RX.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_rtty_RX.Location = new System.Drawing.Point(9, 35);
+            this.tb_rtty_RX.Multiline = true;
+            this.tb_rtty_RX.Name = "tb_rtty_RX";
+            this.tb_rtty_RX.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tb_rtty_RX.Size = new System.Drawing.Size(675, 348);
+            this.tb_rtty_RX.TabIndex = 2;
+            this.tb_rtty_RX.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tb_rtty_RX_MouseDown);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.Controls.Add(this.textBox6);
+            this.panel1.Controls.Add(this.cb_rx_autosync);
+            this.panel1.Controls.Add(this.rb_rtty_real);
+            this.panel1.Controls.Add(this.bt_rtty_text6);
+            this.panel1.Controls.Add(this.bt_rtty_text5);
+            this.panel1.Controls.Add(this.bt_rtty_text4);
+            this.panel1.Controls.Add(this.bt_rtty_text3);
+            this.panel1.Controls.Add(this.bt_rtty_text2);
+            this.panel1.Controls.Add(this.bt_rtty_text1);
+            this.panel1.Controls.Add(this.button5);
+            this.panel1.Controls.Add(this.bt_rtty_RY);
+            this.panel1.Controls.Add(this.textBox2);
+            this.panel1.Controls.Add(this.button4);
+            this.panel1.Controls.Add(this.bt_rtty_cq);
+            this.panel1.Controls.Add(this.bt_rxfont);
+            this.panel1.Controls.Add(this.bt_rtty_answerCQ);
+            this.panel1.Controls.Add(this.button3);
+            this.panel1.Controls.Add(this.bt_rtty_start);
+            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.bt_rtty_end);
+            this.panel1.Controls.Add(this.textBox5);
+            this.panel1.Controls.Add(this.bt_rtty_endqso);
+            this.panel1.Controls.Add(this.rb_rtty_edit);
+            this.panel1.Controls.Add(this.bt_rtty_myinfo);
+            this.panel1.Controls.Add(this.rb_rtty_normal);
+            this.panel1.Controls.Add(this.bt_rtty_station);
+            this.panel1.Controls.Add(this.bt_rtty_default);
+            this.panel1.Controls.Add(this.bt_rtty_tx);
+            this.panel1.Controls.Add(this.label_urname);
+            this.panel1.Controls.Add(this.tb_rtty_deftext);
+            this.panel1.Controls.Add(this.tb_urname);
+            this.panel1.Controls.Add(this.tb_urcall);
+            this.panel1.Controls.Add(this.label_urcall);
+            this.panel1.Location = new System.Drawing.Point(696, 8);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(564, 514);
+            this.panel1.TabIndex = 31;
+            // 
+            // rb_rtty_real
+            // 
+            this.rb_rtty_real.AutoSize = true;
+            this.rb_rtty_real.Location = new System.Drawing.Point(373, 203);
+            this.rb_rtty_real.Name = "rb_rtty_real";
+            this.rb_rtty_real.Size = new System.Drawing.Size(47, 17);
+            this.rb_rtty_real.TabIndex = 33;
+            this.rb_rtty_real.Text = "Real";
+            this.rb_rtty_real.UseVisualStyleBackColor = true;
+            this.rb_rtty_real.CheckedChanged += new System.EventHandler(this.rb_rtty_real_CheckedChanged);
+            // 
+            // bt_rtty_text6
+            // 
+            this.bt_rtty_text6.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_text6.ImageIndex = 22;
+            this.bt_rtty_text6.ImageList = this.imageList1;
+            this.bt_rtty_text6.Location = new System.Drawing.Point(432, 293);
+            this.bt_rtty_text6.Name = "bt_rtty_text6";
+            this.bt_rtty_text6.Size = new System.Drawing.Size(107, 25);
+            this.bt_rtty_text6.TabIndex = 32;
+            this.bt_rtty_text6.Text = "TEXT 6";
+            this.bt_rtty_text6.UseVisualStyleBackColor = true;
+            this.bt_rtty_text6.Click += new System.EventHandler(this.bt_rtty_text6_Click);
+            // 
+            // bt_rtty_text5
+            // 
+            this.bt_rtty_text5.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_text5.ImageIndex = 22;
+            this.bt_rtty_text5.ImageList = this.imageList1;
+            this.bt_rtty_text5.Location = new System.Drawing.Point(432, 264);
+            this.bt_rtty_text5.Name = "bt_rtty_text5";
+            this.bt_rtty_text5.Size = new System.Drawing.Size(107, 25);
+            this.bt_rtty_text5.TabIndex = 31;
+            this.bt_rtty_text5.Text = "TEXT 5";
+            this.bt_rtty_text5.UseVisualStyleBackColor = true;
+            this.bt_rtty_text5.Click += new System.EventHandler(this.bt_rtty_text5_Click);
+            // 
+            // bt_rtty_text4
+            // 
+            this.bt_rtty_text4.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_text4.ImageIndex = 22;
+            this.bt_rtty_text4.ImageList = this.imageList1;
+            this.bt_rtty_text4.Location = new System.Drawing.Point(432, 235);
+            this.bt_rtty_text4.Name = "bt_rtty_text4";
+            this.bt_rtty_text4.Size = new System.Drawing.Size(107, 25);
+            this.bt_rtty_text4.TabIndex = 30;
+            this.bt_rtty_text4.Text = "TEXT 4";
+            this.bt_rtty_text4.UseVisualStyleBackColor = true;
+            this.bt_rtty_text4.Click += new System.EventHandler(this.bt_rtty_text4_Click);
+            // 
+            // bt_rtty_text3
+            // 
+            this.bt_rtty_text3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_text3.ImageIndex = 22;
+            this.bt_rtty_text3.ImageList = this.imageList1;
+            this.bt_rtty_text3.Location = new System.Drawing.Point(319, 293);
+            this.bt_rtty_text3.Name = "bt_rtty_text3";
+            this.bt_rtty_text3.Size = new System.Drawing.Size(107, 25);
+            this.bt_rtty_text3.TabIndex = 29;
+            this.bt_rtty_text3.Text = "TEXT 3";
+            this.bt_rtty_text3.UseVisualStyleBackColor = true;
+            this.bt_rtty_text3.Click += new System.EventHandler(this.bt_rtty_text3_Click);
+            // 
+            // bt_rtty_text2
+            // 
+            this.bt_rtty_text2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_text2.ImageIndex = 22;
+            this.bt_rtty_text2.ImageList = this.imageList1;
+            this.bt_rtty_text2.Location = new System.Drawing.Point(319, 264);
+            this.bt_rtty_text2.Name = "bt_rtty_text2";
+            this.bt_rtty_text2.Size = new System.Drawing.Size(107, 25);
+            this.bt_rtty_text2.TabIndex = 28;
+            this.bt_rtty_text2.Text = "TEXT 2";
+            this.bt_rtty_text2.UseVisualStyleBackColor = true;
+            this.bt_rtty_text2.Click += new System.EventHandler(this.bt_rtty_text2_Click);
+            // 
+            // bt_rtty_text1
+            // 
+            this.bt_rtty_text1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_text1.ImageIndex = 22;
+            this.bt_rtty_text1.ImageList = this.imageList1;
+            this.bt_rtty_text1.Location = new System.Drawing.Point(319, 235);
+            this.bt_rtty_text1.Name = "bt_rtty_text1";
+            this.bt_rtty_text1.Size = new System.Drawing.Size(107, 25);
+            this.bt_rtty_text1.TabIndex = 27;
+            this.bt_rtty_text1.Text = "TEXT 1";
+            this.bt_rtty_text1.UseVisualStyleBackColor = true;
+            this.bt_rtty_text1.Click += new System.EventHandler(this.bt_rtty_text1_Click);
+            // 
+            // button5
+            // 
+            this.button5.BackColor = System.Drawing.Color.Transparent;
+            this.button5.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button5.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button5.ImageIndex = 1;
+            this.button5.ImageList = this.imageList1;
+            this.button5.Location = new System.Drawing.Point(39, 123);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(114, 38);
+            this.button5.TabIndex = 26;
+            this.button5.Text = "Stop TX";
+            this.button5.UseVisualStyleBackColor = false;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // bt_rtty_RY
+            // 
+            this.bt_rtty_RY.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_RY.ImageIndex = 15;
+            this.bt_rtty_RY.ImageList = this.imageList1;
+            this.bt_rtty_RY.Location = new System.Drawing.Point(179, 293);
+            this.bt_rtty_RY.Name = "bt_rtty_RY";
+            this.bt_rtty_RY.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_RY.TabIndex = 25;
+            this.bt_rtty_RY.Text = "RYRYRY...";
+            this.bt_rtty_RY.UseVisualStyleBackColor = true;
+            this.bt_rtty_RY.Click += new System.EventHandler(this.bt_rtty_RY_Click);
+            // 
+            // textBox2
+            // 
+            this.textBox2.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox2.Enabled = false;
+            this.textBox2.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox2.Location = new System.Drawing.Point(305, 18);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.ReadOnly = true;
+            this.textBox2.Size = new System.Drawing.Size(186, 143);
+            this.textBox2.TabIndex = 12;
+            this.textBox2.Text = "Special Markers:\r\n%m ... my call\r\n%c ... ur call\r\n%n ... ur name\r\n%r ... stop TX\r" +
+    "\n";
+            // 
+            // button4
+            // 
+            this.button4.BackgroundImage = global::oscardata.Properties.Resources.foht;
+            this.button4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button4.Location = new System.Drawing.Point(1, 429);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(24, 24);
+            this.button4.TabIndex = 24;
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // bt_rtty_cq
+            // 
+            this.bt_rtty_cq.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_cq.ImageIndex = 16;
+            this.bt_rtty_cq.ImageList = this.imageList1;
+            this.bt_rtty_cq.Location = new System.Drawing.Point(39, 177);
+            this.bt_rtty_cq.Name = "bt_rtty_cq";
+            this.bt_rtty_cq.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_cq.TabIndex = 3;
+            this.bt_rtty_cq.Text = "Call CQ";
+            this.bt_rtty_cq.UseVisualStyleBackColor = true;
+            this.bt_rtty_cq.Click += new System.EventHandler(this.bt_rtty_cq_Click);
+            // 
+            // bt_rxfont
+            // 
+            this.bt_rxfont.BackgroundImage = global::oscardata.Properties.Resources.foht;
+            this.bt_rxfont.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.bt_rxfont.Location = new System.Drawing.Point(1, 59);
+            this.bt_rxfont.Name = "bt_rxfont";
+            this.bt_rxfont.Size = new System.Drawing.Size(24, 24);
+            this.bt_rxfont.TabIndex = 23;
+            this.bt_rxfont.UseVisualStyleBackColor = true;
+            this.bt_rxfont.Click += new System.EventHandler(this.bt_rxfont_Click);
+            // 
+            // bt_rtty_answerCQ
+            // 
+            this.bt_rtty_answerCQ.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_answerCQ.ImageIndex = 18;
+            this.bt_rtty_answerCQ.ImageList = this.imageList1;
+            this.bt_rtty_answerCQ.Location = new System.Drawing.Point(39, 206);
+            this.bt_rtty_answerCQ.Name = "bt_rtty_answerCQ";
+            this.bt_rtty_answerCQ.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_answerCQ.TabIndex = 4;
+            this.bt_rtty_answerCQ.Text = "Answer CQ Call";
+            this.bt_rtty_answerCQ.UseVisualStyleBackColor = true;
+            this.bt_rtty_answerCQ.Click += new System.EventHandler(this.bt_rtty_answerCQ_Click);
+            // 
+            // button3
+            // 
+            this.button3.BackgroundImage = global::oscardata.Properties.Resources.clearscreen;
+            this.button3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button3.Location = new System.Drawing.Point(1, 399);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(24, 24);
+            this.button3.TabIndex = 22;
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // bt_rtty_start
+            // 
+            this.bt_rtty_start.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_start.ImageIndex = 20;
+            this.bt_rtty_start.ImageList = this.imageList1;
+            this.bt_rtty_start.Location = new System.Drawing.Point(39, 235);
+            this.bt_rtty_start.Name = "bt_rtty_start";
+            this.bt_rtty_start.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_start.TabIndex = 5;
+            this.bt_rtty_start.Text = "Start Transmission";
+            this.bt_rtty_start.UseVisualStyleBackColor = true;
+            this.bt_rtty_start.Click += new System.EventHandler(this.bt_rtty_start_Click);
+            // 
+            // button1
+            // 
+            this.button1.BackgroundImage = global::oscardata.Properties.Resources.clearscreen;
+            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button1.Location = new System.Drawing.Point(1, 29);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(24, 24);
+            this.button1.TabIndex = 21;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // bt_rtty_end
+            // 
+            this.bt_rtty_end.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_end.ImageIndex = 19;
+            this.bt_rtty_end.ImageList = this.imageList1;
+            this.bt_rtty_end.Location = new System.Drawing.Point(39, 264);
+            this.bt_rtty_end.Name = "bt_rtty_end";
+            this.bt_rtty_end.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_end.TabIndex = 6;
+            this.bt_rtty_end.Text = "End Transmission";
+            this.bt_rtty_end.UseVisualStyleBackColor = true;
+            this.bt_rtty_end.Click += new System.EventHandler(this.bt_rtty_end_Click);
+            // 
+            // textBox5
+            // 
+            this.textBox5.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.textBox5.Location = new System.Drawing.Point(171, 67);
+            this.textBox5.Multiline = true;
+            this.textBox5.Name = "textBox5";
+            this.textBox5.ReadOnly = true;
+            this.textBox5.Size = new System.Drawing.Size(117, 50);
+            this.textBox5.TabIndex = 20;
+            this.textBox5.Text = "Click Callsign and Names in RX-Windows";
+            // 
+            // bt_rtty_endqso
+            // 
+            this.bt_rtty_endqso.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_endqso.ImageIndex = 21;
+            this.bt_rtty_endqso.ImageList = this.imageList1;
+            this.bt_rtty_endqso.Location = new System.Drawing.Point(39, 293);
+            this.bt_rtty_endqso.Name = "bt_rtty_endqso";
+            this.bt_rtty_endqso.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_endqso.TabIndex = 7;
+            this.bt_rtty_endqso.Text = "End QSO";
+            this.bt_rtty_endqso.UseVisualStyleBackColor = true;
+            this.bt_rtty_endqso.Click += new System.EventHandler(this.bt_rtty_endqso_Click);
+            // 
+            // rb_rtty_edit
+            // 
+            this.rb_rtty_edit.AutoSize = true;
+            this.rb_rtty_edit.Location = new System.Drawing.Point(436, 203);
+            this.rb_rtty_edit.Name = "rb_rtty_edit";
+            this.rb_rtty_edit.Size = new System.Drawing.Size(43, 17);
+            this.rb_rtty_edit.TabIndex = 19;
+            this.rb_rtty_edit.Text = "Edit";
+            this.rb_rtty_edit.UseVisualStyleBackColor = true;
+            this.rb_rtty_edit.CheckedChanged += new System.EventHandler(this.rb_rtty_edit_CheckedChanged);
+            // 
+            // bt_rtty_myinfo
+            // 
+            this.bt_rtty_myinfo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_myinfo.ImageIndex = 17;
+            this.bt_rtty_myinfo.ImageList = this.imageList1;
+            this.bt_rtty_myinfo.Location = new System.Drawing.Point(179, 235);
+            this.bt_rtty_myinfo.Name = "bt_rtty_myinfo";
+            this.bt_rtty_myinfo.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_myinfo.TabIndex = 8;
+            this.bt_rtty_myinfo.Text = "My Info";
+            this.bt_rtty_myinfo.UseVisualStyleBackColor = true;
+            this.bt_rtty_myinfo.Click += new System.EventHandler(this.bt_rtty_myinfo_Click);
+            // 
+            // rb_rtty_normal
+            // 
+            this.rb_rtty_normal.AutoSize = true;
+            this.rb_rtty_normal.Checked = true;
+            this.rb_rtty_normal.Location = new System.Drawing.Point(320, 203);
+            this.rb_rtty_normal.Name = "rb_rtty_normal";
+            this.rb_rtty_normal.Size = new System.Drawing.Size(39, 17);
+            this.rb_rtty_normal.TabIndex = 18;
+            this.rb_rtty_normal.TabStop = true;
+            this.rb_rtty_normal.Text = "TX";
+            this.rb_rtty_normal.UseVisualStyleBackColor = true;
+            this.rb_rtty_normal.CheckedChanged += new System.EventHandler(this.rb_rtty_normal_CheckedChanged);
+            // 
+            // bt_rtty_station
+            // 
+            this.bt_rtty_station.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_station.ImageIndex = 14;
+            this.bt_rtty_station.ImageList = this.imageList1;
+            this.bt_rtty_station.Location = new System.Drawing.Point(179, 264);
+            this.bt_rtty_station.Name = "bt_rtty_station";
+            this.bt_rtty_station.Size = new System.Drawing.Size(134, 25);
+            this.bt_rtty_station.TabIndex = 9;
+            this.bt_rtty_station.Text = "My Station";
+            this.bt_rtty_station.UseVisualStyleBackColor = true;
+            this.bt_rtty_station.Click += new System.EventHandler(this.bt_rtty_station_Click);
+            // 
+            // bt_rtty_default
+            // 
+            this.bt_rtty_default.Enabled = false;
+            this.bt_rtty_default.Location = new System.Drawing.Point(305, 167);
+            this.bt_rtty_default.Name = "bt_rtty_default";
+            this.bt_rtty_default.Size = new System.Drawing.Size(186, 23);
+            this.bt_rtty_default.TabIndex = 17;
+            this.bt_rtty_default.Text = "set Default Text";
+            this.bt_rtty_default.UseVisualStyleBackColor = true;
+            this.bt_rtty_default.Click += new System.EventHandler(this.bt_rtty_default_Click);
+            // 
+            // bt_rtty_tx
+            // 
+            this.bt_rtty_tx.BackColor = System.Drawing.Color.LightGreen;
+            this.bt_rtty_tx.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bt_rtty_tx.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rtty_tx.ImageIndex = 9;
+            this.bt_rtty_tx.ImageList = this.imageList1;
+            this.bt_rtty_tx.Location = new System.Drawing.Point(39, 79);
+            this.bt_rtty_tx.Name = "bt_rtty_tx";
+            this.bt_rtty_tx.Size = new System.Drawing.Size(114, 38);
+            this.bt_rtty_tx.TabIndex = 10;
+            this.bt_rtty_tx.Text = "TX on/off";
+            this.bt_rtty_tx.UseVisualStyleBackColor = false;
+            this.bt_rtty_tx.Click += new System.EventHandler(this.bt_rtty_tx_Click);
+            // 
+            // label_urname
+            // 
+            this.label_urname.AutoSize = true;
+            this.label_urname.Location = new System.Drawing.Point(74, 46);
+            this.label_urname.Name = "label_urname";
+            this.label_urname.Size = new System.Drawing.Size(63, 13);
+            this.label_urname.TabIndex = 16;
+            this.label_urname.Text = "Your Name:";
+            // 
+            // tb_rtty_deftext
+            // 
+            this.tb_rtty_deftext.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_rtty_deftext.Location = new System.Drawing.Point(39, 341);
+            this.tb_rtty_deftext.Multiline = true;
+            this.tb_rtty_deftext.Name = "tb_rtty_deftext";
+            this.tb_rtty_deftext.Size = new System.Drawing.Size(522, 153);
+            this.tb_rtty_deftext.TabIndex = 11;
+            this.tb_rtty_deftext.TextChanged += new System.EventHandler(this.tb_rtty_deftext_TextChanged);
+            // 
+            // tb_urname
+            // 
+            this.tb_urname.Location = new System.Drawing.Point(171, 43);
+            this.tb_urname.Name = "tb_urname";
+            this.tb_urname.Size = new System.Drawing.Size(117, 20);
+            this.tb_urname.TabIndex = 15;
+            // 
+            // tb_urcall
+            // 
+            this.tb_urcall.Location = new System.Drawing.Point(171, 17);
+            this.tb_urcall.Name = "tb_urcall";
+            this.tb_urcall.Size = new System.Drawing.Size(117, 20);
+            this.tb_urcall.TabIndex = 13;
+            // 
+            // label_urcall
+            // 
+            this.label_urcall.AutoSize = true;
+            this.label_urcall.Location = new System.Drawing.Point(74, 20);
+            this.label_urcall.Name = "label_urcall";
+            this.label_urcall.Size = new System.Drawing.Size(71, 13);
+            this.label_urcall.TabIndex = 14;
+            this.label_urcall.Text = "Your Callsign:";
+            // 
             // tabPage_setup
             // 
             this.tabPage_setup.BackColor = System.Drawing.Color.Transparent;
+            this.tabPage_setup.Controls.Add(this.label_cfgpath);
+            this.tabPage_setup.Controls.Add(this.label_cfgpath_tit);
             this.tabPage_setup.Controls.Add(this.groupBox4);
             this.tabPage_setup.Controls.Add(this.groupBox3);
             this.tabPage_setup.Controls.Add(this.groupBox2);
@@ -960,6 +1503,24 @@
             this.tabPage_setup.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_setup.TabIndex = 4;
             this.tabPage_setup.Text = "Setup";
+            // 
+            // label_cfgpath
+            // 
+            this.label_cfgpath.AutoSize = true;
+            this.label_cfgpath.Location = new System.Drawing.Point(162, 441);
+            this.label_cfgpath.Name = "label_cfgpath";
+            this.label_cfgpath.Size = new System.Drawing.Size(16, 13);
+            this.label_cfgpath.TabIndex = 17;
+            this.label_cfgpath.Text = "...";
+            // 
+            // label_cfgpath_tit
+            // 
+            this.label_cfgpath_tit.AutoSize = true;
+            this.label_cfgpath_tit.Location = new System.Drawing.Point(17, 441);
+            this.label_cfgpath_tit.Name = "label_cfgpath_tit";
+            this.label_cfgpath_tit.Size = new System.Drawing.Size(115, 13);
+            this.label_cfgpath_tit.TabIndex = 16;
+            this.label_cfgpath_tit.Text = "Configuration stored in:";
             // 
             // groupBox4
             // 
@@ -1254,6 +1815,12 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.tb_myqthloc);
+            this.groupBox2.Controls.Add(this.label14);
+            this.groupBox2.Controls.Add(this.tb_myqth);
+            this.groupBox2.Controls.Add(this.lb_qth);
+            this.groupBox2.Controls.Add(this.tb_myname);
+            this.groupBox2.Controls.Add(this.lb_myname);
             this.groupBox2.Controls.Add(this.lb_rec);
             this.groupBox2.Controls.Add(this.tb_recintro);
             this.groupBox2.Controls.Add(this.bt_astop);
@@ -1276,12 +1843,61 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Personal Settings";
             // 
+            // tb_myqthloc
+            // 
+            this.tb_myqthloc.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.tb_myqthloc.Location = new System.Drawing.Point(71, 99);
+            this.tb_myqthloc.Name = "tb_myqthloc";
+            this.tb_myqthloc.Size = new System.Drawing.Size(104, 20);
+            this.tb_myqthloc.TabIndex = 35;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(14, 102);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(54, 13);
+            this.label14.TabIndex = 34;
+            this.label14.Text = "QTHLOC:";
+            // 
+            // tb_myqth
+            // 
+            this.tb_myqth.Location = new System.Drawing.Point(71, 72);
+            this.tb_myqth.Name = "tb_myqth";
+            this.tb_myqth.Size = new System.Drawing.Size(104, 20);
+            this.tb_myqth.TabIndex = 33;
+            // 
+            // lb_qth
+            // 
+            this.lb_qth.AutoSize = true;
+            this.lb_qth.Location = new System.Drawing.Point(14, 75);
+            this.lb_qth.Name = "lb_qth";
+            this.lb_qth.Size = new System.Drawing.Size(33, 13);
+            this.lb_qth.TabIndex = 32;
+            this.lb_qth.Text = "QTH:";
+            // 
+            // tb_myname
+            // 
+            this.tb_myname.Location = new System.Drawing.Point(71, 46);
+            this.tb_myname.Name = "tb_myname";
+            this.tb_myname.Size = new System.Drawing.Size(104, 20);
+            this.tb_myname.TabIndex = 31;
+            // 
+            // lb_myname
+            // 
+            this.lb_myname.AutoSize = true;
+            this.lb_myname.Location = new System.Drawing.Point(14, 49);
+            this.lb_myname.Name = "lb_myname";
+            this.lb_myname.Size = new System.Drawing.Size(38, 13);
+            this.lb_myname.TabIndex = 30;
+            this.lb_myname.Text = "Name:";
+            // 
             // lb_rec
             // 
             this.lb_rec.AutoSize = true;
             this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lb_rec.ForeColor = System.Drawing.Color.Red;
-            this.lb_rec.Location = new System.Drawing.Point(576, 101);
+            this.lb_rec.Location = new System.Drawing.Point(712, 101);
             this.lb_rec.Name = "lb_rec";
             this.lb_rec.Size = new System.Drawing.Size(23, 13);
             this.lb_rec.TabIndex = 29;
@@ -1293,7 +1909,7 @@
             this.tb_recintro.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tb_recintro.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tb_recintro.ForeColor = System.Drawing.Color.Black;
-            this.tb_recintro.Location = new System.Drawing.Point(334, 100);
+            this.tb_recintro.Location = new System.Drawing.Point(470, 100);
             this.tb_recintro.Multiline = true;
             this.tb_recintro.Name = "tb_recintro";
             this.tb_recintro.Size = new System.Drawing.Size(121, 19);
@@ -1306,7 +1922,7 @@
             this.bt_astop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bt_astop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bt_astop.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_astop.Location = new System.Drawing.Point(527, 89);
+            this.bt_astop.Location = new System.Drawing.Point(663, 89);
             this.bt_astop.Name = "bt_astop";
             this.bt_astop.Size = new System.Drawing.Size(32, 36);
             this.bt_astop.TabIndex = 27;
@@ -1319,7 +1935,7 @@
             this.bt_aplay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bt_aplay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bt_aplay.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_aplay.Location = new System.Drawing.Point(489, 89);
+            this.bt_aplay.Location = new System.Drawing.Point(625, 89);
             this.bt_aplay.Name = "bt_aplay";
             this.bt_aplay.Size = new System.Drawing.Size(32, 36);
             this.bt_aplay.TabIndex = 26;
@@ -1332,7 +1948,7 @@
             this.bt_arecord.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bt_arecord.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bt_arecord.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_arecord.Location = new System.Drawing.Point(451, 89);
+            this.bt_arecord.Location = new System.Drawing.Point(587, 89);
             this.bt_arecord.Name = "bt_arecord";
             this.bt_arecord.Size = new System.Drawing.Size(32, 36);
             this.bt_arecord.TabIndex = 25;
@@ -1344,7 +1960,7 @@
             this.cb_sendIntro.AutoSize = true;
             this.cb_sendIntro.Checked = true;
             this.cb_sendIntro.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_sendIntro.Location = new System.Drawing.Point(71, 104);
+            this.cb_sendIntro.Location = new System.Drawing.Point(207, 104);
             this.cb_sendIntro.Name = "cb_sendIntro";
             this.cb_sendIntro.Size = new System.Drawing.Size(105, 17);
             this.cb_sendIntro.TabIndex = 24;
@@ -1356,7 +1972,7 @@
             this.cb_stampinfo.AutoSize = true;
             this.cb_stampinfo.Checked = true;
             this.cb_stampinfo.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_stampinfo.Location = new System.Drawing.Point(71, 84);
+            this.cb_stampinfo.Location = new System.Drawing.Point(207, 84);
             this.cb_stampinfo.Name = "cb_stampinfo";
             this.cb_stampinfo.Size = new System.Drawing.Size(128, 17);
             this.cb_stampinfo.TabIndex = 23;
@@ -1367,7 +1983,7 @@
             // 
             this.tb_info.Location = new System.Drawing.Point(243, 28);
             this.tb_info.Name = "tb_info";
-            this.tb_info.Size = new System.Drawing.Size(413, 20);
+            this.tb_info.Size = new System.Drawing.Size(492, 20);
             this.tb_info.TabIndex = 22;
             this.tb_info.Text = "tnx fer QSO, vy 73";
             // 
@@ -1395,7 +2011,7 @@
             "8",
             "9",
             "10"});
-            this.cb_announcement.Location = new System.Drawing.Point(453, 60);
+            this.cb_announcement.Location = new System.Drawing.Point(589, 60);
             this.cb_announcement.Name = "cb_announcement";
             this.cb_announcement.Size = new System.Drawing.Size(56, 21);
             this.cb_announcement.TabIndex = 19;
@@ -1407,7 +2023,7 @@
             this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox4.ForeColor = System.Drawing.Color.Black;
-            this.textBox4.Location = new System.Drawing.Point(518, 62);
+            this.textBox4.Location = new System.Drawing.Point(654, 62);
             this.textBox4.Multiline = true;
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(75, 19);
@@ -1420,7 +2036,7 @@
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.ForeColor = System.Drawing.Color.Black;
-            this.textBox1.Location = new System.Drawing.Point(259, 64);
+            this.textBox1.Location = new System.Drawing.Point(395, 64);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(196, 19);
@@ -1430,7 +2046,7 @@
             // tb_callsign
             // 
             this.tb_callsign.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.tb_callsign.Location = new System.Drawing.Point(71, 28);
+            this.tb_callsign.Location = new System.Drawing.Point(71, 20);
             this.tb_callsign.Name = "tb_callsign";
             this.tb_callsign.Size = new System.Drawing.Size(104, 20);
             this.tb_callsign.TabIndex = 1;
@@ -1438,7 +2054,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 31);
+            this.label1.Location = new System.Drawing.Point(14, 23);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(46, 13);
             this.label1.TabIndex = 0;
@@ -1449,7 +2065,7 @@
             this.cb_stampcall.AutoSize = true;
             this.cb_stampcall.Checked = true;
             this.cb_stampcall.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_stampcall.Location = new System.Drawing.Point(71, 64);
+            this.cb_stampcall.Location = new System.Drawing.Point(207, 64);
             this.cb_stampcall.Name = "cb_stampcall";
             this.cb_stampcall.Size = new System.Drawing.Size(146, 17);
             this.cb_stampcall.TabIndex = 2;
@@ -1472,7 +2088,7 @@
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.richTextBox1.Location = new System.Drawing.Point(17, 22);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(855, 527);
+            this.richTextBox1.Size = new System.Drawing.Size(573, 527);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
@@ -1489,8 +2105,9 @@
             "5500 8APSK BW: 2300 Hz",
             "6000 8APSK BW: 2500 Hz (QO-100 Transceiver)",
             "6600 8APSK BW: 2600 Hz",
-            "7200 8APSK BW: 2700 Hz (QO-100 SDR)"});
-            this.cb_speed.Location = new System.Drawing.Point(658, 591);
+            "7200 8APSK BW: 2700 Hz (QO-100 SDR)",
+            "45.45 Baud RTTY"});
+            this.cb_speed.Location = new System.Drawing.Point(122, 2);
             this.cb_speed.Name = "cb_speed";
             this.cb_speed.Size = new System.Drawing.Size(304, 21);
             this.cb_speed.TabIndex = 11;
@@ -1500,7 +2117,7 @@
             // label_speed
             // 
             this.label_speed.AutoSize = true;
-            this.label_speed.Location = new System.Drawing.Point(567, 594);
+            this.label_speed.Location = new System.Drawing.Point(31, 5);
             this.label_speed.Name = "label_speed";
             this.label_speed.Size = new System.Drawing.Size(71, 13);
             this.label_speed.TabIndex = 12;
@@ -1514,26 +2131,16 @@
             // label_fifo
             // 
             this.label_fifo.AutoSize = true;
-            this.label_fifo.Location = new System.Drawing.Point(567, 620);
+            this.label_fifo.Location = new System.Drawing.Point(31, 31);
             this.label_fifo.Name = "label_fifo";
             this.label_fifo.Size = new System.Drawing.Size(55, 13);
             this.label_fifo.TabIndex = 14;
             this.label_fifo.Text = "TX Buffer:";
             // 
-            // bt_blockinfo
-            // 
-            this.bt_blockinfo.Location = new System.Drawing.Point(1213, 591);
-            this.bt_blockinfo.Name = "bt_blockinfo";
-            this.bt_blockinfo.Size = new System.Drawing.Size(68, 23);
-            this.bt_blockinfo.TabIndex = 13;
-            this.bt_blockinfo.Text = "Block Info";
-            this.bt_blockinfo.UseVisualStyleBackColor = true;
-            this.bt_blockinfo.Click += new System.EventHandler(this.bt_blockinfo_Click);
-            // 
             // label_capfifo
             // 
             this.label_capfifo.AutoSize = true;
-            this.label_capfifo.Location = new System.Drawing.Point(567, 643);
+            this.label_capfifo.Location = new System.Drawing.Point(31, 54);
             this.label_capfifo.Name = "label_capfifo";
             this.label_capfifo.Size = new System.Drawing.Size(56, 13);
             this.label_capfifo.TabIndex = 16;
@@ -1542,7 +2149,7 @@
             // lb_rxsignal
             // 
             this.lb_rxsignal.AutoSize = true;
-            this.lb_rxsignal.Location = new System.Drawing.Point(984, 643);
+            this.lb_rxsignal.Location = new System.Drawing.Point(448, 54);
             this.lb_rxsignal.Name = "lb_rxsignal";
             this.lb_rxsignal.Size = new System.Drawing.Size(57, 13);
             this.lb_rxsignal.TabIndex = 18;
@@ -1551,52 +2158,92 @@
             // lb_rxsync
             // 
             this.lb_rxsync.AutoSize = true;
-            this.lb_rxsync.Location = new System.Drawing.Point(984, 596);
+            this.lb_rxsync.Location = new System.Drawing.Point(448, 7);
             this.lb_rxsync.Name = "lb_rxsync";
             this.lb_rxsync.Size = new System.Drawing.Size(52, 13);
             this.lb_rxsync.TabIndex = 20;
             this.lb_rxsync.Text = "RX Sync:";
             // 
-            // pb_rxsync
+            // pn1
             // 
-            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
-            this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsync.Location = new System.Drawing.Point(1047, 591);
-            this.pb_rxsync.Name = "pb_rxsync";
-            this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
-            this.pb_rxsync.TabIndex = 19;
-            this.pb_rxsync.TabStop = false;
+            this.pn1.Controls.Add(this.progressBar_fifo);
+            this.pn1.Controls.Add(this.label_capfifo);
+            this.pn1.Controls.Add(this.label_speed);
+            this.pn1.Controls.Add(this.pb_rxsignal);
+            this.pn1.Controls.Add(this.lb_rxsync);
+            this.pn1.Controls.Add(this.progressBar_capfifo);
+            this.pn1.Controls.Add(this.cb_speed);
+            this.pn1.Controls.Add(this.lb_rxsignal);
+            this.pn1.Controls.Add(this.pb_rxsync);
+            this.pn1.Controls.Add(this.label_fifo);
+            this.pn1.Location = new System.Drawing.Point(540, 588);
+            this.pn1.Name = "pn1";
+            this.pn1.Size = new System.Drawing.Size(538, 74);
+            this.pn1.TabIndex = 30;
             // 
             // pb_rxsignal
             // 
             this.pb_rxsignal.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsignal.BackgroundImage")));
             this.pb_rxsignal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsignal.Location = new System.Drawing.Point(1047, 636);
+            this.pb_rxsignal.Location = new System.Drawing.Point(511, 47);
             this.pb_rxsignal.Name = "pb_rxsignal";
             this.pb_rxsignal.Size = new System.Drawing.Size(24, 24);
             this.pb_rxsignal.TabIndex = 17;
             this.pb_rxsignal.TabStop = false;
             // 
-            // progressBar_capfifo
+            // pb_rxsync
             // 
-            this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.progressBar_capfifo.Location = new System.Drawing.Point(658, 642);
-            this.progressBar_capfifo.Name = "progressBar_capfifo";
-            this.progressBar_capfifo.Size = new System.Drawing.Size(304, 18);
-            this.progressBar_capfifo.Step = 1;
-            this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar_capfifo.TabIndex = 15;
+            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
+            this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_rxsync.Location = new System.Drawing.Point(511, 2);
+            this.pb_rxsync.Name = "pb_rxsync";
+            this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
+            this.pb_rxsync.TabIndex = 19;
+            this.pb_rxsync.TabStop = false;
+            // 
+            // cb_rx_autosync
+            // 
+            this.cb_rx_autosync.AutoSize = true;
+            this.cb_rx_autosync.Location = new System.Drawing.Point(195, 146);
+            this.cb_rx_autosync.Name = "cb_rx_autosync";
+            this.cb_rx_autosync.Size = new System.Drawing.Size(93, 17);
+            this.cb_rx_autosync.TabIndex = 34;
+            this.cb_rx_autosync.Text = "RX Auto Sync";
+            this.cb_rx_autosync.UseVisualStyleBackColor = true;
+            // 
+            // textBox6
+            // 
+            this.textBox6.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.textBox6.Location = new System.Drawing.Point(195, 167);
+            this.textBox6.Multiline = true;
+            this.textBox6.Name = "textBox6";
+            this.textBox6.ReadOnly = true;
+            this.textBox6.Size = new System.Drawing.Size(93, 35);
+            this.textBox6.TabIndex = 35;
+            this.textBox6.Text = "or double click in spectrum";
             // 
             // progressBar_fifo
             // 
             this.progressBar_fifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.progressBar_fifo.Location = new System.Drawing.Point(658, 618);
+            this.progressBar_fifo.Location = new System.Drawing.Point(122, 29);
             this.progressBar_fifo.Maximum = 20;
             this.progressBar_fifo.Name = "progressBar_fifo";
             this.progressBar_fifo.Size = new System.Drawing.Size(304, 18);
             this.progressBar_fifo.Step = 11;
             this.progressBar_fifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar_fifo.TabIndex = 13;
+            // 
+            // progressBar_capfifo
+            // 
+            this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.progressBar_capfifo.Location = new System.Drawing.Point(122, 53);
+            this.progressBar_capfifo.Name = "progressBar_capfifo";
+            this.progressBar_capfifo.Size = new System.Drawing.Size(304, 18);
+            this.progressBar_capfifo.Step = 1;
+            this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar_capfifo.TabIndex = 15;
             // 
             // vu_cap
             // 
@@ -1617,18 +2264,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1293, 691);
-            this.Controls.Add(this.lb_rxsync);
-            this.Controls.Add(this.pb_rxsync);
-            this.Controls.Add(this.lb_rxsignal);
-            this.Controls.Add(this.pb_rxsignal);
-            this.Controls.Add(this.label_capfifo);
-            this.Controls.Add(this.progressBar_capfifo);
-            this.Controls.Add(this.bt_blockinfo);
-            this.Controls.Add(this.label_fifo);
-            this.Controls.Add(this.progressBar_fifo);
-            this.Controls.Add(this.cb_speed);
-            this.Controls.Add(this.label_speed);
+            this.ClientSize = new System.Drawing.Size(1296, 693);
+            this.Controls.Add(this.pn1);
             this.Controls.Add(this.panel_txspectrum);
             this.Controls.Add(this.panel_constel);
             this.Controls.Add(this.statusStrip1);
@@ -1636,7 +2273,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.56 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.64 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -1665,7 +2302,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_voicePBstatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_mic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_loadspeaker)).EndInit();
+            this.tabPage_rtty.ResumeLayout(false);
+            this.tabPage_rtty.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.tabPage_setup.ResumeLayout(false);
+            this.tabPage_setup.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1679,8 +2321,10 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tabPage_about.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pb_rxsync)).EndInit();
+            this.pn1.ResumeLayout(false);
+            this.pn1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_rxsignal)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_rxsync)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1766,7 +2410,6 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ComboBox cb_mic;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Button bt_blockinfo;
         private System.Windows.Forms.CheckBox cb_switchtoLS;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.CheckBox cb_voiceloop;
@@ -1812,6 +2455,54 @@
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.Button bt_tune_minus;
         private System.Windows.Forms.Button bt_tune_plus;
+        private System.Windows.Forms.TabPage tabPage_rtty;
+        private System.Windows.Forms.TextBox tb_rtty_TX;
+        private System.Windows.Forms.Button bt_rtty_station;
+        private System.Windows.Forms.Button bt_rtty_myinfo;
+        private System.Windows.Forms.Button bt_rtty_endqso;
+        private System.Windows.Forms.Button bt_rtty_end;
+        private System.Windows.Forms.Button bt_rtty_start;
+        private System.Windows.Forms.Button bt_rtty_answerCQ;
+        private System.Windows.Forms.Button bt_rtty_cq;
+        private System.Windows.Forms.TextBox tb_rtty_deftext;
+        private System.Windows.Forms.Button bt_rtty_tx;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label_urname;
+        private System.Windows.Forms.TextBox tb_urname;
+        private System.Windows.Forms.Label label_urcall;
+        private System.Windows.Forms.TextBox tb_urcall;
+        private System.Windows.Forms.Button bt_rtty_default;
+        private System.Windows.Forms.RadioButton rb_rtty_edit;
+        private System.Windows.Forms.RadioButton rb_rtty_normal;
+        private System.Windows.Forms.TextBox tb_rtty_RX;
+        private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.TextBox tb_myqthloc;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox tb_myqth;
+        private System.Windows.Forms.Label lb_qth;
+        private System.Windows.Forms.TextBox tb_myname;
+        private System.Windows.Forms.Label lb_myname;
+        private System.Windows.Forms.Label label_cfgpath_tit;
+        private System.Windows.Forms.Label label_cfgpath;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button bt_rxfont;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button bt_rtty_RY;
+        private System.Windows.Forms.Panel pn1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button bt_rtty_text6;
+        private System.Windows.Forms.Button bt_rtty_text5;
+        private System.Windows.Forms.Button bt_rtty_text4;
+        private System.Windows.Forms.Button bt_rtty_text3;
+        private System.Windows.Forms.Button bt_rtty_text2;
+        private System.Windows.Forms.Button bt_rtty_text1;
+        private System.Windows.Forms.RadioButton rb_rtty_real;
+        private System.Windows.Forms.CheckBox cb_rx_autosync;
+        private System.Windows.Forms.TextBox textBox6;
     }
 }
 

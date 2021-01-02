@@ -100,9 +100,17 @@ void closeAllandTerminate()
     exit(0);
 }
 
+void showbitstring(char* title, uint8_t* data, int totallen, int anz)
+{
+    printf("%s. len %d: ", title, totallen);
+    for (int i = 0; i < anz; i++)
+        printf("%01X ", data[i]);
+    printf("\n");
+}
+
 void showbytestring(char *title, uint8_t *data, int totallen, int anz)
 {
-    printf("%s. Len %d: ",title, totallen);
+    printf("%s. len %d: ",title, totallen);
     for(int i=0; i<anz; i++)
         printf("%02X ",data[i]);
     printf("\n");
@@ -110,7 +118,7 @@ void showbytestring(char *title, uint8_t *data, int totallen, int anz)
 
 void showbytestring16(char *title, uint16_t *data, int anz)
 {
-    printf("%s. Len %d: ",title,anz);
+    printf("%s. len %d: ",title,anz);
     for(int i=0; i<anz; i++)
         printf("%04X ",data[i]);
     printf("\n");
@@ -118,7 +126,7 @@ void showbytestring16(char *title, uint16_t *data, int anz)
 
 void showbytestringf(char* title, float* data, int totallen, int anz)
 {
-    printf("%s. Len %d: ", title, totallen);
+    printf("%s. len %d: ", title, totallen);
     for (int i = 0; i < anz; i++)
         printf("%7.4f ", data[i]);
     printf("\n");

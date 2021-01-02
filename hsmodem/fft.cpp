@@ -47,6 +47,24 @@ int rxlevel_deteced = 0;
 int rx_in_sync = 0;
 msresamp_crcf fftdecim = NULL;
 
+float doublePeak(float *f_fftout, int e)
+{
+    // measure level at rtty freq
+    // -100..-70 and +70..+100
+    float v = 0;
+    v += f_fftout[e - 7];
+    v += f_fftout[e - 8];
+    v += f_fftout[e - 9];
+    v += f_fftout[e - 10];
+
+    v += f_fftout[e + 7];
+    v += f_fftout[e + 8];
+    v += f_fftout[e + 9];
+    v += f_fftout[e + 10];
+
+    return v;
+}
+
 uint16_t *make_waterfall(float fre, int *retlen)
 {
     int fftrdy = 0;
@@ -101,9 +119,27 @@ uint16_t *make_waterfall(float fre, int *retlen)
 
             // measure level at mid band
             float midlevel = 0;
-            for (int e = 100; e < 200; e++)
-                midlevel += f_fftout[e];
-            midlevel /= 100;
+            if (speedmode == 10)
+            {
+                // RTTY
+                int mid = (rtty_frequency - 170 / 2) / 10;
+                int lowlow = mid - 5;
+                int lowhigh = mid + 5;
+                mid = (rtty_frequency + 170 / 2) / 10;
+                int highlow = mid - 5;
+                int highhigh = mid + 5;
+                for (int e = lowlow; e < lowhigh; e++)
+                    midlevel += f_fftout[e];
+                for (int e = highlow; e < highhigh; e++)
+                    midlevel += f_fftout[e];
+                midlevel /= ((lowhigh-lowlow) + (highhigh-highlow));
+            }
+            else
+            {
+                for (int e = 100; e < 200; e++)
+                    midlevel += f_fftout[e];
+                midlevel /= 100;
+            }
 
             //calc difference in %
             int idiff = (int)((edgelevel * 100) / midlevel);
@@ -118,9 +154,61 @@ uint16_t *make_waterfall(float fre, int *retlen)
 
             // check if signal detected or not
             if (idiff > 100) sig = 0;
-            if (idiff < 30) sig = 1;
+            if (idiff < 50) sig = 1;
 
             rxlevel_deteced = sig;
+
+            if (speedmode == 10 && rtty_autosync == 1)
+            {
+                // find an RTTY signal
+                // from 200 to 2800 Hz look for the beste double peak
+                float dp = 0;
+                int dpidx = 0;
+
+                for (int e = 20; e < 280; e++)
+                {
+                    float d = doublePeak(f_fftout, e);
+                    if (d > dp)
+                    {
+                        dp = d;
+                        dpidx = e;
+                    }
+                }
+
+                //printf("Signal at: %d Hz\n", (int)(dpidx * 10));
+
+                // accept if we get 3 equal values after each other
+                const static int simi = 3;
+                static int simiarr[simi];
+                static int simiidx = 0;
+                simiarr[simiidx] = (int)(dpidx * 10);
+                if (++simiidx >= simi) simiidx = 0;
+
+                int cp0 = simiarr[0];
+                for (int i = 1; i < simi; i++)
+                    if (simiarr[i] < (cp0-10) || simiarr[i] > (cp0 + 10)) cp0 = 0;
+
+                if (cp0 > 0)
+                {
+                    // mid value of last "arl" frequencies
+                    const static int arl = 10;
+                    static int fra[arl];
+                    static int fraidx = 0;
+                    fra[fraidx] = cp0;
+                    if (++fraidx >= arl) fraidx = 0;
+                    int fm = 0;
+                    for (int i = 0; i < arl; i++)
+                        fm += fra[i];
+                    fm /= arl;
+
+                    static int lastfm = 0;
+                    if (fm == lastfm)
+                    {
+                        rtty_modifyRXfreq(fm);
+                    }
+                    lastfm = fm;
+                }
+            }
 
             // check if changed since last check
             if (sig != lastsig)

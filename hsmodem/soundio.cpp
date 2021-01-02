@@ -36,7 +36,7 @@ struct SoundIoDevice* io_cap_device = NULL;
 struct SoundIoInStream* instream = NULL;
 struct SoundIoOutStream* outstream = NULL;
 
-float latenz = 0.1f;
+float latenz = 0.1f; // long (some seconds) delay can be caused by SDR console (not this program and not the VAC)
 
 
 typedef struct _AUDIODEV_ {
@@ -83,6 +83,7 @@ static void get_channel_layout(const struct SoundIoChannelLayout* layout)
 
 int print_device(struct SoundIoDevice* device) 
 {
+    if (soundio == NULL) return 0;
     if (!device->probe_error)
     {
         // ignore if exists
@@ -119,6 +120,7 @@ int print_device(struct SoundIoDevice* device)
 
 static int scan_devices(struct SoundIo* soundio) 
 {
+    if (soundio == NULL) return 0;
     audiodevidx = 0;
     for (int i = 0; i < soundio_input_device_count(soundio); i++) 
     {
@@ -224,14 +226,14 @@ int min_int(int a, int b)
 void read_callback(struct SoundIoInStream* instream, int frame_count_min, int frame_count_max)
 {
     int err;
-    if (instream == NULL) return;
+    if (instream == NULL || soundio == NULL) return;
     //printf("cap: %d  %d\n", frame_count_min, frame_count_max);
     //int chans = instream->layout.channel_count;
 
     struct SoundIoChannelArea* areas;
     // samples are in areas.ptr
     int frames_left = frame_count_max; // take all
-    while (1)
+    while (keeprunning)
     {
         int frame_count = frames_left;
         if ((err = soundio_instream_begin_read(instream, &areas, &frame_count)))
@@ -340,6 +342,7 @@ static double seconds_offset = 0.0;
 
 static void write_callback(struct SoundIoOutStream* outstream, int frame_count_min, int frame_count_max)
 {
+    if(outstream == NULL || soundio == NULL) return;
     //printf("pb: %d  %d\n", frame_count_min, frame_count_max);
 #ifdef SINEWAVETEST
     double float_sample_rate = outstream->sample_rate;
@@ -431,7 +434,7 @@ int io_init_sound(char *pbname, char *capname)
     init_audio_result = 0;
 
     printf("\n ==== IO INIT AUDIO devices ====\n");
-    printf("requested\nTX:<%s>\nRX:<%s>\ncapture rate:%d\n\n",pbname,capname,caprate);
+    //printf("requested\nTX:<%s>\nRX:<%s>\ncapture rate:%d\n\n",pbname,capname,caprate);
 
     io_close_audio();
 

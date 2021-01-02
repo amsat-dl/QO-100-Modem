@@ -31,6 +31,7 @@ namespace oscardata
         static UdpQueue uq_ctrl = new UdpQueue();
         static UdpQueue uq_fft = new UdpQueue();
         static UdpQueue uq_iq = new UdpQueue();
+        static UdpQueue uq_rtty_rx = new UdpQueue();
 
         public static int searchtimeout = 0;
         static String last_audiodevstring = "";
@@ -150,6 +151,10 @@ namespace oscardata
                             statics.RXinSync = b[3];
                             statics.maxRXlevel = b[4];
                             statics.maxTXlevel = b[5];
+                            statics.tune_frequency = b[6];
+                            statics.tune_frequency <<= 8;
+                            statics.tune_frequency += b[7];
+                            //Console.WriteLine("f:" + statics.tune_frequency);
                             Byte[] b1 = new byte[b.Length - 6];
                             Array.Copy(b, 6, b1, 0, b1.Length);
                             drawFftBitmap(b1);
@@ -174,6 +179,11 @@ namespace oscardata
                                 idx++;
                             }
                             drawBitmap(re, im);
+                        }
+
+                        if (rxtype == statics.udp_rtty_rx)
+                        {
+                            uq_rtty_rx.Add(b);
                         }
                     }
                 }
@@ -267,19 +277,22 @@ namespace oscardata
         static Font fnt = new Font("Verdana", 9.0f);
         static Font smallfnt = new Font("Verdana", 7.0f);
         static Pen penyl = new Pen(Brushes.Yellow, 1);
+        static Pen pengn = new Pen(Brushes.LightGreen, 3);
 
         static void drawFftBitmap(Byte[] b1)
         {
-            if(!bmf)
+            int yl = ffth - 20;
+            int yh = 20;
+
+            if (!bmf)
             {
                 // pre-draw background
                 bmf = true;
-                int yl = ffth - 20;
-                int yh = 20;
                 Pen pen = new Pen(Brushes.Navy, 1);
                 Pen pensolid = new Pen(Brushes.Navy, 1);
                 pen.DashPattern = new float[] { 1.0F, 2.0F, 1.0F, 2.0F };
                 Pen penred = new Pen(Brushes.Red, 1);
+                Pen penred2 = new Pen(Brushes.Red, 2);
 
                 using (Graphics gr = Graphics.FromImage(bmskala))
                 {
@@ -289,7 +302,7 @@ namespace oscardata
                     for (int x = 10; x <= 390; x += 10)
                         gr.DrawLine(pen, x, yl, x, yh);
 
-                    gr.DrawLine(penred, 10, yl, 10, yh);
+                    gr.DrawLine(penred2, 11, yl, 10, yh);
                     gr.DrawLine(penred, 150, yl, 150, yh);
                     gr.DrawLine(pensolid, 20, yl, 20, yh);
                     gr.DrawLine(pensolid, 280, yl, 280, yh);
@@ -322,6 +335,15 @@ namespace oscardata
                 gr.FillRectangle(bgcol, 0, 0, bm.Width, bm.Height);
                 // scala
                 gr.DrawImage(bmskala,16,2);
+
+                if(statics.real_datarate == 45)
+                {
+                    // RTTY Markers
+                    int low = (statics.tune_frequency - 170 / 2)/10;
+                    int high = (statics.tune_frequency + 170 / 2)/10;
+                    gr.DrawLine(pengn, low + 16, yl, low + 16, yh + 3);
+                    gr.DrawLine(pengn, high + 16, yl, high + 16, yh + 3);
+                }
                 /*
                 // screws at the 4 corners
                 Bitmap screw = new Bitmap(Properties.Resources.schraube);
@@ -462,6 +484,12 @@ namespace oscardata
         {
             if (uq_iq.Count() == 0) return false;
             return true;
+        }
+
+        public static Byte[] getRTTYrx()
+        {
+            if (uq_rtty_rx.Count() == 0) return null;
+            return uq_rtty_rx.Getarr();
         }
     }
 

@@ -1,7 +1,6 @@
 #include "hsmodem.h"
 
-SYMTRACK km_symtrack;
-SYMTRACK* q = &km_symtrack;
+
 
 // create km_symtrack object with basic parameters
 //  _ftype  : filter type (e.g. LIQUID_FIRFILT_RRC)
@@ -9,7 +8,7 @@ SYMTRACK* q = &km_symtrack;
 //  _m      : filter delay (symbols)
 //  _beta   : filter excess bandwidth
 //  _ms     : modulation scheme (e.g. LIQUID_MODEM_QPSK)
-void km_symtrack_cccf_create(int          _ftype,
+SYMTRACK* km_symtrack_cccf_create(int          _ftype,
                             unsigned int _k,
                             unsigned int _m,
                             float        _beta,
@@ -17,13 +16,16 @@ void km_symtrack_cccf_create(int          _ftype,
 {
     // validate input
     if (_k < 2)
-        printf((char *)"symtrack_cccf_create(), filter samples/symbol must be at least 2\n");
+        printf((char*)"symtrack_cccf_create(), filter samples/symbol must be at least 2\n");
     if (_m == 0)
         printf((char*)"symtrack_cccf_create(), filter delay must be greater than zero\n");
     if (_beta <= 0.0f || _beta > 1.0f)
         printf((char*)"symtrack_cccf_create(), filter excess bandwidth must be in [0,1]\n");
     if (_ms == LIQUID_MODEM_UNKNOWN || _ms >= LIQUID_MODEM_NUM_SCHEMES)
         printf((char*)"symtrack_cccf_create(), invalid modulation scheme\n");
+
+    // allocate memory for main object
+    SYMTRACK *q = (SYMTRACK *) malloc(sizeof(SYMTRACK));
 
     // set input parameters
     q->filter_type = _ftype;
@@ -54,14 +56,33 @@ void km_symtrack_cccf_create(int          _ftype,
     q->demod = modem_create((modulation_scheme)q->mod_scheme);
 
     // set default bandwidth
-    km_symtrack_cccf_set_bandwidth(0.9f);
+    km_symtrack_cccf_set_bandwidth(q, 0.9f);
 
     // reset and return main object
-    km_symtrack_cccf_reset(0xff);
+    km_symtrack_cccf_reset(q, 0xff);
+
+    return q;
 }
 
-void km_symtrack_cccf_reset(int mode)
+void km_symtrack_cccf_destroy(SYMTRACK *_q)
 {
+    if (_q == NULL) return;
+
+    // destroy objects
+    agc_crcf_destroy(_q->agc);
+    symsync_crcf_destroy(_q->symsync);
+    eqlms_cccf_destroy(_q->eq);
+    nco_crcf_destroy(_q->nco);
+    modem_destroy(_q->demod);
+
+    // free main object
+    free(_q);
+}
+
+void km_symtrack_cccf_reset(SYMTRACK* q, int mode)
+{
+    if (q == NULL) return;
+
     // reset objects
     if (mode & 1) agc_crcf_reset(q->agc);
     if (mode & 2) symsync_crcf_reset(q->symsync);
@@ -74,7 +95,7 @@ void km_symtrack_cccf_reset(int mode)
     q->num_syms_rx = 0;
 }
 
-void km_symtrack_cccf_set_bandwidth(float _bw)
+void km_symtrack_cccf_set_bandwidth(SYMTRACK *q, float _bw)
 {
     // validate input
     if (_bw < 0)
@@ -106,8 +127,10 @@ void km_symtrack_cccf_set_bandwidth(float _bw)
 //  _x      : input data sample
 //  _y      : output data array
 //  _ny     : number of samples written to output buffer
-void km_symtrack_execute(liquid_float_complex _x, liquid_float_complex* _y, unsigned int* _ny, unsigned int *psym_out)
+void km_symtrack_execute(SYMTRACK* q, liquid_float_complex _x, liquid_float_complex* _y, unsigned int* _ny, unsigned int *psym_out)
 {
+    if (q == NULL) return;
+
     liquid_float_complex v;   // output sample
     unsigned int i;
     unsigned int num_outputs = 0;

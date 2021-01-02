@@ -39,6 +39,10 @@ namespace oscardata
         public static Byte tuning = 27;
         public static Byte marker = 28;
         public static Byte setfreq = 29;
+        public static Byte rttykey = 30;
+        public static Byte rttystring = 31;
+        public static Byte txonoff = 32;
+        public static Byte rtty_stopTX = 33;
 
         // frame sequence, modem needs that for i.e. sending a preamble
         public static Byte FirstFrame = 0;
@@ -51,6 +55,7 @@ namespace oscardata
         public static Byte udp_bc = 3;
         public static Byte udp_fft = 4;
         public static Byte udp_iq = 5;
+        public static Byte udp_rtty_rx = 6;
 
         // global static variables
         public static bool running = true;
@@ -85,6 +90,7 @@ namespace oscardata
         public static Color WindowBackColor;
         public static String[] langstr;
         public static int tuning_active = 0;
+        public static int tune_frequency = 1500;
 
         public static String[] getOwnIPs()
         {
@@ -434,6 +440,25 @@ namespace oscardata
                 File.Delete(fn);
             }
             catch { }
+        }
+
+        // Culture invariant conversion
+
+        public static double MyToDouble(String s)
+
+        {
+            double r = 0;
+
+            try
+            {
+                s = s.Replace(',', '.');
+                r = Convert.ToDouble(s, System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+            }
+            return r;
+
         }
     }
 }

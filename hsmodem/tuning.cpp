@@ -79,7 +79,7 @@ float do_tuning(int send)
 
     // adapt speed to soundcard samplerate
     int fs;
-    while (1) 
+    while (keeprunning)
     {
         fs = io_pb_fifo_freespace(0);
         // wait until there is space in fifo

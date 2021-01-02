@@ -64,6 +64,7 @@
 #include "symboltracker.h"
 #include "codec2.h"
 #include "soundio.h"
+#include "baudot.h"
 
 #define jpg_tempfilename "rxdata.jpg"
 
@@ -191,14 +192,15 @@ void write_sample_s16ne(char* ptr, double sample);
 int io_ls_fifo_usedspace();
 void write_sample_float32ne(char* ptr, double sample);
 
-void km_symtrack_cccf_create(int          _ftype,
-    unsigned int _k,
-    unsigned int _m,
-    float        _beta,
-    int          _ms);
-void km_symtrack_cccf_reset(int mode);
-void km_symtrack_cccf_set_bandwidth(float      _bw);
-void km_symtrack_execute(liquid_float_complex _x, liquid_float_complex* _y, unsigned int* _ny, unsigned int* psym_out);
+SYMTRACK* km_symtrack_cccf_create(  int _ftype,
+                                    unsigned int _k,
+                                    unsigned int _m,
+                                    float        _beta,
+                                    int          _ms);
+void km_symtrack_cccf_reset(SYMTRACK*, int mode);
+void km_symtrack_cccf_set_bandwidth(SYMTRACK* , float _bw);
+void km_symtrack_execute(SYMTRACK* ,liquid_float_complex _x, liquid_float_complex* _y, unsigned int* _ny, unsigned int* psym_out);
+void km_symtrack_cccf_destroy(SYMTRACK*);
 
 void io_saveStream(float f);
 void playIntro();
@@ -206,10 +208,24 @@ void io_clear_voice_fifos();
 float do_tuning(int send);
 void init_tune();
 float singleFrequency();
-void rtty_tx();
 int rtty_rx();
-void modifyRXfreq(float fr);
+void modifyRXfreq(float diff_Hz, int absolute);
 void showbytestring16(char* title, uint16_t* data, int anz);
+void rtty_sendChar(int c);
+void init_rtty();
+int do_rtty();
+void make_FFTdata(float f);
+void getMax(float fv);
+void close_rtty();
+void close_a();
+void rtty_modifyRXfreq(int);
+void showbitstring(char* title, uint8_t* data, int totallen, int anz);
+void rtty_tx_write_fifo(char c);
+int rtty_tx_read_fifo(char* pc);
+void rtty_rx_write_fifo(char c);
+int rtty_rx_read_fifo(char* pc);
+void clear_rtty_txfifo();
+void fmtest();
 
 
 extern int speedmode;
@@ -252,9 +268,13 @@ extern int sendIntro;
 extern int tuning;
 extern uint32_t tuning_runtime;
 extern int marker;
+extern int rtty_txoff;
+extern int rtty_txidx;
+extern int rtty_frequency;
+extern int rtty_autosync;
+
 
 #ifdef _LINUX_
 int isRunning(char* prgname);
 void install_signal_handler();
-int isRunning(char* prgname);
 #endif

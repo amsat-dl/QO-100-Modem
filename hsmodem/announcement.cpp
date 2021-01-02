@@ -27,8 +27,6 @@
 
 #include "hsmodem.h"
 
-void close_a();
-
 const int h_len = 57;
 float h[h_len];
 firfilt_crcf qfilt = NULL;

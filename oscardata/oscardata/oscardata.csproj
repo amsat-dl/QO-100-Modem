@@ -64,12 +64,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form2_showtext.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form2_showtext.Designer.cs">
-      <DependentUpon>Form2_showtext.cs</DependentUpon>
-    </Compile>
     <Compile Include="imagehandler.cs" />
     <Compile Include="KmProgressBar.cs">
       <SubType>Component</SubType>
@@ -81,9 +75,6 @@
     <Compile Include="zip.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Form2_showtext.resx">
-      <DependentUpon>Form2_showtext.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -152,6 +143,17 @@
     <None Include="Properties\playback.png" />
     <None Include="Properties\playbackicon.png" />
     <None Include="Properties\captureicon.png" />
+    <None Include="Properties\rtty.png" />
+    <None Include="Properties\amsat_dl_logo.png" />
+    <None Include="Properties\clearscreen.png" />
+    <None Include="Properties\foht.png" />
+    <None Include="Properties\home-icon.png" />
+    <None Include="Properties\ryry-icon.png" />
+    <None Include="Properties\voice-icon.png" />
+    <None Include="Properties\user-icon.png" />
+    <None Include="Properties\answer.png" />
+    <None Include="Properties\stop-icon.png" />
+    <None Include="Properties\start-icon.png" />
     <Content Include="Satellite-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

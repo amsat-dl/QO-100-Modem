@@ -200,7 +200,7 @@ void modulator(uint8_t sym_in)
     
         // adapt speed to soundcard samplerate
         int fs;
-        while(1)
+        while(keeprunning)
         {
             fs = io_pb_fifo_freespace(0);
             // wait until there is space in fifo
@@ -218,7 +218,6 @@ void modulator(uint8_t sym_in)
 // =========== DEMODULATOR =============================
 
 nco_crcf dnnco = NULL;
-symtrack_cccf symtrack = NULL;
 firdecim_crcf decim = NULL;
 msresamp_crcf adecim = NULL;
 msresamp_crcf lsresamp = NULL;
@@ -243,14 +242,8 @@ uint8_t maxTXLevel = 0; // maximum TXlevel over the last x samples in %
 
 float radians_per_sample = ((2.0f * (float)M_PI * (float)FREQUENCY) / (float)caprate);
 float last_radians_per_sample = 0;
-float actfrequency = (float)FREQUENCY;
 
-void modifyRXfreq(float diff_Hz)
-{
-    actfrequency += diff_Hz;
-    printf("set:%f Hz\n", actfrequency);
-    radians_per_sample = ((2.0f * (float)M_PI * actfrequency) / (float)caprate);
-}
+SYMTRACK *km_symtrack = NULL;
 
 void init_demodulator()
 {
@@ -275,8 +268,8 @@ void init_demodulator()
     lsresamp = msresamp_crcf_create((float)(48000.0/44100.0), As_adecim);
     
     // create symbol tracking synchronizer
-    km_symtrack_cccf_create(ftype_st, k_st, m_st, beta_st, getMod());
-    km_symtrack_cccf_set_bandwidth(bandwidth_st);
+    km_symtrack = km_symtrack_cccf_create(ftype_st, k_st, m_st, beta_st, getMod());
+    km_symtrack_cccf_set_bandwidth(km_symtrack, bandwidth_st);
 }
 
 void close_demodulator()
@@ -287,16 +280,17 @@ void close_demodulator()
     adecim = NULL;
     if (lsresamp) msresamp_crcf_destroy(lsresamp);
     lsresamp = NULL;
-    if (symtrack != NULL) symtrack_cccf_destroy(symtrack);
-    symtrack = NULL;
     if (dnnco != NULL) nco_crcf_destroy(dnnco);
     dnnco = NULL;
+    if (km_symtrack != NULL) km_symtrack_cccf_destroy(km_symtrack);
+    km_symtrack = NULL;
 }
 
 void resetModem()
 {
     //printf("Reset Symtrack\n");
-    km_symtrack_cccf_reset(0xff);
+    if (km_symtrack == NULL) return;
+    km_symtrack_cccf_reset(km_symtrack,0xff);
 }
 
 // called for Audio-Samples (FFT)
@@ -307,33 +301,6 @@ void make_FFTdata(float f)
     uint16_t* fft = make_waterfall(f, &fftlen);
     if (fft != NULL)
     {
-        // fft data are in fft[] size: 0..fftlen
-        // 10 Hz per value
-        float fdiff = (float)FREQUENCY - actfrequency;
-        // shift spectrum if we are off 1500 Hz
-        int diff10Hz = (int)(fdiff / 10.0);
-        if (diff10Hz != 0)
-        {
-            //printf("%d %f %f %d\n", FREQUENCY, actfrequency, fdiff, diff10Hz);
-            if (diff10Hz < 0)
-            {
-                diff10Hz = -diff10Hz;
-                for (int i = 0; i < (fftlen-diff10Hz); i++)
-                    fft[i] = fft[i + diff10Hz];
-
-                for (int i = (fftlen - diff10Hz); i < fftlen; i++)
-                    fft[i] = 0;
-            }
-            else
-            {
-                for (int i = fftlen-1; i >= diff10Hz; i--)
-                    fft[i] = fft[i - diff10Hz];
-                
-                for (int i = 0; i < diff10Hz; i++)
-                    fft[i] = 0;
-            }
-        }
-
         uint8_t txpl[10000];
         if (fftlen > (10000 * 2 + 1))
         {
@@ -344,10 +311,17 @@ void make_FFTdata(float f)
         int bidx = 0;
         txpl[bidx++] = 4;    // type 4: FFT data follows
 
-        int us = io_pb_fifo_usedBlocks();
+        int us = 0;
+        if(speedmode < 10)
+            us = io_pb_fifo_usedBlocks();
+        if (speedmode == 10)
+        {
+            // RTTY
+            us = io_pb_fifo_usedspace();
+        }
+
         if (us > 255 || ann_running == 1) us = 255;
         txpl[bidx++] = us;    // usage of TX fifo
-
         us = io_cap_fifo_usedPercent();
         if (us > 255) us = 255;
         txpl[bidx++] = us;    // usage of TX fifo
@@ -355,8 +329,11 @@ void make_FFTdata(float f)
         txpl[bidx++] = rxlevel_deteced; // RX level present
         txpl[bidx++] = rx_in_sync;
 
-        txpl[bidx++] = maxLevel;                  // actual max level on sound capture in %
-        txpl[bidx++] = maxTXLevel;           // actual max level on sound playback in %
+        txpl[bidx++] = maxLevel;                // actual max level on sound capture in %
+        txpl[bidx++] = maxTXLevel;              // actual max level on sound playback in %
+
+        txpl[bidx++] = rtty_frequency >> 8;     // rtty qrg by autosync
+        txpl[bidx++] = rtty_frequency & 0xff;
 
         for (int i = 0; i < fftlen; i++)
         {
@@ -491,7 +468,7 @@ static int const_idx = 0;
     unsigned int num_symbols_sync;
     liquid_float_complex syms;
     unsigned int nsym_out;   // demodulated output symbol
-    km_symtrack_execute(y, &syms, &num_symbols_sync, &nsym_out);
+    km_symtrack_execute(km_symtrack,y, &syms, &num_symbols_sync, &nsym_out);
 
     if (num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n", num_symbols_sync);
     if (num_symbols_sync != 0)

@@ -27,6 +27,8 @@
 
 #include "hsmodem.h"
 
+void rtty_init_pipes();
+
 #ifdef _WIN32_
 CRITICAL_SECTION io_cap_crit_sec;
 CRITICAL_SECTION io_pb_crit_sec;
@@ -77,6 +79,7 @@ void io_init_pipes()
 #endif
 
     io_voice_init_pipes();
+    rtty_init_pipes();
 }
 
 // write one sample into the fifo
@@ -190,19 +193,25 @@ int io_pb_fifo_freespace(int nolock)
 
 int io_pb_fifo_usedspace()
 {
+    IO_PB_LOCK;
+    int elemInFifo = (io_pb_wridx + AUDIO_PLAYBACK_BUFLEN - io_pb_rdidx) % AUDIO_PLAYBACK_BUFLEN;
+    IO_PB_UNLOCK();
+
+    return elemInFifo;
+    /*
     int anz = io_pb_fifo_freespace(0);
-    return AUDIO_PLAYBACK_BUFLEN - anz;
+    return AUDIO_PLAYBACK_BUFLEN - anz;*/
 }
 
 // read num elements
-// if num elems not avail, return 0
+// if num elems not avail, return all what fifo has stored
 int io_pb_read_fifo_num(float* data, int num)
 {
     IO_PB_LOCK;
 
     int elemInFifo = (io_pb_wridx + AUDIO_PLAYBACK_BUFLEN - io_pb_rdidx) % AUDIO_PLAYBACK_BUFLEN;
 
-    if (elemInFifo < num)
+    if (elemInFifo == 0)
     {
         // Fifo empty, no data available
         //printf("only %d elements available\n", elemInFifo);
@@ -210,18 +219,170 @@ int io_pb_read_fifo_num(float* data, int num)
         return 0;
     }
 
+    if (num > elemInFifo)
+        num = elemInFifo;
+
     for (int i = 0; i < num; i++)
     {
         *data++ = io_pb_buffer[io_pb_rdidx];
         if (++io_pb_rdidx >= AUDIO_PLAYBACK_BUFLEN) io_pb_rdidx = 0;
     }
     IO_PB_UNLOCK();
-
-    return 1;
+    
+    return num;
 }
 
 void io_clear_audio_fifos()
 {
     io_pb_write_fifo_clear();
     io_cap_write_fifo_clear();
+}
+
+// ================== RTTY FIFO ===================
+
+void clear_rtty_fifos();
+
+#ifdef _WIN32_
+CRITICAL_SECTION rtty_tx_crit_sec;
+CRITICAL_SECTION rtty_rx_crit_sec;
+#define RTTY_TX_LOCK	EnterCriticalSection(&rtty_tx_crit_sec)
+#define RTTY_RX_LOCK	    EnterCriticalSection(&rtty_rx_crit_sec)
+void RTTY_TX_UNLOCK()
+{
+    if (&rtty_tx_crit_sec != NULL)
+        LeaveCriticalSection(&rtty_tx_crit_sec);
+}
+void RTTY_RX_UNLOCK()
+{
+    if (&rtty_rx_crit_sec != NULL)
+        LeaveCriticalSection(&rtty_rx_crit_sec);
+}
+#endif
+
+#ifdef _LINUX_
+pthread_mutex_t rtty_tx_crit_sec;
+pthread_mutex_t rtty_rx_crit_sec;
+#define RTTY_TX_LOCK	pthread_mutex_lock(&rtty_tx_crit_sec)
+void RTTY_TX_UNLOCK() { pthread_mutex_unlock(&rtty_tx_crit_sec); }
+#define RTTY_RX_LOCK	pthread_mutex_lock(&rtty_rx_crit_sec)
+void RTTY_RX_UNLOCK() { pthread_mutex_unlock(&rtty_rx_crit_sec); }
+#endif
+
+void rtty_init_pipes()
+{
+#ifdef _WIN32_
+    if (&rtty_tx_crit_sec != NULL) DeleteCriticalSection(&rtty_tx_crit_sec);
+    InitializeCriticalSection(&rtty_tx_crit_sec);
+
+    if (&rtty_rx_crit_sec != NULL) DeleteCriticalSection(&rtty_rx_crit_sec);
+    InitializeCriticalSection(&rtty_rx_crit_sec);
+
+#endif
+
+    clear_rtty_fifos();
+}
+
+#define RTTY_FIFOLEN    200
+
+int rtty_tx_wridx = 0;
+int rtty_tx_rdidx = 0;
+char rtty_tx_buffer[RTTY_FIFOLEN];
+
+int rtty_rx_wridx = 0;
+int rtty_rx_rdidx = 0;
+char rtty_rx_buffer[RTTY_FIFOLEN];
+
+// TX char from GUI to RTTY TX thread
+
+void clear_rtty_fifos()
+{
+    rtty_tx_wridx = rtty_tx_rdidx = 0;
+    rtty_rx_wridx = rtty_rx_rdidx = 0;
+}
+
+int rtty_tx_fifo_freespace()
+{
+    int elemInFifo = (rtty_tx_wridx + RTTY_FIFOLEN - rtty_tx_rdidx) % RTTY_FIFOLEN;
+    return RTTY_FIFOLEN - elemInFifo;
+}
+
+void clear_rtty_txfifo()
+{
+    RTTY_TX_LOCK;
+    rtty_tx_wridx = rtty_tx_rdidx = 0;
+    RTTY_TX_UNLOCK();
+}
+
+void rtty_tx_write_fifo(char c)
+{
+    RTTY_TX_LOCK;
+
+    // check if there is free space in fifo
+    if (rtty_tx_fifo_freespace() == 0)
+    {
+        RTTY_TX_UNLOCK();
+        return;
+    }
+
+    rtty_tx_buffer[rtty_tx_wridx] = c;
+    if (++rtty_tx_wridx >= RTTY_FIFOLEN) rtty_tx_wridx = 0;
+    RTTY_TX_UNLOCK();
+}
+
+int rtty_tx_read_fifo(char *pc)
+{
+    RTTY_TX_LOCK;
+
+    if (rtty_tx_rdidx == rtty_tx_wridx)
+    {
+        // Fifo empty, no data available
+        RTTY_TX_UNLOCK();
+        return 0;
+    }
+
+    *pc = rtty_tx_buffer[rtty_tx_rdidx];
+    if (++rtty_tx_rdidx >= RTTY_FIFOLEN) rtty_tx_rdidx = 0;
+    RTTY_TX_UNLOCK();
+
+    return 1;
+}
+
+int rtty_rx_fifo_freespace()
+{
+    int elemInFifo = (rtty_rx_wridx + RTTY_FIFOLEN - rtty_rx_rdidx) % RTTY_FIFOLEN;
+    return RTTY_FIFOLEN - elemInFifo;
+}
+
+void rtty_rx_write_fifo(char c)
+{
+    RTTY_RX_LOCK;
+
+    // check if there is free space in fifo
+    if (rtty_rx_fifo_freespace() == 0)
+    {
+        RTTY_RX_UNLOCK();
+        return;
+    }
+
+    rtty_rx_buffer[rtty_rx_wridx] = c;
+    if (++rtty_rx_wridx >= RTTY_FIFOLEN) rtty_rx_wridx = 0;
+    RTTY_RX_UNLOCK();
+}
+
+int rtty_rx_read_fifo(char* pc)
+{
+    RTTY_RX_LOCK;
+
+    if (rtty_rx_rdidx == rtty_rx_wridx)
+    {
+        // Fifo empty, no data available
+        RTTY_RX_UNLOCK();
+        return 0;
+    }
+
+    *pc = rtty_rx_buffer[rtty_rx_rdidx];
+    if (++rtty_rx_rdidx >= RTTY_FIFOLEN) rtty_rx_rdidx = 0;
+    RTTY_RX_UNLOCK();
+
+    return 1;
 }

@@ -56,6 +56,7 @@ int UdpDataPort_ModemToApp = 40133;
 // op mode depending values
 // default mode if not set by the app
 int speedmode = 4;
+int set_speedmode = 4; 
 int bitsPerSymbol = 2;      // QPSK=2, 8PSK=3
 int constellationSize = 4;  // QPSK=4, 8PSK=8
 
@@ -208,10 +209,11 @@ int main(int argc, char* argv[])
     {
         if (restart_modems == 1)
         {
+            printf("restart modem requested\n");
             startModem();
             restart_modems = 0;
         }
-        
+
         //doArraySend();
         if (VoiceAudioMode == VOICEMODE_INTERNALLOOP)
         {
@@ -255,24 +257,34 @@ int main(int argc, char* argv[])
             do_tuning(tuning);
         }
         
-        // demodulate incoming audio data stream
-        static uint64_t old_tm = 0;
-        uint64_t tm = getms();
-        if (tm >= (old_tm + 1000))
+        if (speedmode == 10)
         {
-            // read Audio device list every 1s
-            io_readAudioDevices();
-            old_tm = tm;
+            //testall();
+            //fmtest();
+            sleep_ms(10);   // nothing to do here
         }
-        int dret = demodulator();
-        if (dret == 0)
+        else
         {
-            // no new data in fifo
+            // demodulate incoming audio data stream
+            static uint64_t old_tm = 0;
+            uint64_t tm = getms();
+            if (tm >= (old_tm + 1000))
+            {
+                // read Audio device list every 1s
+                io_readAudioDevices();
+                old_tm = tm;
+            }
+            int dret = demodulator();
+            if (dret == 0)
+            {
+                // no new data in fifo
 #ifdef _LINUX_
             // not important how long to sleep, 10ms is fine
-            sleep_ms(10);
+                sleep_ms(10);
 #endif
+            }
         }
+        
     }
     printf("stopped: %d\n", keeprunning);
 
@@ -282,7 +294,6 @@ int main(int argc, char* argv[])
 #ifdef _WIN32_
     closesocket(BC_sock_AppToModem);
 #endif
-
 
     return 0;
 }
@@ -298,7 +309,7 @@ typedef struct {
 } SPEEDRATE;
 
 // AudioRate, TX-Resampler, RX-Resampler/4, bit/symbol, Codec-Rate
-SPEEDRATE sr[10] = {
+SPEEDRATE sr[11] = {
     // BPSK modes
     {48000, 40,10, 1, 1200, 800},
     {48000, 20, 5, 1, 2400, 2000},
@@ -314,10 +325,19 @@ SPEEDRATE sr[10] = {
     {48000, 24, 6, 3, 6000, 4800},
     {44100, 20, 5, 3, 6600, 5200},
     {48000, 20, 5, 3, 7200, 6000},
+
+    // RTTY
+    {48000, 0, 0, 0, 0, 0},
 };
 
 void startModem()
 {
+    printf("startModem\n");
+    close_dsp();
+    close_rtty();
+    io_close_audio();
+    speedmode = set_speedmode;
+
     bitsPerSymbol = sr[speedmode].bpsym;
     constellationSize = (1 << bitsPerSymbol); // QPSK=4, 8PSK=8
 
@@ -328,10 +348,27 @@ void startModem()
     opusbitrate = sr[speedmode].codecrate;
 
     // int TX audio and modulator
-    close_dsp();
     init_audio_result = io_init_sound(playbackDeviceName, captureDeviceName);
     _init_fft();
-    init_dsp();
+    if (speedmode < 10)
+    {
+        init_dsp();
+    }
+    if (speedmode == 10)
+    {
+        rtty_txoff = 1;
+        init_rtty();
+    }
+}
+
+// called from UDP callback ! DO NOT call any system functions
+void setSpeedmode(int spm)
+{
+    printf("set speedmode:%d\n", spm);
+
+    set_speedmode = spm;
+    restart_modems = 1;
+    transmissions = 1000;   // announcement at next TX
 }
 
 void io_setAudioDevices(uint8_t pbvol, uint8_t capvol, uint8_t announce, uint8_t pbls, uint8_t pbmic, char *pbname, char*capname)
@@ -374,7 +411,8 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         * 5 ... DV mic volume
         * 6 ... safe mode number
         * 7 ... send Intro
-        * 8..9 ... unused
+        * 8 ... rtty autosync
+        * 9 ... unused
         * 10 .. 109 ... PB device name
         * 110 .. 209 ... CAP device name
         */
@@ -429,6 +467,7 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char*)(pdata + 10), (char*)(pdata + 110));
         safemode = pdata[6];
         sendIntro = pdata[7];
+        rtty_autosync = pdata[8];
 
         lastms = actms;
     }
@@ -440,19 +479,13 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     uint8_t type = pdata[0];
     uint8_t minfo = pdata[1];
 
+    //printf("from GUI: %d %d\n", pdata[0], pdata[1]);
+
     // type values: see oscardata config.cs: frame types
     if (type == 16)
     {
-        // Byte 1 contains the resampler ratio for TX and RX modem
-        if (pdata[1] >= 12)
-        {
-            printf("wrong speedmode %d, ignoring\n", pdata[1]);
-            return;
-        }
-        speedmode = pdata[1];
-        printf("set speedmode to %d\n", speedmode);
-        restart_modems = 1;
-        transmissions = 1000;   // announcement at next TX
+        // Byte 1 contains the speed mode index
+        setSpeedmode(pdata[1]);
         return;
     }
 
@@ -544,7 +577,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         VoiceAudioMode = pdata[1];
         codec = pdata[2];
 
-        printf("LS:<%s> MIC:<%s> Mode:%d codec:%d\n", lsDeviceName, micDeviceName, VoiceAudioMode, codec);
+        //printf("LS:<%s> MIC:<%s> Mode:%d codec:%d\n", lsDeviceName, micDeviceName, VoiceAudioMode, codec);
 
         // init voice audio
         if (VoiceAudioMode == VOICEMODE_OFF)
@@ -585,14 +618,61 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         return;
     }
 
-    if (type == 29)
+    if (speedmode == 10)
     {
-        int v = minfo;
-        if (v > 128) 
-            v = v - 255;
-        modifyRXfreq(float(v));
-        return;
+        // rtty commands
+        if (type == 29)
+        {
+            int16_t freq = pdata[1];
+            freq <<= 8;
+            freq += pdata[2];
+            printf("set freq:%d\n", freq);
+
+            rtty_modifyRXfreq(freq);
+            return;
+        }
+
+        if (type == 30)
+        {
+            // rtty key pressed
+            rtty_tx_write_fifo(minfo);
+            return;
+        }
+
+        if (type == 31)
+        {
+            // rtty string
+            int len = pdata[1];
+            len <<= 8;
+            len += pdata[2];
+            len++; // the first toTX command
+            //printf("hsmodem.cpp rtty_tx_write_fifo: ");
+            for (int i = 0; i < len; i++)
+            {
+                //printf("%c", pdata[3 + i]);
+                rtty_tx_write_fifo(pdata[3 + i]);
+            }
+            //printf("\n");
+            return;
+        }
+
+        if (type == 32)
+        {
+            // TX on/off, but send buffer
+            rtty_txoff = minfo?0:1;
+            return;
+        }
+
+        if (type == 33)
+        {
+            // stop TX immediately
+            rtty_txoff = 1;
+            clear_rtty_txfifo();
+        }
     }
+    if (type >= 29 && type <= 32) return;
+
+    if (speedmode == 10) return;
 
     // here we are with payload data to be sent via the modulator
 
@@ -741,8 +821,11 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                 // reset modem if more than 2 frames have not been received
                 trigger_resetmodem = 0;
                 rx_in_sync = 0;
-                printf("no signal detected, reset RX modem\n");
-                resetModem();
+                if (speedmode < 10)
+                {
+                    printf("no signal detected, reset RX modem\n");
+                    resetModem();
+                }
                 lasttime = acttm;
             }
         }
