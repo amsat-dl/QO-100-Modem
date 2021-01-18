@@ -36,8 +36,10 @@ void close_modulator();
 
 void init_dsp()
 {
+    printf("init DSP\n");
     init_modulator();
-    io_pb_write_fifo_clear();
+    io_fifo_clear(io_pbidx);
+    io_fifo_clear(io_capidx);
     init_demodulator();
 }
 
@@ -200,18 +202,22 @@ void modulator(uint8_t sym_in)
     
         // adapt speed to soundcard samplerate
         int fs;
+        int to = 0;
         while(keeprunning)
         {
-            fs = io_pb_fifo_freespace(0);
+            fs = io_fifo_freespace(io_pbidx);
             // wait until there is space in fifo
-            if(fs > 20000) break;
+            if(fs > 10) break;
             sleep_ms(10);
+            if (++to >= 400) break; // give up after 4s 
         }
 
-        if(marker)
+        if (marker)
             usb += singleFrequency() / 4.0f;
 
-        io_pb_write_fifo(usb * 0.2f); // reduce volume and send to soundcard
+        // reduce volume and send to soundcard
+        usb *= 0.1f;
+        kmaudio_playsamples(io_pbidx, &usb, 1, pbvol);
     }
 }
 
@@ -219,16 +225,10 @@ void modulator(uint8_t sym_in)
 
 nco_crcf dnnco = NULL;
 firdecim_crcf decim = NULL;
-msresamp_crcf adecim = NULL;
-msresamp_crcf lsresamp = NULL;
 
 // decimator parameters
 unsigned int m_predec = 8;  // filter delay
 float As_predec = 40.0f;    // stop-band att 
-
-// adecimator parameters
-float r_OutDivInRatio;      // resampling rate (output/input)
-float As_adecim = 60.0f;     // resampling filter stop-band attenuation [dB]
 
 // symtrack parameters
 int          ftype_st       = LIQUID_FIRFILT_RRC;
@@ -260,13 +260,6 @@ void init_demodulator()
     decim = firdecim_crcf_create_kaiser(rxPreInterpolfactor, m_predec, As_predec);
     firdecim_crcf_set_scale(decim, 1.0f/(float)rxPreInterpolfactor);
 
-    // create arbitrary pre decimator
-    // if Audio SR is 48000 but caprate is 44100
-    r_OutDivInRatio = (float)((float)caprate / 48000.0);
-    adecim = msresamp_crcf_create(r_OutDivInRatio, As_adecim);
-
-    lsresamp = msresamp_crcf_create((float)(48000.0/44100.0), As_adecim);
-    
     // create symbol tracking synchronizer
     km_symtrack = km_symtrack_cccf_create(ftype_st, k_st, m_st, beta_st, getMod());
     km_symtrack_cccf_set_bandwidth(km_symtrack, bandwidth_st);
@@ -276,10 +269,6 @@ void close_demodulator()
 {
     if(decim != NULL) firdecim_crcf_destroy(decim);
     decim = NULL;
-    if(adecim) msresamp_crcf_destroy(adecim);
-    adecim = NULL;
-    if (lsresamp) msresamp_crcf_destroy(lsresamp);
-    lsresamp = NULL;
     if (dnnco != NULL) nco_crcf_destroy(dnnco);
     dnnco = NULL;
     if (km_symtrack != NULL) km_symtrack_cccf_destroy(km_symtrack);
@@ -312,25 +301,33 @@ void make_FFTdata(float f)
         txpl[bidx++] = 4;    // type 4: FFT data follows
 
         int us = 0;
-        if(speedmode < 10)
-            us = io_pb_fifo_usedBlocks();
+        if (speedmode < 10)
+        {
+            // Bytes in Fifo
+            int bus = io_fifo_usedspace(io_pbidx);
+            // Payloads in fifo
+            us = bus / (txinterpolfactor * UDPBLOCKLEN * 8 / bitsPerSymbol);
+            //printf("bytes:%d blocks:%d\n", bus, us);
+        }
         if (speedmode == 10)
         {
             // RTTY
-            us = io_pb_fifo_usedspace();
+            us = io_fifo_usedspace(io_pbidx);
         }
 
         if (us > 255 || ann_running == 1) us = 255;
         txpl[bidx++] = us;    // usage of TX fifo
-        us = io_cap_fifo_usedPercent();
+
+        us = io_fifo_usedspace(io_capidx);
+        us /= 400;
         if (us > 255) us = 255;
-        txpl[bidx++] = us;    // usage of TX fifo
+        txpl[bidx++] = us;    // usage of RX fifo
 
         txpl[bidx++] = rxlevel_deteced; // RX level present
         txpl[bidx++] = rx_in_sync;
 
-        txpl[bidx++] = maxLevel;                // actual max level on sound capture in %
-        txpl[bidx++] = maxTXLevel;              // actual max level on sound playback in %
+        txpl[bidx++] = kmaudio_maxlevel(io_capidx);
+        txpl[bidx++] = kmaudio_maxlevel(io_pbidx);
 
         txpl[bidx++] = rtty_frequency >> 8;     // rtty qrg by autosync
         txpl[bidx++] = rtty_frequency & 0xff;
@@ -340,36 +337,8 @@ void make_FFTdata(float f)
             txpl[bidx++] = fft[i] >> 8;
             txpl[bidx++] = fft[i] & 0xff;
         }
+
         sendUDP(appIP, UdpDataPort_ModemToApp, txpl, bidx);
-    }
-}
-
-#define MCHECK 48000
-void getMax(float fv)
-{
-    static float farr[MCHECK];
-    static int idx = 0;
-    static int f = 1;
-
-    if (f)
-    {
-        f = 0;
-        for (int i = 0; i < MCHECK; i++)
-            farr[i] = 1;
-    }
-
-    farr[idx] = fv;
-    idx++;
-    if (idx == MCHECK)
-    {
-        idx = 0;
-        float max = 0;
-        for (int i = 0; i < MCHECK; i++)
-        {
-            if (farr[i] > max) max = farr[i];
-        }
-        maxLevel = (uint8_t)(max*100);
-        //printf("RX max: %10.6f\n", max);
     }
 }
 
@@ -383,124 +352,91 @@ static int16_t const_im[CONSTPOINTS];
 static int const_idx = 0;
 
     if(dnnco == NULL) return 0;
-    
-    // get one received sample
-    float f;
-    int ret = io_cap_read_fifo(&f);
+
+    // get available received samples
+    float farr[1100];
+    int ret = kmaudio_readsamples(io_capidx, farr, 1000, capvol,0);
     if(ret == 0) return 0;
 
-    if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
+    //measure_speed_bps(ret);
+
+    for (int fanz = 0; fanz < ret; fanz++)
     {
-        if (physRXcaprate == 44100)
+        float f = farr[fanz];
+        if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
         {
-            // Loudspeaker Audio "ls" works only with 48k
-            // so we have to resample 44k1 to 48k
-            unsigned int num_written = 0;
-            liquid_float_complex in;
-            liquid_float_complex out[100];
-            in.real = f;
-            in.imag = 0;
-            msresamp_crcf_execute(lsresamp, &in, 1, out, &num_written);
-            if (num_written != 0)
-            {
-                for (unsigned int i = 0; i < num_written; i++)
-                {
-                    float fout = out[i].real;
-                    io_ls_write_fifo(fout);
-                }
-            }
+            kmaudio_playsamples(voice_pbidx, &f, 1,lsvol);
         }
-        else
-            io_ls_write_fifo(f);
-    }
 
-    // input volume
-    f *= softwareCAPvolume;
+        make_FFTdata(f * 100);
 
-    getMax(f);
-    make_FFTdata(f * 100);
-
-    if (caprate == 44100 && physRXcaprate == 48000)
-    {
-        // the sound card capture for a VAC always works with 48000 because
-        // a VAC cannot be set to a specific cap rate in shared mode
-        // downsample 48k to 44.1k
-        unsigned int num_written = 0;
-        liquid_float_complex in;
-        liquid_float_complex out;
-        in.real = f;
-        in.imag = 0;
-        msresamp_crcf_execute(adecim, &in, 1, &out, &num_written);
-        if (num_written == 0) return 1;
-        f = out.real;
-    }
-
-    // if user changed frequency
-    if (radians_per_sample != last_radians_per_sample)
-    {
-        //printf("new QRG. Rad:%f\n", radians_per_sample);
-        nco_crcf_set_frequency(dnnco, radians_per_sample);
-        last_radians_per_sample = radians_per_sample;
-    }
-
-    // downconvert 1,5kHz into baseband, still at soundcard sample rate
-    nco_crcf_step(dnnco);
-    
-    liquid_float_complex in;
-    in.real = f;
-    in.imag = f;
-    liquid_float_complex c;
-    nco_crcf_mix_down(dnnco,in,&c);
-    
-    // c is the actual sample, converted to complex and shifted to baseband
-    
-    // this is the first decimator. We need to collect rxPreInterpolfactor number of samples
-    // then call execute which will give us one decimated sample
-    ccol[ccol_idx++] = c;
-    if(ccol_idx < rxPreInterpolfactor) return 1;
-    ccol_idx = 0;
-    
-    // we have rxPreInterpolfactor samples in ccol
-    liquid_float_complex y;
-    firdecim_crcf_execute(decim, ccol, &y);
-    // the output of the pre decimator is exactly one sample in y
-
-    unsigned int num_symbols_sync;
-    liquid_float_complex syms;
-    unsigned int nsym_out;   // demodulated output symbol
-    km_symtrack_execute(km_symtrack,y, &syms, &num_symbols_sync, &nsym_out);
-
-    if (num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n", num_symbols_sync);
-    if (num_symbols_sync != 0)
-    {
-        measure_speed_syms(1); // do NOT remove, used for speed display in GUI
-
-        // try to extract a complete frame
-        uint8_t symb = nsym_out;
-        if (bitsPerSymbol == 2) symb ^= (symb >> 1);
-        GRdata_rxdata(&symb, 1, NULL);
-
-        // send the data "as is" to app for Constellation Diagram
-        // collect values until a UDP frame is full
-        const_re[const_idx] = (int16_t)(syms.real * 15000.0f);
-        const_im[const_idx] = (int16_t)(syms.imag * 15000.0f);
-        if (++const_idx >= CONSTPOINTS)
+        // if user changed frequency
+        if (radians_per_sample != last_radians_per_sample)
         {
-            uint8_t txpl[CONSTPOINTS * sizeof(int16_t) * 2 + 1];
-            int idx = 0;
-            txpl[idx++] = 5;    // type 5: IQ data follows
+            //printf("new QRG. Rad:%f\n", radians_per_sample);
+            nco_crcf_set_frequency(dnnco, radians_per_sample);
+            last_radians_per_sample = radians_per_sample;
+        }
 
-            for (int i = 0; i < CONSTPOINTS; i++)
+        // downconvert 1,5kHz into baseband, still at soundcard sample rate
+        nco_crcf_step(dnnco);
+
+        liquid_float_complex in;
+        in.real = f;
+        in.imag = f;
+        liquid_float_complex c;
+        nco_crcf_mix_down(dnnco, in, &c);
+
+        // c is the actual sample, converted to complex and shifted to baseband
+
+        // this is the first decimator. We need to collect rxPreInterpolfactor number of samples
+        // then call execute which will give us one decimated sample
+        ccol[ccol_idx++] = c;
+        if (ccol_idx < rxPreInterpolfactor) continue;
+        ccol_idx = 0;
+
+        // we have rxPreInterpolfactor samples in ccol
+        liquid_float_complex y;
+        firdecim_crcf_execute(decim, ccol, &y);
+        // the output of the pre decimator is exactly one sample in y
+
+        unsigned int num_symbols_sync;
+        liquid_float_complex syms;
+        unsigned int nsym_out;   // demodulated output symbol
+        km_symtrack_execute(km_symtrack, y, &syms, &num_symbols_sync, &nsym_out);
+
+        if (num_symbols_sync > 1) printf("symtrack_cccf_execute %d output symbols ???\n", num_symbols_sync);
+        if (num_symbols_sync != 0)
+        {
+            measure_speed_syms(1); // do NOT remove, used for speed display in GUI
+
+            // try to unpack and extract a complete frame
+            uint8_t symb = nsym_out;
+            if (bitsPerSymbol == 2) symb ^= (symb >> 1);
+            GRdata_rxdata(&symb, 1, NULL);
+
+            // send the data "as is" to app for Constellation Diagram
+            // collect values until an UDP frame is full
+            const_re[const_idx] = (int16_t)(syms.real * 15000.0f);
+            const_im[const_idx] = (int16_t)(syms.imag * 15000.0f);
+            if (++const_idx >= CONSTPOINTS)
             {
-                txpl[idx++] = (uint8_t)(const_re[i] >> 8);
-                txpl[idx++] = (uint8_t)(const_re[i]);
-                txpl[idx++] = (uint8_t)(const_im[i] >> 8);
-                txpl[idx++] = (uint8_t)(const_im[i]);
-            }
-            
-            sendUDP(appIP, UdpDataPort_ModemToApp, txpl, sizeof(txpl));
+                uint8_t txpl[CONSTPOINTS * sizeof(int16_t) * 2 + 1];
+                int idx = 0;
+                txpl[idx++] = 5;    // type 5: IQ data follows
 
-            const_idx = 0;
+                for (int i = 0; i < CONSTPOINTS; i++)
+                {
+                    txpl[idx++] = (uint8_t)(const_re[i] >> 8);
+                    txpl[idx++] = (uint8_t)(const_re[i]);
+                    txpl[idx++] = (uint8_t)(const_im[i] >> 8);
+                    txpl[idx++] = (uint8_t)(const_im[i]);
+                }
+
+                sendUDP(appIP, UdpDataPort_ModemToApp, txpl, sizeof(txpl));
+
+                const_idx = 0;
+            }
         }
     }
             

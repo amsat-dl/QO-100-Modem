@@ -760,8 +760,8 @@ item: Install File
   Flags=0000000010000010
 end
 item: Install File
-  Source=c:\tmp\WinRelease\libsoundio.dll
-  Destination=%MAINDIR%\libsoundio.dll
+  Source=c:\tmp\WinRelease\portaudio_x86.dll
+  Destination=%MAINDIR%\portaudio_x86.dll
   Flags=0000000010000010
 end
 item: Install File

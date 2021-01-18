@@ -122,11 +122,14 @@ namespace oscardata
                             statics.ModemIP = ModIP;
                             searchtimeout = 0;
                             // message b contains audio devices and init status
-                            statics.initAudioStatus = b[0];
-                            statics.initVoiceStatus = b[1];
 
-                            //String s = statics.ByteArrayToString(b,2);
-                            String s = statics.ByteArrayToStringUtf8(b, 2);
+                            statics.initAudioStatus = (b[0] == '1') ? 2 : 0;
+                            statics.initAudioStatus |= (b[1] == '1') ? 1 : 0;
+                            statics.initVoiceStatus = (b[2] == '1') ? 2 : 0;
+                            statics.initVoiceStatus |= (b[3] == '1') ? 1 : 0;
+
+                            //String s = statics.ByteArrayToString(b,4);
+                            String s = statics.ByteArrayToStringUtf8(b, 4);
                             String[] sa1 = s.Split(new char[] { '^' });
                             statics.AudioPBdevs = sa1[0].Split(new char[] { '~' });
                             statics.AudioCAPdevs = sa1[1].Split(new char[] { '~' }); 
@@ -145,18 +148,19 @@ namespace oscardata
                         // FFT data
                         if (rxtype == statics.udp_fft)
                         {
-                            statics.PBfifousage = b[0];
-                            statics.CAPfifousage = b[1];
-                            statics.RXlevelDetected = b[2];
-                            statics.RXinSync = b[3];
-                            statics.maxRXlevel = b[4];
-                            statics.maxTXlevel = b[5];
-                            statics.tune_frequency = b[6];
+                            int idx = 0;
+                            statics.PBfifousage = b[idx++];
+                            statics.CAPfifousage = b[idx++];
+                            statics.RXlevelDetected = b[idx++];
+                            statics.RXinSync = b[idx++];
+                            statics.maxRXlevel = b[idx++];
+                            statics.maxTXlevel = b[idx++];
+                            statics.tune_frequency = b[idx++];
                             statics.tune_frequency <<= 8;
-                            statics.tune_frequency += b[7];
+                            statics.tune_frequency += b[idx++];
                             //Console.WriteLine("f:" + statics.tune_frequency);
-                            Byte[] b1 = new byte[b.Length - 6];
-                            Array.Copy(b, 6, b1, 0, b1.Length);
+                            Byte[] b1 = new byte[b.Length - idx];
+                            Array.Copy(b, idx, b1, 0, b1.Length);
                             drawFftBitmap(b1);
                         }
 
@@ -329,6 +333,7 @@ namespace oscardata
             // bitmap for drawing the complete picture
             bm = new Bitmap(442, 76);
 
+            int rshift = 14;
             using (Graphics gr = Graphics.FromImage(bm))
             {
                 // background
@@ -341,8 +346,8 @@ namespace oscardata
                     // RTTY Markers
                     int low = (statics.tune_frequency - 170 / 2)/10;
                     int high = (statics.tune_frequency + 170 / 2)/10;
-                    gr.DrawLine(pengn, low + 16, yl, low + 16, yh + 3);
-                    gr.DrawLine(pengn, high + 16, yl, high + 16, yh + 3);
+                    gr.DrawLine(pengn, low + rshift, yl, low + rshift, yh + 3);
+                    gr.DrawLine(pengn, high + rshift, yl, high + rshift, yh + 3);
                 }
                 /*
                 // screws at the 4 corners
@@ -366,7 +371,7 @@ namespace oscardata
 
                     us = (int)(fus - 5.0);
                     if(lastus != -1 && i>0)
-                        gr.DrawLine(penyl, i/2+15, 76-lastus, i/2+1+15, 76-us); // 15 istead of 16 to get it in exact position
+                        gr.DrawLine(penyl, i/2+ rshift, 76-lastus, i/2+1+ rshift, 76-us); // 15 istead of 16 to get it in exact position
                     lastus = us;
                 }
             }
@@ -376,6 +381,7 @@ namespace oscardata
         // Udp TX Loop runs in its own thread
         static void Udptxloop()
         {
+            DateTime dt = DateTime.UtcNow;
             UdpClient udpc = new UdpClient();
 
             while (statics.running)
@@ -392,11 +398,19 @@ namespace oscardata
                 if(statics.PBfifousage < 3)
                 {
                     // we need to send more payload data
-                    if (uq_tx.Count() > 0)
+                    // but never send faster than 1000 Byte/s
+                    // because statics.PBfifousage may be updated too slow
+                    //DateTime dtact = DateTime.UtcNow;
+                    //TimeSpan ts = dtact - dt;
+                    //if (ts.TotalMilliseconds > statics.UdpBlocklen)
                     {
-                        Byte[] b = uq_tx.Getarr();
-                        udpc.Send(b, b.Length, statics.ModemIP, statics.UdpTXport);
-                        wait = false;
+                        if (uq_tx.Count() > 0)
+                        {
+                            Byte[] b = uq_tx.Getarr();
+                            udpc.Send(b, b.Length, statics.ModemIP, statics.UdpTXport);
+                            wait = false;
+                            //dt = dtact;
+                        }
                     }
                 }
                 if (wait) Thread.Sleep(1);
@@ -438,25 +452,6 @@ namespace oscardata
             if (uq_rx.Count() == 0) return null;
 
             return uq_rx.Getarr();
-        }
-
-        public static UInt16[] UdpGetFFT()
-        {
-            if (uq_fft.Count() == 0) return null;
-
-            Byte[] d = uq_fft.Getarr();
-            UInt16[] varr = new UInt16[d.Length / 2];
-            int j = 0;
-            for (int i = 0; i < d.Length; i += 2)
-            {
-                if ((i + 1) >= d.Length) break;
-                UInt16 us = d[i];
-                us <<= 8;
-                us += d[i + 1];
-                if (j >= (varr.Length)) break;
-                varr[j++] = us;
-            }
-            return varr;
         }
 
         public static qpskitem UdpGetIQ()

@@ -3,6 +3,7 @@
 #ifdef _WIN32
 #define _WIN32_
 	// ignore senseless warnings invented by M$ to confuse developers
+    // I love LINUX :-) which works 100000x better than Windows
 	#pragma warning( disable : 4091 )
 	#pragma warning( disable : 4003 )
 #else
@@ -63,8 +64,9 @@
 #include "udp.h"
 #include "symboltracker.h"
 #include "codec2.h"
-#include "soundio.h"
+#include "libkmaudio/soundio.h"
 #include "baudot.h"
+#include "libkmaudio/libkmaudio.h"
 
 #define jpg_tempfilename "rxdata.jpg"
 
@@ -125,7 +127,7 @@ void measure_speed_bps(int len);
 void initFEC();
 void GetFEC(uint8_t* txblock, int len, uint8_t* destArray);
 int cfec_Reconstruct(uint8_t* darr, uint8_t* destination);
-
+/*
 void io_pb_write_fifo_clear();
 int io_init_sound(char* pbname, char* capname);
 int io_pb_fifo_freespace(int nolock);
@@ -140,11 +142,28 @@ int io_pb_fifo_usedspace();
 int io_cap_fifo_usedPercent();
 int io_pb_read_fifo_num(float* data, int num);
 void io_clear_audio_fifos();
+int io_pb_fifo_usedBlocks();
+void io_voice_init_pipes();
+int io_mic_read_fifo(float* data);
+void io_ls_write_fifo(float sample);
+char* getDevID(char* devname, int io);
+int io_init_voice(char* lsname, char* micname);
+int min_int(int a, int b);
+void io_close_voice();
+int io_ls_read_fifo_num(float* data, int num);
+void io_mic_write_fifo(float sample);
+void write_sample_s16ne(char* ptr, double sample);
+int io_ls_fifo_usedspace();
+void write_sample_float32ne(char* ptr, double sample);
+void io_clear_voice_fifos();
+
+*/
+
 void io_setPBvolume(int v);
 void io_setCAPvolume(int v);
-void io_setVolume(int pbcap, int v);
+void io_setLSvolume(int v);
+void io_setMICvolume(int v);
 
-void setVolume_voice(int pbcap, int v);
 void sendAnnouncement();
 
 void sleep_ms(int ms);
@@ -153,7 +172,7 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
 void toGR_sendData(uint8_t* data, int type, int status, int repeat);
 
 void modulator(uint8_t sym_in);
-int io_pb_fifo_usedBlocks();
+
 void init_dsp();
 int demodulator();
 void sendToModulator(uint8_t* d, int len);
@@ -177,20 +196,6 @@ void closeAllandTerminate();
 void close_voiceproc();
 void close_codec2();
 
-void io_voice_init_pipes();
-int io_mic_read_fifo(float* data);
-void io_ls_write_fifo(float sample);
-void io_setLSvolume(int v);
-void io_setMICvolume(int v);
-char* getDevID(char* devname, int io);
-int io_init_voice(char* lsname, char* micname);
-int min_int(int a, int b);
-void io_close_voice();
-int io_ls_read_fifo_num(float* data, int num);
-void io_mic_write_fifo(float sample);
-void write_sample_s16ne(char* ptr, double sample);
-int io_ls_fifo_usedspace();
-void write_sample_float32ne(char* ptr, double sample);
 
 SYMTRACK* km_symtrack_cccf_create(  int _ftype,
                                     unsigned int _k,
@@ -202,9 +207,8 @@ void km_symtrack_cccf_set_bandwidth(SYMTRACK* , float _bw);
 void km_symtrack_execute(SYMTRACK* ,liquid_float_complex _x, liquid_float_complex* _y, unsigned int* _ny, unsigned int* psym_out);
 void km_symtrack_cccf_destroy(SYMTRACK*);
 
-void io_saveStream(float f);
+void io_saveStream(float *fa, int anz);
 void playIntro();
-void io_clear_voice_fifos();
 float do_tuning(int send);
 void init_tune();
 float singleFrequency();
@@ -215,7 +219,6 @@ void rtty_sendChar(int c);
 void init_rtty();
 int do_rtty();
 void make_FFTdata(float f);
-void getMax(float fv);
 void close_rtty();
 void close_a();
 void rtty_modifyRXfreq(int);
@@ -226,6 +229,9 @@ void rtty_rx_write_fifo(char c);
 int rtty_rx_read_fifo(char* pc);
 void clear_rtty_txfifo();
 void fmtest();
+void rtty_init_pipes();
+void initVoice();
+void sendStationInfo();
 
 
 extern int speedmode;
@@ -240,8 +246,6 @@ extern int UdpDataPort_ModemToApp;
 extern int txinterpolfactor;
 extern int rxPreInterpolfactor;
 extern char appIP[20];
-extern float softwareCAPvolume;
-extern float softwarePBvolume;
 extern int announcement;
 extern int ann_running;
 extern int transmissions;
@@ -250,7 +254,6 @@ extern uint8_t maxLevel;
 extern uint8_t maxTXLevel;
 extern int VoiceAudioMode;
 extern int opusbitrate;
-extern int init_audio_result;
 extern int init_voice_result;
 extern int initialLSvol;
 extern int initialMICvol;
@@ -258,9 +261,6 @@ extern int codec;
 extern int trigger_resetmodem;
 extern int rxlevel_deteced;
 extern int rx_in_sync;
-extern float softwareMICvolume;
-extern float softwareLSvolume;
-extern int physRXcaprate;
 extern int restart_modems;
 extern int safemode;
 extern char homepath[];
@@ -272,6 +272,14 @@ extern int rtty_txoff;
 extern int rtty_txidx;
 extern int rtty_frequency;
 extern int rtty_autosync;
+extern int io_capidx;
+extern int io_pbidx;
+extern int voice_capidx;
+extern int voice_pbidx;
+extern float pbvol;
+extern float capvol;
+extern float lsvol;
+extern float micvol;
 
 
 #ifdef _LINUX_

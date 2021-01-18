@@ -92,7 +92,7 @@ void playAudioPCM(char* fn, int destination)
                 {
                     int to = 4000;
                     int res;
-                    while ((res = io_ls_fifo_usedspace()) > 10000)
+                    while ((res = io_fifo_usedspace(voice_pbidx)) > 10000)
                     {
                         if (--to == 0) 
                         {
@@ -102,7 +102,8 @@ void playAudioPCM(char* fn, int destination)
                         }
                         sleep_ms(1);
                     }
-                    io_ls_write_fifo(f / 32768);
+                    float f1 = f / 32768;
+                    kmaudio_playsamples(voice_pbidx, &f1, 1, lsvol);
                 }
 
                 if (caprate == 44100)
@@ -123,7 +124,8 @@ void playAudioPCM(char* fn, int destination)
                 if ((destination & 1) == 1)
                 {
                     int to = 4000;
-                    while (io_pb_fifo_usedspace() > 10000)
+                    //while (io_pb_fifo_usedspace() > 10000)
+                    while (io_fifo_usedspace(io_pbidx) > 10000)
                     {
                         if (--to == 0)
                         {
@@ -133,7 +135,7 @@ void playAudioPCM(char* fn, int destination)
                         }
                         sleep_ms(1);
                     }
-                    io_pb_write_fifo(f);
+                    kmaudio_playsamples(io_pbidx, &f, 1, pbvol);
                 }
 
             }
@@ -191,7 +193,9 @@ void playIntro()
     snprintf(fn, 499, "%s/oscardata/intro/intro.pcm", homepath);
     fn[499] = 0;
 
-    io_clear_voice_fifos();
+    //io_clear_voice_fifos();
+    io_fifo_clear(voice_pbidx);
+    io_fifo_clear(voice_capidx);
     create_a();
     playAudioPCM(fn, 3);
     close_a();

@@ -23,6 +23,7 @@ namespace oscardata
         public static Byte HTMLFile = 4;
         public static Byte BinaryFile = 5;
         public static Byte Audio = 6;
+        public static Byte Userinfo = 7;
 
         // the upper values are for internal use
         public static Byte ResamplingRate = 16;
@@ -182,6 +183,23 @@ namespace oscardata
 
             System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
             
+            return enc.GetString(ban);
+        }
+
+        public static string ByteArrayToString(byte[] arr, int offset, int length)
+        {
+            Byte[] ba = new byte[arr.Length];
+            int dst = 0;
+            for (int i = 0; i < length; i++)
+            {
+                if (i >= arr.Length) break;
+                if (arr[i+ offset] != 0) ba[dst++] = arr[i+ offset];
+            }
+            Byte[] ban = new byte[dst];
+            Array.Copy(ba, ban, dst);
+
+            System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
+
             return enc.GetString(ban);
         }
 

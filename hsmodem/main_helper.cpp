@@ -74,8 +74,7 @@ void closeAllandTerminate()
     // terminate all Threads
     keeprunning = 0;
     // close audio
-    io_close_audio();
-    io_close_voice();
+    kmaudio_close();
     // close fft
     _exit_fft();
     // close codec2 and opus

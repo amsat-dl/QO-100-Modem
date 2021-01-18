@@ -30,7 +30,7 @@
 #include <fftw3.h>
 #endif
 
-uint16_t* mean(uint16_t* f);
+uint16_t* mean(uint16_t* f, int smoothX, int smoothY);
 
 #define FFT_AUDIOSAMPLERATE 800
 
@@ -234,20 +234,20 @@ uint16_t *make_waterfall(float fre, int *retlen)
     if(fftrdy == 1)
     {
         *retlen = fftcount;
-        return mean(fftout);
+        if(speedmode == 10)
+            return mean(fftout, 2, 2);
+        return mean(fftout,2,4);
     }
     
     return NULL;
 }
 
 // smooth fft output
-const int smoothX = 2; // must be an even number !
-const int smoothY = 10;
 int yidx = 0;
 
-uint16_t* mean(uint16_t* f)
+uint16_t* mean(uint16_t* f, int smoothX, int smoothY)
 {
-    
+    if (smoothY > 20) smoothY = 20;
     static uint16_t fa[FFT_AUDIOSAMPLERATE / 2 + 1];
 
     if (tuning)
@@ -270,12 +270,12 @@ uint16_t* mean(uint16_t* f)
     
     // smooth Y values
     
-    static uint16_t yarr[smoothY][FFT_AUDIOSAMPLERATE / 2 + 1];
+    static uint16_t yarr[20][FFT_AUDIOSAMPLERATE / 2 + 1];
     for (int i = 0; i < fftcount; i++)
         yarr[yidx][i] = fa[i];
     if (++yidx >= smoothY) yidx = 0;
 
-    memset(fa, 0, FFT_AUDIOSAMPLERATE / 2 + 1);
+    memset(fa, 0, sizeof(uint16_t) * (FFT_AUDIOSAMPLERATE / 2 + 1));
     for (int i = 0; i < fftcount; i++)
     {
         for (int j = 0; j < smoothY; j++)
@@ -288,6 +288,7 @@ uint16_t* mean(uint16_t* f)
 
 void _init_fft()
 {
+    printf("init FFT\n");
     fftcount = FFT_AUDIOSAMPLERATE / 2 + 1;     // number of output samples
     // the FFT outputs 400 values from 0 to 4kHz with a resolution of 10 Hz
 
@@ -301,9 +302,8 @@ void _init_fft()
     // decimate 44.1k or 48k down to 8000Hz
     // the FFT rate is 800, but we feed it with 8000 Samplerate
     // this results in a new fft every 100ms with a resolution of 10 Hz
-    float ratio = 10.0f * (float)FFT_AUDIOSAMPLERATE / (float)physRXcaprate;
+    float ratio = 10.0f * (float)FFT_AUDIOSAMPLERATE / (float)caprate;
     fftdecim = msresamp_crcf_create(ratio, 40.0f);
-
 }
 
 void _exit_fft()

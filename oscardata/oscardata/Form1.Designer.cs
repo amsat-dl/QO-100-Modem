@@ -37,10 +37,13 @@
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ts_ip = new System.Windows.Forms.ToolStripStatusLabel();
             this.RXstatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStrip_spacer = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ts_userinfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel_constel = new System.Windows.Forms.Panel();
             this.timer_qpsk = new System.Windows.Forms.Timer(this.components);
             this.panel_txspectrum = new System.Windows.Forms.Panel();
             this.tabPage_ber = new System.Windows.Forms.TabPage();
+            this.button6 = new System.Windows.Forms.Button();
             this.bt_allf = new System.Windows.Forms.Button();
             this.lb_tuningqrgs = new System.Windows.Forms.Label();
             this.rtb = new System.Windows.Forms.RichTextBox();
@@ -103,6 +106,8 @@
             this.tb_rtty_TX = new System.Windows.Forms.TextBox();
             this.tb_rtty_RX = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.cb_rx_autosync = new System.Windows.Forms.CheckBox();
             this.rb_rtty_real = new System.Windows.Forms.RadioButton();
             this.bt_rtty_text6 = new System.Windows.Forms.Button();
             this.bt_rtty_text5 = new System.Windows.Forms.Button();
@@ -152,7 +157,8 @@
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.bt_tune_plus = new System.Windows.Forms.Button();
             this.bt_tune_minus = new System.Windows.Forms.Button();
-            this.cb_marker = new System.Windows.Forms.CheckBox();
+            this.vu_cap = new oscardata.KmProgressBar();
+            this.vu_pb = new oscardata.KmProgressBar();
             this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
             this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -193,14 +199,10 @@
             this.lb_rxsignal = new System.Windows.Forms.Label();
             this.lb_rxsync = new System.Windows.Forms.Label();
             this.pn1 = new System.Windows.Forms.Panel();
-            this.pb_rxsignal = new System.Windows.Forms.PictureBox();
-            this.pb_rxsync = new System.Windows.Forms.PictureBox();
-            this.cb_rx_autosync = new System.Windows.Forms.CheckBox();
-            this.textBox6 = new System.Windows.Forms.TextBox();
             this.progressBar_fifo = new oscardata.KmProgressBar();
+            this.pb_rxsignal = new System.Windows.Forms.PictureBox();
             this.progressBar_capfifo = new oscardata.KmProgressBar();
-            this.vu_cap = new oscardata.KmProgressBar();
-            this.vu_pb = new oscardata.KmProgressBar();
+            this.pb_rxsync = new System.Windows.Forms.PictureBox();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -253,7 +255,9 @@
             this.toolStrip_Type,
             this.toolStripStatusLabel,
             this.ts_ip,
-            this.RXstatus});
+            this.RXstatus,
+            this.toolStrip_spacer,
+            this.ts_userinfo});
             this.statusStrip1.Location = new System.Drawing.Point(0, 671);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1296, 22);
@@ -286,6 +290,20 @@
             this.RXstatus.Size = new System.Drawing.Size(58, 17);
             this.RXstatus.Text = "RX-Status";
             // 
+            // toolStrip_spacer
+            // 
+            this.toolStrip_spacer.Name = "toolStrip_spacer";
+            this.toolStrip_spacer.Size = new System.Drawing.Size(1156, 17);
+            this.toolStrip_spacer.Spring = true;
+            // 
+            // ts_userinfo
+            // 
+            this.ts_userinfo.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.ts_userinfo.ForeColor = System.Drawing.Color.Blue;
+            this.ts_userinfo.Name = "ts_userinfo";
+            this.ts_userinfo.Size = new System.Drawing.Size(16, 17);
+            this.ts_userinfo.Text = "...";
+            // 
             // panel_constel
             // 
             this.panel_constel.BackColor = System.Drawing.Color.AliceBlue;
@@ -314,6 +332,7 @@
             // tabPage_ber
             // 
             this.tabPage_ber.BackColor = System.Drawing.Color.Transparent;
+            this.tabPage_ber.Controls.Add(this.button6);
             this.tabPage_ber.Controls.Add(this.bt_allf);
             this.tabPage_ber.Controls.Add(this.lb_tuningqrgs);
             this.tabPage_ber.Controls.Add(this.rtb);
@@ -326,6 +345,16 @@
             this.tabPage_ber.Size = new System.Drawing.Size(1280, 552);
             this.tabPage_ber.TabIndex = 0;
             this.tabPage_ber.Text = "BER Test";
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(638, 18);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(145, 23);
+            this.button6.TabIndex = 26;
+            this.button6.Text = "100..2900 (200Hz steps)";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // bt_allf
             // 
@@ -1116,6 +1145,29 @@
             this.panel1.Size = new System.Drawing.Size(564, 514);
             this.panel1.TabIndex = 31;
             // 
+            // textBox6
+            // 
+            this.textBox6.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.textBox6.Location = new System.Drawing.Point(195, 167);
+            this.textBox6.Multiline = true;
+            this.textBox6.Name = "textBox6";
+            this.textBox6.ReadOnly = true;
+            this.textBox6.Size = new System.Drawing.Size(93, 35);
+            this.textBox6.TabIndex = 35;
+            this.textBox6.Text = "or double click in spectrum";
+            // 
+            // cb_rx_autosync
+            // 
+            this.cb_rx_autosync.AutoSize = true;
+            this.cb_rx_autosync.Location = new System.Drawing.Point(195, 146);
+            this.cb_rx_autosync.Name = "cb_rx_autosync";
+            this.cb_rx_autosync.Size = new System.Drawing.Size(93, 17);
+            this.cb_rx_autosync.TabIndex = 34;
+            this.cb_rx_autosync.Text = "RX Auto Sync";
+            this.cb_rx_autosync.UseVisualStyleBackColor = true;
+            // 
             // rb_rtty_real
             // 
             this.rb_rtty_real.AutoSize = true;
@@ -1650,7 +1702,6 @@
             this.groupBox3.Controls.Add(this.pictureBox3);
             this.groupBox3.Controls.Add(this.bt_tune_plus);
             this.groupBox3.Controls.Add(this.bt_tune_minus);
-            this.groupBox3.Controls.Add(this.cb_marker);
             this.groupBox3.Controls.Add(this.vu_cap);
             this.groupBox3.Controls.Add(this.vu_pb);
             this.groupBox3.Controls.Add(this.pb_audioCAPstatus);
@@ -1712,20 +1763,19 @@
             this.bt_tune_minus.Visible = false;
             this.bt_tune_minus.Click += new System.EventHandler(this.bt_tune_minus_Click);
             // 
-            // cb_marker
+            // vu_cap
             // 
-            this.cb_marker.AutoSize = true;
-            this.cb_marker.Checked = true;
-            this.cb_marker.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_marker.Location = new System.Drawing.Point(605, 23);
-            this.cb_marker.Name = "cb_marker";
-            this.cb_marker.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.cb_marker.Size = new System.Drawing.Size(129, 17);
-            this.cb_marker.TabIndex = 27;
-            this.cb_marker.Text = "100Hz Tuning Marker";
-            this.cb_marker.UseVisualStyleBackColor = true;
-            this.cb_marker.Visible = false;
-            this.cb_marker.CheckedChanged += new System.EventHandler(this.cb_marker_CheckedChanged);
+            this.vu_cap.Location = new System.Drawing.Point(479, 111);
+            this.vu_cap.Name = "vu_cap";
+            this.vu_cap.Size = new System.Drawing.Size(100, 10);
+            this.vu_cap.TabIndex = 20;
+            // 
+            // vu_pb
+            // 
+            this.vu_pb.Location = new System.Drawing.Point(479, 47);
+            this.vu_pb.Name = "vu_pb";
+            this.vu_pb.Size = new System.Drawing.Size(100, 10);
+            this.vu_pb.TabIndex = 19;
             // 
             // pb_audioCAPstatus
             // 
@@ -2181,49 +2231,6 @@
             this.pn1.Size = new System.Drawing.Size(538, 74);
             this.pn1.TabIndex = 30;
             // 
-            // pb_rxsignal
-            // 
-            this.pb_rxsignal.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsignal.BackgroundImage")));
-            this.pb_rxsignal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsignal.Location = new System.Drawing.Point(511, 47);
-            this.pb_rxsignal.Name = "pb_rxsignal";
-            this.pb_rxsignal.Size = new System.Drawing.Size(24, 24);
-            this.pb_rxsignal.TabIndex = 17;
-            this.pb_rxsignal.TabStop = false;
-            // 
-            // pb_rxsync
-            // 
-            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
-            this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsync.Location = new System.Drawing.Point(511, 2);
-            this.pb_rxsync.Name = "pb_rxsync";
-            this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
-            this.pb_rxsync.TabIndex = 19;
-            this.pb_rxsync.TabStop = false;
-            // 
-            // cb_rx_autosync
-            // 
-            this.cb_rx_autosync.AutoSize = true;
-            this.cb_rx_autosync.Location = new System.Drawing.Point(195, 146);
-            this.cb_rx_autosync.Name = "cb_rx_autosync";
-            this.cb_rx_autosync.Size = new System.Drawing.Size(93, 17);
-            this.cb_rx_autosync.TabIndex = 34;
-            this.cb_rx_autosync.Text = "RX Auto Sync";
-            this.cb_rx_autosync.UseVisualStyleBackColor = true;
-            // 
-            // textBox6
-            // 
-            this.textBox6.BackColor = System.Drawing.SystemColors.Control;
-            this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.textBox6.Location = new System.Drawing.Point(195, 167);
-            this.textBox6.Multiline = true;
-            this.textBox6.Name = "textBox6";
-            this.textBox6.ReadOnly = true;
-            this.textBox6.Size = new System.Drawing.Size(93, 35);
-            this.textBox6.TabIndex = 35;
-            this.textBox6.Text = "or double click in spectrum";
-            // 
             // progressBar_fifo
             // 
             this.progressBar_fifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -2235,6 +2242,16 @@
             this.progressBar_fifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar_fifo.TabIndex = 13;
             // 
+            // pb_rxsignal
+            // 
+            this.pb_rxsignal.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsignal.BackgroundImage")));
+            this.pb_rxsignal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_rxsignal.Location = new System.Drawing.Point(511, 47);
+            this.pb_rxsignal.Name = "pb_rxsignal";
+            this.pb_rxsignal.Size = new System.Drawing.Size(24, 24);
+            this.pb_rxsignal.TabIndex = 17;
+            this.pb_rxsignal.TabStop = false;
+            // 
             // progressBar_capfifo
             // 
             this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
@@ -2245,19 +2262,15 @@
             this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar_capfifo.TabIndex = 15;
             // 
-            // vu_cap
+            // pb_rxsync
             // 
-            this.vu_cap.Location = new System.Drawing.Point(479, 111);
-            this.vu_cap.Name = "vu_cap";
-            this.vu_cap.Size = new System.Drawing.Size(100, 10);
-            this.vu_cap.TabIndex = 20;
-            // 
-            // vu_pb
-            // 
-            this.vu_pb.Location = new System.Drawing.Point(479, 47);
-            this.vu_pb.Name = "vu_pb";
-            this.vu_pb.Size = new System.Drawing.Size(100, 10);
-            this.vu_pb.TabIndex = 19;
+            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
+            this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_rxsync.Location = new System.Drawing.Point(511, 2);
+            this.pb_rxsync.Name = "pb_rxsync";
+            this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
+            this.pb_rxsync.TabIndex = 19;
+            this.pb_rxsync.TabStop = false;
             // 
             // Form1
             // 
@@ -2273,7 +2286,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.64 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.72 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -2450,7 +2463,6 @@
         private System.Windows.Forms.Label lb_rec;
         private System.Windows.Forms.Label lb_tuningqrgs;
         private System.Windows.Forms.Button bt_allf;
-        private System.Windows.Forms.CheckBox cb_marker;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.Button bt_tune_minus;
@@ -2503,6 +2515,9 @@
         private System.Windows.Forms.RadioButton rb_rtty_real;
         private System.Windows.Forms.CheckBox cb_rx_autosync;
         private System.Windows.Forms.TextBox textBox6;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.ToolStripStatusLabel toolStrip_spacer;
+        private System.Windows.Forms.ToolStripStatusLabel ts_userinfo;
     }
 }
 

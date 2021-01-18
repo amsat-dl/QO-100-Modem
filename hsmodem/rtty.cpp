@@ -78,7 +78,7 @@ int rtty_autosync = 0;
 
 void rtty_modifyRXfreq(int f_Hz)
 {
-    printf("set:%d Hz\n", f_Hz);
+    //printf("set:%d Hz\n", f_Hz);
     rtty_frequency = f_Hz;
     rtty_RX_RADIANS_PER_SAMPLE = ((2.0f * (float)M_PI * (float)f_Hz) / (float)caprate);
 }
@@ -414,6 +414,8 @@ void init_rtty()
     //printf("wegen FM test, kein Init RTTY\n");
     //return;
 
+    rtty_init_pipes();
+
     close_rtty();
 
     printf("Init RTTY\n");
@@ -438,8 +440,8 @@ void init_rtty()
     // RTTY RX Filter
     rtty_q = firfilt_crcf_create_kaiser(flt_h_len, flt_fc, flt_As, 0.0f);
     firfilt_crcf_set_scale(rtty_q, 2.0f * flt_fc);
-
-    // create the rtty TX threads
+    
+    // create the rtty threads
     static int f = 1;
     if (f)
     {
@@ -497,6 +499,7 @@ void rtty_tx_function(void* param)
     uint8_t bd[2];
     int anz = 0;
 
+    printf("TX thread\n");
     while (keeprunning)
     {
         while (run_rtty_threads == 0)
@@ -513,15 +516,6 @@ void rtty_tx_function(void* param)
 #endif
             }
         }
-
-        /*static int last_txoff = -2;
-        if (last_txoff != 0 && rtty_txoff == 0)
-        {
-            // just switched TX on
-            //printf("force Bu/Zi switch: %d %d\n", rtty_txoff, last_txoff);
-            isletters = isletters ? 0 : 1;  // force Bu/Zi command
-        }
-        last_txoff = rtty_txoff;*/
 
         char csend;
         if (rtty_tx_read_fifo(&csend))
@@ -542,7 +536,7 @@ void rtty_tx_function(void* param)
 
             if (rtty_txoff > 1) rtty_txoff--;
         }
-
+        
         //if(bd[0] != 0x1f) printf("send chars: %02X\n",bd[0]);
 
         for (int i = 0; i < anz; i++)
@@ -586,14 +580,15 @@ void rtty_tx_function(void* param)
                         int fs;
                         while (keeprunning && run_rtty_threads)
                         {
-                            fs = io_pb_fifo_usedspace();
+                            fs = io_fifo_usedspace(io_pbidx);
                             //printf("%d\n", fs);
                             // attention: if this number is too low, the audio write callback will not process it
                             if (fs < 24000) break;
-                            sleep_ms(1);
+                            sleep_ms(10);
                         }
 
-                        io_pb_write_fifo(usbf * 0.05f); // reduce volume and send to soundcard
+                        usbf *= 0.2f;
+                        kmaudio_playsamples(io_pbidx, &usbf, 1, pbvol);
                     }
                 }
             }
@@ -634,18 +629,21 @@ void rtty_rx_function(void* param)
         }
 
         static int bridx = 0;
-        float f;
-        int ret = io_cap_read_fifo(&f);
-        if (ret)
+        // get available received samples
+        float farr[1100];
+        int ret = kmaudio_readsamples(io_capidx, farr, 1000, capvol,0);
+        if (ret == 0) 
         {
+            sleep_ms(10);
+            continue;
+        }
+
+        for (int fanz = 0; fanz < ret; fanz++)
+        {
+            float f = farr[fanz];
             if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN)
-                io_ls_write_fifo(f);
+                kmaudio_playsamples(voice_pbidx, &f, 1,lsvol);
 
-            // input volume
-            f *= softwareCAPvolume;
-
-            // TODO check Multithreading !!!!!!!!!
-            getMax(f);
             make_FFTdata(f * 25);
             
             static float last_rs = 0;
@@ -685,8 +683,6 @@ void rtty_rx_function(void* param)
                 }
             }
         }
-        else
-            sleep_ms(1);
     }
 
 #ifdef _LINUX_

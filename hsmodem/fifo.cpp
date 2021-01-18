@@ -27,8 +27,9 @@
 
 #include "hsmodem.h"
 
-void rtty_init_pipes();
 
+
+/*
 #ifdef _WIN32_
 CRITICAL_SECTION io_cap_crit_sec;
 CRITICAL_SECTION io_pb_crit_sec;
@@ -198,9 +199,6 @@ int io_pb_fifo_usedspace()
     IO_PB_UNLOCK();
 
     return elemInFifo;
-    /*
-    int anz = io_pb_fifo_freespace(0);
-    return AUDIO_PLAYBACK_BUFLEN - anz;*/
 }
 
 // read num elements
@@ -237,7 +235,7 @@ void io_clear_audio_fifos()
     io_pb_write_fifo_clear();
     io_cap_write_fifo_clear();
 }
-
+*/
 // ================== RTTY FIFO ===================
 
 void clear_rtty_fifos();
@@ -271,12 +269,17 @@ void RTTY_RX_UNLOCK() { pthread_mutex_unlock(&rtty_rx_crit_sec); }
 void rtty_init_pipes()
 {
 #ifdef _WIN32_
-    if (&rtty_tx_crit_sec != NULL) DeleteCriticalSection(&rtty_tx_crit_sec);
-    InitializeCriticalSection(&rtty_tx_crit_sec);
+    static int f = 1;
 
-    if (&rtty_rx_crit_sec != NULL) DeleteCriticalSection(&rtty_rx_crit_sec);
-    InitializeCriticalSection(&rtty_rx_crit_sec);
+    if (f)
+    {
+        f = 0;
+        if (&rtty_tx_crit_sec != NULL) DeleteCriticalSection(&rtty_tx_crit_sec);
+        InitializeCriticalSection(&rtty_tx_crit_sec);
 
+        if (&rtty_rx_crit_sec != NULL) DeleteCriticalSection(&rtty_rx_crit_sec);
+        InitializeCriticalSection(&rtty_rx_crit_sec);
+    }
 #endif
 
     clear_rtty_fifos();

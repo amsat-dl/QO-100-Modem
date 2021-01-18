@@ -26,8 +26,8 @@
 
 #include "hsmodem.h"
 
-#define NUMFREQ 13
-int tunefreq[NUMFREQ] = { 150,420,690,960,1230,1500,1770,2040,2310,2580,2850,2890,100 };
+#define NUMFREQ 15
+int tunefreq[NUMFREQ] = { 100,300,500,700,900,1100,1300,1500,1700,1900,2100,2300,2500,2700,2900 };
 nco_crcf tunenco[NUMFREQ];
 uint32_t tuning_runtime = 0;
 
@@ -41,6 +41,7 @@ void init_tune()
         f = 0;
     }
 
+    printf("init tune tones to samprate: %d\n", caprate);
     for (int i = 0; i < NUMFREQ; i++)
     {
         if (tunenco[i] != NULL) nco_crcf_destroy(tunenco[i]);
@@ -57,8 +58,7 @@ void init_tune()
 // send= 2,3,4 ... send a single freq to soundcard
 float do_tuning(int send)
 {
-    if (tunenco == NULL) return 0.0f;
-    if (send < 0 || send > 11) return 0.0f;
+    if (send < 0 || send >= NUMFREQ) return 0.0f;
 
     float f = 0;
     if (send == 1)
@@ -81,13 +81,15 @@ float do_tuning(int send)
     int fs;
     while (keeprunning)
     {
-        fs = io_pb_fifo_freespace(0);
+        fs = io_fifo_usedspace(io_pbidx);
         // wait until there is space in fifo
-        if (fs > 20000) break;
+        if (fs < 48000) break;
+        if (tuning == 0) return 0.0f;
         sleep_ms(10);
     }
 
-    io_pb_write_fifo(f * 0.05f); // reduce volume and send to soundcard
+    f *= 0.05f;
+    kmaudio_playsamples(io_pbidx, &f, 1, pbvol);
 
     if (++tuning_runtime >= (48000 * 5 * 60))
     {
@@ -100,12 +102,7 @@ float do_tuning(int send)
 
 float singleFrequency()
 {
-    int /*i = 11; // 2900 Hz
-    if (tunenco[i] == NULL) return 0.0f;
-    nco_crcf_step(tunenco[i]);
-    float f = nco_crcf_sin(tunenco[i]);*/
-
-    i = 12; // 2930 Hz
+    int i = 0; // 100 Hz
     if (tunenco[i] == NULL) return 0.0f;
     nco_crcf_step(tunenco[i]);
     float f = nco_crcf_sin(tunenco[i]);

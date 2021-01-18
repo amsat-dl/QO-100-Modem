@@ -133,8 +133,7 @@ void encode(float f)
                 printf("opus_decode_float error: %d", r);
             }
 
-            for (int i = 0; i < r; i++)
-               io_ls_write_fifo(fresult[i]);
+            kmaudio_playsamples(voice_pbidx, fresult, r,lsvol);
         }
 
         farridx = 0;
@@ -171,7 +170,7 @@ void sendCodecToModulator(uint8_t *pdata, int len)
         while (keeprunning)
         {
             // we have to check if the TX fifo has enough data. In case of an underrun the Q(8A)PSK signal will be distorted
-            int us = io_pb_fifo_usedspace();
+            int us = io_fifo_usedspace(io_pbidx);
             if (us < 20000)
             {
                 //printf("tx filler\n");
@@ -244,9 +243,53 @@ void toCodecDecoder(uint8_t *pdata, int len)
             else
             {
                 //measure_speed_bps(r);
-                for (int j = 0; j < r; j++)
-                   io_ls_write_fifo(fresult[j]);
+                kmaudio_playsamples(voice_pbidx, fresult, r,lsvol);
             }
+        }
+    }
+}
+
+void io_saveStream(float *fa, int anz)
+{
+    static FILE* fw = NULL;
+    static int old_VoiceAudioMode = 0;
+    if (VoiceAudioMode != old_VoiceAudioMode)
+    {
+        if (old_VoiceAudioMode == VOICEMODE_OFF && VoiceAudioMode == VOICEMODE_RECORD)
+        {
+            char fn[500];
+            snprintf(fn, 499, "%s/oscardata/intro/intro.pcm", homepath);
+            fn[499] = 0;
+
+            // audio was switched on, open file to save PCM stream
+            if (fw) fclose(fw);
+            fw = fopen(fn, "wb");
+            if (!fw) printf("cannot open pcm file:%s\n", fn);
+            else printf("AUDIO RECORDING:%s ...\n Speak, then switch off\n", fn);
+        }
+
+        if (VoiceAudioMode == VOICEMODE_OFF)
+        {
+            // audio was switched off, stop recording
+            if (fw)
+            {
+                fclose(fw);
+                printf("AUDIO RECORDING off\n");
+            }
+            fw = NULL;
+        }
+        old_VoiceAudioMode = VoiceAudioMode;
+    }
+
+    if (fw)
+    {
+        for (int n = 0; n < anz; n++)
+        {
+            float f = fa[n];
+            if (f > 1) f = 1;
+            if (f < -1) f = -1;
+            int16_t sh = (int16_t)(f * 32768.0f);
+            fwrite(&sh, sizeof(int16_t), 1, fw);
         }
     }
 }

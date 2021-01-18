@@ -74,7 +74,7 @@ void UdpRxInit(int *sock, int port, void (*rxfunc)(uint8_t *, int, struct sockad
 	memset(&sin, 0, sizeof(struct sockaddr_in));
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
-	sin.sin_addr.s_addr = INADDR_ANY;
+    sin.sin_addr.s_addr = INADDR_ANY;
 
 	if (bind(*sock, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) != 0)
 	{
@@ -102,13 +102,11 @@ void UdpRxInit(int *sock, int port, void (*rxfunc)(uint8_t *, int, struct sockad
     rxcfg_idx++;
 }
 
-
 #ifdef _LINUX_
 void* threadfunction(void* param) {
     socklen_t fromlen;
     pthread_detach(pthread_self());
 #endif
-
 #ifdef _WIN32_
 void threadfunction(void* param) {
         int fromlen;
@@ -116,18 +114,24 @@ void threadfunction(void* param) {
     RXCFG rxcfg;
     memcpy((uint8_t *)(&rxcfg), (uint8_t *)param, sizeof(RXCFG));
 	int recvlen;
-	char rxbuf[256];
+    const int maxUDPpacketsize = 1024;
+	char rxbuf[maxUDPpacketsize];
 	struct sockaddr_in fromSock;
 	fromlen = sizeof(struct sockaddr_in);
 	while(*rxcfg.keeprunning)
 	{
-        recvlen = recvfrom(*rxcfg.sock, rxbuf, 256, 0, (struct sockaddr *)&fromSock, &fromlen);
+        recvlen = recvfrom(*rxcfg.sock, rxbuf, maxUDPpacketsize, 0, (struct sockaddr *)&fromSock, &fromlen);
 		if (recvlen > 0)
         {
             // data received, send it to callback function
             (*rxcfg.rxfunc)((uint8_t *)rxbuf,recvlen, &fromSock);
         }
-        
+        if (recvlen < 0)
+        {
+#ifdef _WIN32_
+            printf("recvfrom error: %d", WSAGetLastError());
+#endif
+        }
 	}
 #ifdef _LINUX_
     pthread_exit(NULL); // self terminate this thread

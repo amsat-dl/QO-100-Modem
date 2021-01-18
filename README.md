@@ -3,7 +3,7 @@ The purpose of this project is to transfer data (pictures...) via a 2,7kHz SSB c
 Now also including RTTY mode.
 
 # this is work in progress
-Version 0.64
+Version 0.72
 Windows 10 (should work on Win7, not tested)
 linux Desktop PC, 
 Odroid SBC
@@ -18,7 +18,7 @@ Raspberry 4 (3B+)
 * Odroid C2 ... working
 * Odroid C4 ... working
 
-* Raspberry: Raspian OS ist NOT working, instead Ubuntu 64bit is required
+* Raspberry: Raspian OS ist NOT working, instead Ubuntu 64bit is required. Or use the Beta Rapi-IO-64bit
 
 * Application Software "oscardata.exe" running on Windows, Linux, (possibly MAC-OS, not tested)
 
@@ -29,11 +29,12 @@ this software uses these programs:
 * libsoundio: https://github.com/andrewrk/libsoundio (MIT License)
 * fftw3: http://www.fftw.org (GPL V.2 or later)
 * libcodec2: https://github.com/drowe67/codec2 (LGPL 2.1, Linux: standard lib, Windows: from freeDV)
+* portaudio: https://github.com/PortAudio/portaudio
 
 # Download alternatives
 * download from github and build from source
 * download windows installer and download Odroid and Raspberry images:
-https://dj0abr.de/german/technik/sat/modem/images.htm
+https://hsmodem.dj0abr.de (Download section)
 
 
 # building the software for Linux

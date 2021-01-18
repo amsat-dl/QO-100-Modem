@@ -24,7 +24,7 @@
 */
 
 /*
-* this is a console program
+* this is a console program 
 * it can be compiled under Linux: make
 * and under Windows: Visual-Studio
 * 
@@ -65,11 +65,11 @@ char ownfilename[] = { "hsmodem" };
 char appIP[20] = { 0 };
 int fixappIP = 0;
 int restart_modems = 0;
+int init_voice = 0;
 int trigger_resetmodem = 0;
 char homepath[1000] = { 0 };
 
 int caprate = 44100;
-int physRXcaprate = 44100;
 int txinterpolfactor = 20;
 int rxPreInterpolfactor = 5;
 int linespeed = 4410;
@@ -79,22 +79,26 @@ char playbackDeviceName[101] = { 0 };
 char micDeviceName[101] = { 0 };
 char lsDeviceName[101] = { 0 };
 
-float softwareCAPvolume = 1;
-float softwarePBvolume = 1;
-float softwareMICvolume = 1;
-float softwareLSvolume = 1;
-
 int announcement = 0;
 int VoiceAudioMode = VOICEMODE_OFF;
 int codec = 1;  // 0=opus, 1=codec2
 int tuning = 0;
 int marker = 1;
 
-int init_audio_result = 0;
 int init_voice_result = 0;
+
+// number of audio device in libkmaudio
+int io_capidx = -1;
+int io_pbidx = -1;
+int voice_capidx = -1;
+int voice_pbidx = -1;
 
 int safemode = 0;
 int sendIntro = 0;
+
+char mycallsign[21];
+char myqthloc[11];
+char myname[21];
 
 int main(int argc, char* argv[])
 {
@@ -182,7 +186,7 @@ int main(int argc, char* argv[])
 
     struct stat st = { 0 };
 
-    char nd[1000];
+    char nd[1100];
     sprintf(nd, "%s/oscardata", homepath);
     if (stat(nd, &st) == -1) 
     {
@@ -194,6 +198,9 @@ int main(int argc, char* argv[])
 #endif
     printf("user home path:<%s>\n", homepath);
 
+    init_tune();
+    kmaudio_init();
+    kmaudio_getDeviceList();
     init_packer();
     initFEC();
 
@@ -207,6 +214,8 @@ int main(int argc, char* argv[])
 
     while (keeprunning)
     {
+        int wait = 1;
+
         if (restart_modems == 1)
         {
             printf("restart modem requested\n");
@@ -214,25 +223,36 @@ int main(int argc, char* argv[])
             restart_modems = 0;
         }
 
+        if (init_voice == 1)
+        {
+            initVoice();
+            init_voice = 0;
+        }
+
         //doArraySend();
         if (VoiceAudioMode == VOICEMODE_INTERNALLOOP)
         {
             // loop voice mic to LS
-            float f;
-            while (io_mic_read_fifo(&f))
-            {
-                io_ls_write_fifo(f);
-            }
+            float f[1100]; // 1.1 x need rate to have reserve for resampler
+            int anz = kmaudio_readsamples(voice_capidx, f, 1000, micvol, 0);
+            if (anz > 0)
+                kmaudio_playsamples(voice_pbidx, f, anz,lsvol);
         }
 
         if (VoiceAudioMode == VOICEMODE_RECORD)
         {
             // loop voice mic to LS, and record into PCM file
-            float f;
-            while (io_mic_read_fifo(&f))
+            float f[1100];
+            while (keeprunning)
             {
-                io_saveStream(f);
-                io_ls_write_fifo(f);
+                int anz = kmaudio_readsamples(voice_capidx, f, 1000, micvol,0);
+                if (anz > 0)
+                {
+                    io_saveStream(f, anz);
+                    kmaudio_playsamples(voice_pbidx, f, anz,lsvol);
+                }
+                else
+                    break;
             }
         }
 
@@ -246,7 +266,8 @@ int main(int argc, char* argv[])
         {
             // send mic to codec
             float f;
-            while (io_mic_read_fifo(&f))
+            while(kmaudio_readsamples(voice_capidx, &f, 1, micvol,0))
+            //while (io_mic_read_fifo(&f))
             {
                 encode(f);
             }
@@ -255,36 +276,34 @@ int main(int argc, char* argv[])
         if (tuning != 0)
         {
             do_tuning(tuning);
+            wait = 0;
         }
         
         if (speedmode == 10)
         {
+            // nothing to do here
             //testall();
             //fmtest();
-            sleep_ms(10);   // nothing to do here
         }
         else
         {
-            // demodulate incoming audio data stream
-            static uint64_t old_tm = 0;
+#ifdef _LINUX_
+            /*static uint64_t old_tm = 0;
             uint64_t tm = getms();
             if (tm >= (old_tm + 1000))
             {
                 // read Audio device list every 1s
-                io_readAudioDevices();
+                // runtime dectection currently works under linux only
+                kmaudio_getDeviceList();
                 old_tm = tm;
-            }
-            int dret = demodulator();
-            if (dret == 0)
-            {
-                // no new data in fifo
-#ifdef _LINUX_
-            // not important how long to sleep, 10ms is fine
-                sleep_ms(10);
+            }*/
 #endif
-            }
+
+            // demodulate incoming audio data stream
+            int dret = demodulator();
+            if (dret) wait = 0;
         }
-        
+        if (wait) sleep_ms(10);
     }
     printf("stopped: %d\n", keeprunning);
 
@@ -309,7 +328,8 @@ typedef struct {
 } SPEEDRATE;
 
 // AudioRate, TX-Resampler, RX-Resampler/4, bit/symbol, Codec-Rate
-SPEEDRATE sr[11] = {
+#define NUMSPEEDMODES 11
+SPEEDRATE sr[NUMSPEEDMODES] = {
     // BPSK modes
     {48000, 40,10, 1, 1200, 800},
     {48000, 20, 5, 1, 2400, 2000},
@@ -335,8 +355,9 @@ void startModem()
     printf("startModem\n");
     close_dsp();
     close_rtty();
-    io_close_audio();
     speedmode = set_speedmode;
+    if (speedmode < 0 || speedmode >= NUMSPEEDMODES)
+        speedmode = 4;
 
     bitsPerSymbol = sr[speedmode].bpsym;
     constellationSize = (1 << bitsPerSymbol); // QPSK=4, 8PSK=8
@@ -348,7 +369,20 @@ void startModem()
     opusbitrate = sr[speedmode].codecrate;
 
     // int TX audio and modulator
-    init_audio_result = io_init_sound(playbackDeviceName, captureDeviceName);
+    io_capidx = kmaudio_startCapture(captureDeviceName, caprate);
+    if (io_capidx == -1)
+    {
+        printf("CAP: cannot open device: %s\n", captureDeviceName);
+        return;
+    }
+
+    io_pbidx = kmaudio_startPlayback(playbackDeviceName, caprate);
+    if (io_pbidx == -1)
+    {
+        printf("PB: cannot open device: %s\n", playbackDeviceName);
+        return;
+    }
+
     _init_fft();
     if (speedmode < 10)
     {
@@ -358,6 +392,46 @@ void startModem()
     {
         rtty_txoff = 1;
         init_rtty();
+    }
+
+    init_tune();
+}
+
+void initVoice()
+{
+    // init voice audio
+    if (VoiceAudioMode == VOICEMODE_OFF)
+    {
+        float f = 0.0f;
+        io_saveStream(&f, 1);    // close recording
+        close_voiceproc();
+        close_stream(voice_capidx);
+        close_stream(voice_pbidx);
+    }
+    else
+    {
+        int srate = VOICE_SAMPRATE;
+
+        // voice always runs with 48000 with one exception:
+        // if it is used for monitoring only and the digital audio
+        // stream runs with 44100, then also the monitoring voice audio
+        // must runs with 44100
+        if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN && caprate == 44100)
+            srate = 44100;
+
+        voice_capidx = kmaudio_startCapture(micDeviceName, srate);
+        if (voice_capidx == -1)
+        {
+            printf("Voice CAP: cannot open device: %s\n", micDeviceName);
+            return;
+        }
+        voice_pbidx = kmaudio_startPlayback(lsDeviceName, srate);
+        if (voice_pbidx == -1)
+        {
+            printf("Voice PB: cannot open device: %s\n", lsDeviceName);
+            return;
+        }
+        init_voiceproc();
     }
 }
 
@@ -392,11 +466,26 @@ void io_setAudioDevices(uint8_t pbvol, uint8_t capvol, uint8_t announce, uint8_t
     }
 }
 
+uint8_t *getDevList(int* plen)
+{
+    uint8_t* txdata = io_getAudioDevicelist(plen);
+    txdata[0] = 3;  // ID of this UDP message
+
+    txdata[1] = (io_capidx != -1 && devlist[io_capidx].working) ? '1' : '0';
+    txdata[2] = (io_pbidx != -1 && devlist[io_pbidx].working) ? '1' : '0';
+    txdata[3] = (voice_capidx != -1 && devlist[voice_capidx].working) ? '1' : '0';
+    txdata[4] = (voice_pbidx != -1 && devlist[voice_pbidx].working) ? '1' : '0';
+
+    return txdata;
+}
+
 // called from UDP RX thread for Broadcast-search from App
 void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
+
     static uint64_t lastms = 0;  // time of last received BC message
     uint64_t actms = getms();
+
 
     if (len > 0 && pdata[0] == 0x3c)
     {
@@ -415,6 +504,9 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         * 9 ... unused
         * 10 .. 109 ... PB device name
         * 110 .. 209 ... CAP device name
+        * 210 .. 229 ... Callsign
+        * 230 .. 239 ... qthloc
+        * 240 .. 259 ... Name
         */
 
         char rxip[20];
@@ -444,7 +536,7 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
             // App searches for the modem IP, mirror the received messages
             // so the app gets an UDP message with this local IP
             int alen;
-            uint8_t* txdata = io_getAudioDevicelist(&alen);
+            uint8_t* txdata = getDevList(&alen);
             sendUDP(appIP, UdpDataPort_ModemToApp, txdata, alen);
         }
         else
@@ -456,12 +548,23 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                 // App searches for the modem IP, mirror the received messages
                 // so the app gets an UDP message with this local IP
                 int alen;
-                uint8_t* txdata = io_getAudioDevicelist(&alen);
+                uint8_t* txdata = getDevList(&alen);
                 sendUDP(appIP, UdpDataPort_ModemToApp, txdata, alen);
             }
             else
                 return;
         }
+
+        memcpy(mycallsign, pdata + 210, sizeof(mycallsign));
+        mycallsign[sizeof(mycallsign) - 1] = 0;
+
+        memcpy(myqthloc, pdata + 230, sizeof(myqthloc));
+        myqthloc[sizeof(myqthloc) - 1] = 0;
+
+        memcpy(myname, pdata + 240, sizeof(myname));
+        myname[sizeof(myname) - 1] = 0;
+
+        //printf("<%s> <%s> <%s>\n", mycallsign, myqthloc, myname);
 
         //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
         io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char*)(pdata + 10), (char*)(pdata + 110));
@@ -527,35 +630,37 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         // reset liquid RX modem
         tuning = 0;
         resetModem();
-        io_clear_audio_fifos();
+        //io_clear_audio_fifos();
+        io_fifo_clear(voice_pbidx);
+        io_fifo_clear(voice_capidx);
         return;
     }
 
     if (type == 21)
     {
         // set playback volume (in % 0..100)
-        io_setVolume(0,minfo);
+        io_setPBvolume(minfo);
         return;
     }
 
     if (type == 22)
     {
         // set capture volume (in % 0..100)
-        io_setVolume(1,minfo);
+        io_setCAPvolume(minfo);
         return;
     }
 
     if (type == 23)
     {
         // set playback volume (in % 0..100)
-        setVolume_voice(0, minfo);
+        io_setLSvolume(minfo);
         return;
     }
 
     if (type == 24)
     {
         // set capture volume (in % 0..100)
-        setVolume_voice(1, minfo);
+        io_setMICvolume(minfo);
         return;
     }
 
@@ -579,17 +684,18 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 
         //printf("LS:<%s> MIC:<%s> Mode:%d codec:%d\n", lsDeviceName, micDeviceName, VoiceAudioMode, codec);
 
-        // init voice audio
-        if (VoiceAudioMode == VOICEMODE_OFF)
+        init_voice = 1;
+
+        if (!strcmp(micDeviceName, captureDeviceName))
         {
-            io_saveStream(0.0f);    // close recording
-            close_voiceproc();
-            io_close_voice();
+            printf("capture device already in use, ignoring: %s\n", micDeviceName);
+            init_voice = 0;
         }
-        else
+
+        if (!strcmp(lsDeviceName, playbackDeviceName))
         {
-            init_voice_result = io_init_voice(lsDeviceName, micDeviceName);
-            init_voiceproc();
+            printf("playback device already in use, ignoring: %s\n", lsDeviceName);
+            init_voice = 0;
         }
         return;
     }
@@ -681,7 +787,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         printf("data from app: wrong length:%d (should be %d)\n", len - 2, PAYLOADLEN);
         return;
     }
-
+    
     //if (getSending() == 1) return;   // already sending (Array sending)
 
     if (minfo == 0 || minfo == 3)
@@ -696,8 +802,11 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         // one frame has 258 bytes, so we need for 6s: 6* ((caprate/txinterpolfactor) * bitsPerSymbol / 8) /258 + 1 frames
         toGR_sendData(pdata + 2, type, minfo,0);
         int numframespreamble = 6 * ((caprate / txinterpolfactor) * bitsPerSymbol / 8) / 258 + 1;
+        //if (type == 1)// BER Test
+          //  numframespreamble = 1;
         for (int i = 0; i < numframespreamble; i++)
             toGR_sendData(pdata + 2, type, minfo,1);
+        sendStationInfo();
     }
     else if ((len - 2) < PAYLOADLEN)
     {
@@ -741,10 +850,27 @@ void toGR_sendData(uint8_t* data, int type, int status, int repeat)
     int len = 0;
     uint8_t* txdata = Pack(data, type, status, &len, repeat);
 
-    //showbytestring((char *)"BERtx: ", txdata, len);
+    //showbytestring((char *)"TX: ", txdata, len);
 
-    if (txdata != NULL)
-        sendToModulator(txdata, len);
+    if (txdata != NULL) sendToModulator(txdata, len);
+}
+
+void sendStationInfo()
+{
+    uint8_t payload[PAYLOADLEN];
+    memcpy(payload, mycallsign, 20);
+    memcpy(payload+20, myqthloc, 10);
+    memcpy(payload+30, myname, 20);
+
+    int len = 0;
+    uint8_t* txdata = Pack(payload, 7, 1, &len, 1);
+
+    //showbytestring((char *)"TX Userinfo: ", txdata, len);
+
+    for (int i = 0; i < 2; i++)
+    {
+        if (txdata != NULL) sendToModulator(txdata, len);
+    }
 }
 
 // called by liquid demodulator for received data
@@ -758,6 +884,7 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     if (pl != NULL)
     {
         // complete frame received
+        //printf("type:%d\n", pl[0]);
         // send payload to app
         uint8_t txpl[PAYLOADLEN + 10 + 1];
         memcpy(txpl + 1, pl, PAYLOADLEN + 10);
@@ -823,7 +950,7 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                 rx_in_sync = 0;
                 if (speedmode < 10)
                 {
-                    printf("no signal detected, reset RX modem\n");
+                    //printf("no signal detected, reset RX modem\n");
                     resetModem();
                 }
                 lasttime = acttm;

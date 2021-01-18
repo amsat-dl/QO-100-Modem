@@ -136,7 +136,7 @@ void encode_codec2(float f)
 					firinterp_crcf_execute(interp8_48, inp, outp);
 
 					for (int x = 0; x < decfactor; x++)
-						io_ls_write_fifo(outp[x].real);
+						kmaudio_playsamples(voice_pbidx, &outp[x].real, 1, lsvol);
 				}
 			}
 		}
@@ -191,7 +191,8 @@ void toCodecDecoder_codec2(uint8_t* pdata, int len)
 				firinterp_crcf_execute(interp8_48, inp, outp);
 
 				for (int x = 0; x < decfactor; x++)
-					io_ls_write_fifo(outp[x].real);
+					//io_ls_write_fifo(outp[x].real);
+					kmaudio_playsamples(voice_pbidx, &outp[x].real, 1, lsvol);
 			}
 		}
 	}

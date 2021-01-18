@@ -9,7 +9,18 @@
 
 CXXFLAGS = -Wall -O3 -std=c++0x -Wno-write-strings -Wno-narrowing
 LDFLAGS = -lpthread -lrt -lsndfile -lasound -lm -lopus -lfftw3 -lfftw3_threads -lliquid -lcodec2 -lsoundio
-OBJ = hsmodem.o constellation.o crc16.o frame_packer.o main_helper.o scrambler.o speed.o fec.o udp.o fft.o liquid_if.o symboltracker.o voiceprocessor.o codec2.o soundio.o fifo.o announcement.o fifo_voice.o voiceio.o tuning.o rtty.o
+OBJ = hsmodem.o constellation.o crc16.o frame_packer.o main_helper.o\
+scrambler.o speed.o fec.o udp.o fft.o liquid_if.o symboltracker.o\
+voiceprocessor.o codec2.o fifo.o announcement.o tuning.o rtty.o volume.o\
+libkmaudio/libkmaudio_fifo.o\
+libkmaudio/libkmaudio_getDevices.o\
+libkmaudio/libkmaudio_getDevices_Linux.o\
+libkmaudio/libkmaudio_init.o\
+libkmaudio/libkmaudio_init_linux.o\
+libkmaudio/libkmaudio_interface.o\
+libkmaudio/libkmaudio_capture_linux.o\
+libkmaudio/libkmaudio_playback_linux.o\
+libkmaudio/libkmaudio_resampler.o
 
 default: $(OBJ)
 	mkdir -p ../hsmodemLinux
@@ -18,4 +29,5 @@ default: $(OBJ)
 
 clean:
 	rm -f *.o
-	
+	rm -f libkmaudio/*.o
+	rm -f libkmaudio/*.o

@@ -57,25 +57,52 @@
     <ClCompile Include="codec2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="soundio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fifo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="announcement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fifo_voice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="voiceio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tuning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rtty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_capture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_capture_linux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_fifo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_getDevices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_getDevices_Linux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_init_linux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_playback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_playback_linux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkmaudio\libkmaudio_resampler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="volume.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,13 +143,16 @@
     <ClInclude Include="codec2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="soundio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="endian.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="baudot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libkmaudio\libkmaudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libkmaudio\soundio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libkmaudio\endian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
