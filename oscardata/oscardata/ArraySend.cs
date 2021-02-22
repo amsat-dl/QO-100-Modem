@@ -34,6 +34,7 @@ namespace oscardata
                     filestat = statics.LastFrame;
             }
         }
+
         public static bool getSending()
         {
             bool v;
@@ -141,7 +142,7 @@ namespace oscardata
             if (getSending() == false) return; // nothing to send
 
             // check the TX buffer, do not feed more data into
-            // the buffer if it has already more than 10 entries
+            // the buffer if it has already more than n entries
             if (Udp.GetBufferCount() > 3) return;
 
             Byte[] txarr = new byte[statics.PayloadLen];
@@ -153,7 +154,9 @@ namespace oscardata
                 if (txlen <= statics.PayloadLen)
                 {
                     // we just need to send one frame
-                    txudp(txdata, txtype, statics.SingleFrame);
+                    for (int i = 0; i < txdata.Length; i++)
+                        txarr[i] = txdata[i];
+                    txudp(txarr, txtype, statics.SingleFrame);
                     setSending(false);  // transmission complete
                 }
                 else

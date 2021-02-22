@@ -114,7 +114,7 @@ void threadfunction(void* param) {
     RXCFG rxcfg;
     memcpy((uint8_t *)(&rxcfg), (uint8_t *)param, sizeof(RXCFG));
 	int recvlen;
-    const int maxUDPpacketsize = 1024;
+    const int maxUDPpacketsize = 2048;
 	char rxbuf[maxUDPpacketsize];
 	struct sockaddr_in fromSock;
 	fromlen = sizeof(struct sockaddr_in);

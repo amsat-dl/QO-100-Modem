@@ -66,7 +66,7 @@ void read_callback(struct SoundIoInStream* instream, int frame_count_min, int fr
     struct SoundIoChannelArea* areas;
     // samples are in areas.ptr
     int frames_left = frame_count_max; // take all
-    while (keeprunning)
+    while (keepcallbacksrunning)
     {
         int frame_count = frames_left;
         if ((err = soundio_instream_begin_read(instream, &areas, &frame_count)))

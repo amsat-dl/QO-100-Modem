@@ -200,11 +200,12 @@ int io_fifo_freespace(int pipenum);
 // returns number of used elements (audio 16 bit short values) 
 int io_fifo_usedspace(int pipenum);
 
-// like before, but returns a number between 0 and 100 %
-int io_fifo_usedpercent(int pipenum);
 
 // clear the fifo
 void io_fifo_clear(int pipenum);
+
+// check if a playbackdevice is currently playing
+int isPlaying(int id);
 
 
 // -------- functions for internal use only --------
@@ -222,6 +223,7 @@ typedef struct _DEVLIST_ {
 	int requested_samprate = 0; // sample rate requested by caller
 	int real_samprate = 0;		// real sample rate of the device
 	int working = 0;			// 0=not running, 1=initialized and working
+	int audio_playing = 0;		// audio is currently playing, or not
 #ifdef WIN32 // Windows using portaudio
 	int devnum = -1;			// port audio device number
 	PaStreamParameters inputParameters;
@@ -262,7 +264,7 @@ void close_playback_stream(int idx);
 
 extern DEVLIST devlist[MAXDEVICES];
 extern int devanz;
-extern int keeprunning;
+extern int keepcallbacksrunning;
 
 #ifndef WIN32 // Linux
 int kmaudio_init_linux();

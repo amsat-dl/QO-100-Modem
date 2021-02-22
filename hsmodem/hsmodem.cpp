@@ -46,12 +46,13 @@ int keeprunning = 1;
 // UDP I/O
 int BC_sock_AppToModem = -1;
 int DATA_sock_AppToModem = -1;
-int DATA_sock_FFT_from_GR = -1;
-int DATA_sock_I_Q_from_GR = -1;
+int DATA_sock_ExtToModem = -1;
 
-int UdpBCport_AppToModem = 40131;
-int UdpDataPort_AppToModem = 40132;
-int UdpDataPort_ModemToApp = 40133;
+int UdpBCport_AppToModem =      40131;  // broadcast messages from GUI
+int UdpDataPort_AppToModem =    40132;  // data  messages from GUI
+int UdpDataPort_ModemToApp =    40133;  // all messages to GUI
+int TcpDataPort_WebSocket =     40134;  // web socket data exchange to local browser
+int UdpDataPort_ExtWebdata =    40135;  // get data from ext. application to sent via modem
 
 // op mode depending values
 // default mode if not set by the app
@@ -93,8 +94,8 @@ int io_pbidx = -1;
 int voice_capidx = -1;
 int voice_pbidx = -1;
 
-int safemode = 0;
 int sendIntro = 0;
+int extData_active = 0;
 
 char mycallsign[21];
 char myqthloc[11];
@@ -198,11 +199,14 @@ int main(int argc, char* argv[])
 #endif
     printf("user home path:<%s>\n", homepath);
 
-    init_tune();
-    kmaudio_init();
-    kmaudio_getDeviceList();
-    init_packer();
-    initFEC();
+    init_fifos();           // init fifos for PSK data and RTTY characters
+    init_distributor();     // init distribution process for PSK data
+    init_tune();            // init tuning tones (mixed to signal)
+    kmaudio_init();         // init soundcard driver
+    kmaudio_getDeviceList();// get sound devices
+    init_packer();          // init PSK packer/unpacker
+    initFEC();              // init FEC calculator
+    ws_init();              // init Websocket
 
     // start udp RX to listen for broadcast search message from Application
     UdpRxInit(&BC_sock_AppToModem, UdpBCport_AppToModem, &bc_rxdata, &keeprunning);
@@ -210,12 +214,16 @@ int main(int argc, char* argv[])
     // start udp RX for data from application
     UdpRxInit(&DATA_sock_AppToModem, UdpDataPort_AppToModem, &appdata_rxdata, &keeprunning);
 
+    // start udp RX to listen for data from external program
+    // these data will be sent via QO100 (i.e.: to the receiver's websocket)
+    UdpRxInit(&DATA_sock_ExtToModem, UdpDataPort_ExtWebdata, &ext_rxdata, &keeprunning);
+
     printf("QO100modem initialised and running\n");
 
     while (keeprunning)
     {
         int wait = 1;
-
+        
         if (restart_modems == 1)
         {
             printf("restart modem requested\n");
@@ -352,9 +360,10 @@ SPEEDRATE sr[NUMSPEEDMODES] = {
 
 void startModem()
 {
-    printf("startModem\n");
+    printf("startModem. Speedmode:%d\n",set_speedmode);
     close_dsp();
     close_rtty();
+    fifo_clear(PSK_GUI_TX);
     speedmode = set_speedmode;
     if (speedmode < 0 || speedmode >= NUMSPEEDMODES)
         speedmode = 4;
@@ -367,7 +376,6 @@ void startModem()
     rxPreInterpolfactor = sr[speedmode].rx;
     linespeed = sr[speedmode].linespeed;
     opusbitrate = sr[speedmode].codecrate;
-
     // int TX audio and modulator
     io_capidx = kmaudio_startCapture(captureDeviceName, caprate);
     if (io_capidx == -1)
@@ -375,7 +383,7 @@ void startModem()
         printf("CAP: cannot open device: %s\n", captureDeviceName);
         return;
     }
-
+    
     io_pbidx = kmaudio_startPlayback(playbackDeviceName, caprate);
     if (io_pbidx == -1)
     {
@@ -384,6 +392,7 @@ void startModem()
     }
 
     _init_fft();
+    
     if (speedmode < 10)
     {
         init_dsp();
@@ -393,7 +402,6 @@ void startModem()
         rtty_txoff = 1;
         init_rtty();
     }
-
     init_tune();
 }
 
@@ -435,7 +443,7 @@ void initVoice()
     }
 }
 
-// called from UDP callback ! DO NOT call any system functions
+// called from UDP callback
 void setSpeedmode(int spm)
 {
     printf("set speedmode:%d\n", spm);
@@ -475,7 +483,7 @@ uint8_t *getDevList(int* plen)
     txdata[2] = (io_pbidx != -1 && devlist[io_pbidx].working) ? '1' : '0';
     txdata[3] = (voice_capidx != -1 && devlist[voice_capidx].working) ? '1' : '0';
     txdata[4] = (voice_pbidx != -1 && devlist[voice_pbidx].working) ? '1' : '0';
-
+    
     return txdata;
 }
 
@@ -501,12 +509,14 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         * 6 ... safe mode number
         * 7 ... send Intro
         * 8 ... rtty autosync
-        * 9 ... unused
-        * 10 .. 109 ... PB device name
-        * 110 .. 209 ... CAP device name
-        * 210 .. 229 ... Callsign
-        * 230 .. 239 ... qthloc
-        * 240 .. 259 ... Name
+        * 9 ... hsmodem speed mode
+        * 10 .. external data IF on/off
+        * 11-19 ... unused
+        * 20 .. 119 ... PB device name
+        * 120 .. 219 ... CAP device name
+        * 220 .. 239 ... Callsign
+        * 230 .. 249 ... qthloc
+        * 250 .. 269 ... Name
         */
 
         char rxip[20];
@@ -555,22 +565,31 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
                 return;
         }
 
-        memcpy(mycallsign, pdata + 210, sizeof(mycallsign));
+        memcpy(mycallsign, pdata + 220, sizeof(mycallsign));
         mycallsign[sizeof(mycallsign) - 1] = 0;
 
-        memcpy(myqthloc, pdata + 230, sizeof(myqthloc));
+        memcpy(myqthloc, pdata + 240, sizeof(myqthloc));
         myqthloc[sizeof(myqthloc) - 1] = 0;
 
-        memcpy(myname, pdata + 240, sizeof(myname));
+        memcpy(myname, pdata + 250, sizeof(myname));
         myname[sizeof(myname) - 1] = 0;
+
+        if(pdata[9] != 255 && set_speedmode != pdata[9])
+            setSpeedmode(pdata[9]);
 
         //printf("<%s> <%s> <%s>\n", mycallsign, myqthloc, myname);
 
         //printf("%d %d %d %d %d %d %d \n",pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], pdata[6], pdata[7]);
-        io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char*)(pdata + 10), (char*)(pdata + 110));
-        safemode = pdata[6];
+        io_setAudioDevices(pdata[1], pdata[2], pdata[3], pdata[4], pdata[5], (char*)(pdata + 20), (char*)(pdata + 120));
         sendIntro = pdata[7];
         rtty_autosync = pdata[8];
+
+        if (extData_active == 0 && pdata[10] == 1)
+            printf("ext.Data activated\n");
+        else if (extData_active == 1 && pdata[10] == 0)
+            printf("ext.Data deactivated\n");
+
+        extData_active = pdata[10];
 
         lastms = actms;
     }
@@ -583,12 +602,17 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     uint8_t minfo = pdata[1];
 
     //printf("from GUI: %d %d\n", pdata[0], pdata[1]);
-
+    
     // type values: see oscardata config.cs: frame types
+
     if (type == 16)
     {
-        // Byte 1 contains the speed mode index
-        setSpeedmode(pdata[1]);
+        // a bulletin file from the GUI
+        // has to be sent to webbrowsers via websocket
+        //printf("Bulletin contents:\n<%s>\n", pdata + 1);
+        // the first byte (16) is used as the external type specifier
+
+        ws_send(pdata, len);
         return;
     }
 
@@ -741,7 +765,7 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         if (type == 30)
         {
             // rtty key pressed
-            rtty_tx_write_fifo(minfo);
+            write_fifo(FIFO_RTTYTX,&minfo,1);
             return;
         }
 
@@ -753,11 +777,13 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
             len += pdata[2];
             len++; // the first toTX command
             //printf("hsmodem.cpp rtty_tx_write_fifo: ");
-            for (int i = 0; i < len; i++)
+            write_fifo(FIFO_RTTYTX, pdata+3,len);
+
+            /*for (int i = 0; i < len; i++)
             {
                 //printf("%c", pdata[3 + i]);
-                rtty_tx_write_fifo(pdata[3 + i]);
-            }
+                write_fifo(FIFO_RTTYTX, pdata[3 + i]);
+            }*/
             //printf("\n");
             return;
         }
@@ -773,12 +799,13 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         {
             // stop TX immediately
             rtty_txoff = 1;
-            clear_rtty_txfifo();
+            fifo_clear(FIFO_RTTYTX);
         }
     }
     if (type >= 29 && type <= 32) return;
 
     if (speedmode == 10) return;
+
 
     // here we are with payload data to be sent via the modulator
 
@@ -790,22 +817,12 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     
     //if (getSending() == 1) return;   // already sending (Array sending)
 
+    // send a payload
     if (minfo == 0 || minfo == 3)
     {
         // this is the first frame of a larger file
         sendAnnouncement();
-        // send first frame multiple times, like a preamble, to give the
-        // receiver some time for synchronisation
-        // caprate: samples/s. This are symbols: caprate/txinterpolfactor
-        // and bits: symbols * bitsPerSymbol
-        // and bytes/second: bits/8 = (caprate/txinterpolfactor) * bitsPerSymbol / 8
-        // one frame has 258 bytes, so we need for 6s: 6* ((caprate/txinterpolfactor) * bitsPerSymbol / 8) /258 + 1 frames
-        toGR_sendData(pdata + 2, type, minfo,0);
-        int numframespreamble = 6 * ((caprate / txinterpolfactor) * bitsPerSymbol / 8) / 258 + 1;
-        //if (type == 1)// BER Test
-          //  numframespreamble = 1;
-        for (int i = 0; i < numframespreamble; i++)
-            toGR_sendData(pdata + 2, type, minfo,1);
+        toGR_sendData(pdata + 2, type, minfo, 5); // repeat the first frame a couple of times
         sendStationInfo();
     }
     else if ((len - 2) < PAYLOADLEN)
@@ -814,45 +831,63 @@ void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         uint8_t payload[PAYLOADLEN];
         memset(payload, 0, PAYLOADLEN);
         memcpy(payload, pdata + 2, len - 2);
-        toGR_sendData(payload, type, minfo,0);
-        if (safemode > 0)
-        {
-            for (int sm = 0; sm < safemode; sm++)
-                toGR_sendData(payload, type, minfo, 1);
-        }
-        if (minfo == 2)
-        {
-            // repeat last frame
-            for (int rl = 0; rl < (10 - safemode); rl++)
-                toGR_sendData(payload, type, minfo, 1);
-        }
+        
+        if (minfo == 2) // if its the last frame, repeate a couple of times
+            toGR_sendData(payload, type, minfo, 5);
+        else
+            toGR_sendData(payload, type, minfo, 0); // send only once
     }
     else
     {
-        toGR_sendData(pdata + 2, type, minfo,0);
-
-        if (safemode > 0)
-        {
-            for(int sm=0; sm < safemode; sm++)
-                toGR_sendData(pdata + 2, type, minfo, 1);
-        }
-        if (minfo == 2)
-        {
-            // repeat last frame
-            for(int rl = 0; rl < (10-safemode); rl ++)
-                toGR_sendData(pdata + 2, type, minfo, 1);
-        }
+        // normal sending: continous or last frame
+        if (minfo == 2) // if its the last frame, repeate a couple of times
+            toGR_sendData(pdata + 2, type, minfo, 5);
+        else
+            toGR_sendData(pdata + 2, type, minfo, 0);
     }
 }
 
+// pack and send PSK data
 void toGR_sendData(uint8_t* data, int type, int status, int repeat)
 {
+    modem_sendPSKData(data, type, status, repeat, PSK_GUI_TX);
+}
+
+// pack and send PSK data
+// handle repetitions and check if TX was down
+// repeat: 0=do not repeat, 1=repeat if currently not sending, >1 = number of repetitions
+void modem_sendPSKData(uint8_t* data, int type, int status, int repeat, int fifoID)
+{
+    // send the first frame normal (with a new frame counter value)
     int len = 0;
-    uint8_t* txdata = Pack(data, type, status, &len, repeat);
+    uint8_t* txdata = Pack(data, type, status, &len, 0);
+    if (txdata != NULL)
+    {
+        sendPSKdata(txdata, len, fifoID);
+    }
+    if (repeat == 0) return;
 
-    //showbytestring((char *)"TX: ", txdata, len);
+    // now check if repetitions are required
+    if (bitsPerSymbol == 0 || txinterpolfactor == 0) return; // just for security, no useful function
+    int repetitions = 6 * ((caprate / txinterpolfactor) * bitsPerSymbol / 8) / 258 + 1;
 
-    if (txdata != NULL) sendToModulator(txdata, len);
+    if (isPlaying(io_pbidx) == 0) // if not sending, repeat frame
+    {
+        if (repeat == 1)
+            repeat = repetitions;
+        else if (repeat > 1)
+        {
+            // if TX was down, do at least "repetitions" repetitions
+            if (repeat < repetitions) repeat = repetitions;
+        }
+    }
+
+    // and the rest repeated if requested
+    txdata = Pack(data, type, status, &len, 1);
+    for (int i = 0; i < repeat; i++)
+    {
+        if (txdata != NULL) sendPSKdata(txdata, len, fifoID);
+    }
 }
 
 void sendStationInfo()
@@ -869,7 +904,7 @@ void sendStationInfo()
 
     for (int i = 0; i < 2; i++)
     {
-        if (txdata != NULL) sendToModulator(txdata, len);
+        if (txdata != NULL) sendPSKdata(txdata, len, PSK_GUI_TX);
     }
 }
 
@@ -885,6 +920,13 @@ void GRdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     {
         // complete frame received
         //printf("type:%d\n", pl[0]);
+
+        if (pl[0] == 8)
+        {
+            // external data received
+            ext_modemRX(pl);
+        }
+
         // send payload to app
         uint8_t txpl[PAYLOADLEN + 10 + 1];
         memcpy(txpl + 1, pl, PAYLOADLEN + 10);

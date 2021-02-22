@@ -171,7 +171,8 @@ void sendCodecToModulator(uint8_t *pdata, int len)
         {
             // we have to check if the TX fifo has enough data. In case of an underrun the Q(8A)PSK signal will be distorted
             int us = io_fifo_usedspace(io_pbidx);
-            if (us < 20000)
+            if (us > 20000) break;  // too many data in playback fifo, do nothing
+            if (us < 5000)
             {
                 //printf("tx filler\n");
                 // not enough samples in the TX buffer

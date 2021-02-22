@@ -158,6 +158,7 @@ namespace oscardata
                             statics.tune_frequency = b[idx++];
                             statics.tune_frequency <<= 8;
                             statics.tune_frequency += b[idx++];
+                            statics.rtty_txon = b[idx++];
                             //Console.WriteLine("f:" + statics.tune_frequency);
                             Byte[] b1 = new byte[b.Length - idx];
                             Array.Copy(b, idx, b1, 0, b1.Length);
@@ -278,8 +279,8 @@ namespace oscardata
         static int fftw = 410, ffth = 72;
         static Bitmap bmskala = new Bitmap(fftw,ffth);
         static bool bmf = false;
-        static Font fnt = new Font("Verdana", 9.0f);
-        static Font smallfnt = new Font("Verdana", 7.0f);
+        static Font fnt = new Font("Verdana", 10.0f);
+        static Font smallfnt = new Font("Verdana", 8.0f);
         static Pen penyl = new Pen(Brushes.Yellow, 1);
         static Pen pengn = new Pen(Brushes.LightGreen, 3);
 
@@ -294,6 +295,7 @@ namespace oscardata
                 bmf = true;
                 Pen pen = new Pen(Brushes.Navy, 1);
                 Pen pensolid = new Pen(Brushes.Navy, 1);
+                Pen pensolidwhite = new Pen(Brushes.White, 1);
                 pen.DashPattern = new float[] { 1.0F, 2.0F, 1.0F, 2.0F };
                 Pen penred = new Pen(Brushes.Red, 1);
                 Pen penred2 = new Pen(Brushes.Red, 2);
@@ -306,20 +308,28 @@ namespace oscardata
                     for (int x = 10; x <= 390; x += 10)
                         gr.DrawLine(pen, x, yl, x, yh);
 
-                    gr.DrawLine(penred2, 11, yl, 10, yh);
+                    gr.DrawLine(penred2, 11, yl, 11, yh);
                     gr.DrawLine(penred, 150, yl, 150, yh);
                     gr.DrawLine(pensolid, 20, yl, 20, yh);
                     gr.DrawLine(pensolid, 280, yl, 280, yh);
                     gr.DrawLine(pensolid, 360, yl, 360, yh);
 
+                    gr.DrawLine(pensolidwhite, 11, 12, 11,20);
+                    gr.DrawLine(pensolidwhite, 150, yl + 2, 150, yl + 7);
+                    gr.DrawLine(pensolidwhite, 20, yl + 2, 20, yl + 7);
+                    gr.DrawLine(pensolidwhite, 280, yl + 2, 280, yl + 7);
+                    gr.DrawLine(pensolidwhite, 360, yl+2, 360, yl+7);
+
                     gr.DrawRectangle(penred, 15, yh, 270, yl-yh);
 
-                    gr.DrawString("200", smallfnt, Brushes.Black, 8, yl);
-                    gr.DrawString("1500", smallfnt, Brushes.Black, 135, yl);
-                    gr.DrawString("2800", smallfnt, Brushes.Black, 265, yl);
-                    gr.DrawString("3600", smallfnt, Brushes.Black, 345, yl);
+                    gr.DrawString("200", smallfnt, Brushes.DarkBlue, 8, yl+7);
+                    gr.DrawString("1500", smallfnt, Brushes.DarkBlue, 135, yl + 7);
+                    gr.DrawString("2800", smallfnt, Brushes.DarkBlue, 267, yl + 7);
+                    gr.DrawString("3600", smallfnt, Brushes.DarkBlue, 345, yl + 7);
 
-                    gr.DrawString(statics.langstr[8], fnt, Brushes.Black, 100, 0);
+                    gr.DrawString(statics.langstr[8], fnt, Brushes.White, 100, 0);
+
+                    gr.DrawString("Ref", smallfnt, Brushes.LightCoral, 1, 0);
                 }
 
                 bmskala.MakeTransparent(Color.White);

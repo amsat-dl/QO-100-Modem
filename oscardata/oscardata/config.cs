@@ -24,9 +24,10 @@ namespace oscardata
         public static Byte BinaryFile = 5;
         public static Byte Audio = 6;
         public static Byte Userinfo = 7;
+        public static Byte ExternalDate = 8; // data from ext. application
 
         // the upper values are for internal use
-        public static Byte ResamplingRate = 16;
+        public static Byte BulletinFile = 16;
         public static Byte AutosendFile = 17;
         public static Byte AutosendFolder = 18;
         public static Byte Modem_shutdown = 19;
@@ -92,6 +93,9 @@ namespace oscardata
         public static String[] langstr;
         public static int tuning_active = 0;
         public static int tune_frequency = 1500;
+        public static int rtty_txon = 0;
+        public static Byte extData = 0;
+        public static String lastRXedHTMLfile = "";
 
         public static String[] getOwnIPs()
         {

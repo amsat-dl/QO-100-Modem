@@ -233,7 +233,7 @@ int io_fifo_elems_avail(int pipenum)
     elems = (io_wridx[pipenum] + AUDIO_FIFOFLEN - io_rdidx[pipenum]) % AUDIO_FIFOFLEN;
     UNLOCK(pipenum);
 
-    elems -= 10;
+    elems -= 10; // give some reserve
     return elems;
 }
 
@@ -241,12 +241,3 @@ int io_fifo_usedspace(int pipenum)
 {
     return AUDIO_FIFOFLEN - io_fifo_freespace(pipenum);
 }
-
-int io_fifo_usedpercent(int pipenum)
-{
-    int used = AUDIO_FIFOFLEN - io_fifo_freespace(pipenum);
-    int percent = (used * 100) / AUDIO_FIFOFLEN;
-    //printf("idx:%d used:%d size:%d percent:%d\n", pipenum, used, AUDIO_FIFOFLEN, percent);
-    return percent;
-}
-

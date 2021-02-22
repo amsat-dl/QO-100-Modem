@@ -66,7 +66,9 @@
 #include "codec2.h"
 #include "libkmaudio/soundio.h"
 #include "baudot.h"
+#include "fifo.h"
 #include "libkmaudio/libkmaudio.h"
+#include "websocket/websocketserver.h"
 
 #define jpg_tempfilename "rxdata.jpg"
 
@@ -127,37 +129,6 @@ void measure_speed_bps(int len);
 void initFEC();
 void GetFEC(uint8_t* txblock, int len, uint8_t* destArray);
 int cfec_Reconstruct(uint8_t* darr, uint8_t* destination);
-/*
-void io_pb_write_fifo_clear();
-int io_init_sound(char* pbname, char* capname);
-int io_pb_fifo_freespace(int nolock);
-void io_init_pipes();
-void io_clear_audio_fifos();
-void io_close_audio();
-int io_cap_read_fifo(float* data);
-void io_readAudioDevices();
-uint8_t* io_getAudioDevicelist(int* len);
-void io_pb_write_fifo(float sample);
-int io_pb_fifo_usedspace();
-int io_cap_fifo_usedPercent();
-int io_pb_read_fifo_num(float* data, int num);
-void io_clear_audio_fifos();
-int io_pb_fifo_usedBlocks();
-void io_voice_init_pipes();
-int io_mic_read_fifo(float* data);
-void io_ls_write_fifo(float sample);
-char* getDevID(char* devname, int io);
-int io_init_voice(char* lsname, char* micname);
-int min_int(int a, int b);
-void io_close_voice();
-int io_ls_read_fifo_num(float* data, int num);
-void io_mic_write_fifo(float sample);
-void write_sample_s16ne(char* ptr, double sample);
-int io_ls_fifo_usedspace();
-void write_sample_float32ne(char* ptr, double sample);
-void io_clear_voice_fifos();
-
-*/
 
 void io_setPBvolume(int v);
 void io_setCAPvolume(int v);
@@ -175,13 +146,15 @@ void modulator(uint8_t sym_in);
 
 void init_dsp();
 int demodulator();
-void sendToModulator(uint8_t* d, int len);
+void _sendToModulator(uint8_t* d, int len);
 void resetModem();
 void close_dsp();
 void _init_fft();
 void _exit_fft();
 void showbytestringf(char* title, float* data, int totallen, int anz);
 uint16_t* make_waterfall(float fre, int* retlen);
+void sendPSKdata(uint8_t* data, int len, int fifoID);
+void modem_sendPSKData(uint8_t* data, int type, int status, int repeat, int fifoID);
 
 void toCodecDecoder(uint8_t* pdata, int len);
 
@@ -212,26 +185,22 @@ void playIntro();
 float do_tuning(int send);
 void init_tune();
 float singleFrequency();
-int rtty_rx();
-void modifyRXfreq(float diff_Hz, int absolute);
 void showbytestring16(char* title, uint16_t* data, int anz);
-void rtty_sendChar(int c);
 void init_rtty();
-int do_rtty();
 void make_FFTdata(float f);
 void close_rtty();
 void close_a();
 void rtty_modifyRXfreq(int);
 void showbitstring(char* title, uint8_t* data, int totallen, int anz);
-void rtty_tx_write_fifo(char c);
-int rtty_tx_read_fifo(char* pc);
-void rtty_rx_write_fifo(char c);
-int rtty_rx_read_fifo(char* pc);
-void clear_rtty_txfifo();
 void fmtest();
-void rtty_init_pipes();
 void initVoice();
 void sendStationInfo();
+void ext_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock);
+void init_distributor();
+void ext_modemRX(uint8_t* pdata);
+int fifo_dataavail(int pipenum);
+void showbytestring32(char* title, uint32_t* data, int anz);
+void start_timer(int mSec, void(*timer_func_handler)(void));
 
 
 extern int speedmode;
@@ -262,7 +231,6 @@ extern int trigger_resetmodem;
 extern int rxlevel_deteced;
 extern int rx_in_sync;
 extern int restart_modems;
-extern int safemode;
 extern char homepath[];
 extern int sendIntro;
 extern int tuning;
@@ -280,7 +248,7 @@ extern float pbvol;
 extern float capvol;
 extern float lsvol;
 extern float micvol;
-
+extern int extData_active;
 
 #ifdef _LINUX_
 int isRunning(char* prgname);

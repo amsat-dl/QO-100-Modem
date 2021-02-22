@@ -108,11 +108,15 @@ uint8_t *Pack(uint8_t *payload, int type, int status, int *plen, int repeat)
     // polulate the raw frame
     
     // make the frame counter
-    if(repeat == 0 || type == 1) // 1=BER test
-        framecounter++;
+    // for type 8 (external app data) do not use frame counter
+    if (type != 8)
+    {
+        if (repeat == 0 || type == 1) // 1=BER test
+            framecounter++;
 
-    if (status == 0)
-        framecounter = 0;   // start of file
+        if (status == 0)
+            framecounter = 0;   // start of file
+    }
 
     // insert frame counter and status bits
     frame.counter_LSB = framecounter & 0xff;
@@ -367,7 +371,11 @@ uint8_t *getPayload(uint8_t *rxb)
     framenumrx <<= 8;
     framenumrx += frame.counter_LSB;        // frame counter LSB 
     
-    if (lastframenum != framenumrx) rx_status |= 4;
+    if ((lastframenum != framenumrx) && (lastframenum != ((framenumrx+1)%1024)))
+    {
+        
+        rx_status |= 4;
+    }
     lastframenum = framenumrx;
     if (++lastframenum >= 1024) lastframenum = 0; // 1024 = 2^10 (10 bit frame number)
     

@@ -34,7 +34,7 @@
 
 void kmaudio_close();
 
-//int keeprunning = 1;    // to stop callbacks at program end
+int keepcallbacksrunning = 1;    // to stop callbacks at program end
 
 int kmaudio_init()
 {
@@ -43,7 +43,7 @@ int kmaudio_init()
 
 	printf("libkmaudio_init\n");
 
-    keeprunning = 1;
+    keepcallbacksrunning = 1;
     init_pipes();       // init fifo
     init_maxarray();    // init array for maxlevel measurement
 
@@ -86,7 +86,7 @@ void kmaudio_close()
 #else
     kmaudio_close_linux();
 #endif
-    keeprunning = 0;
+    keepcallbacksrunning = 0;
 }
 /*
 // diagonstic routines for development

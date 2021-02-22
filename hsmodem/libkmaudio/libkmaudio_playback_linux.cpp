@@ -85,12 +85,20 @@ static void write_callback(struct SoundIoOutStream* outstream, int frame_count_m
         }
 
         float f[10000];
+        // if fifo does not have enough data, just send 0.. (silence)
+        // this gives the fifo a chance to fill up a bit
         memset(f, 0, sizeof(float) * frame_count);
         if (io_fifo_elems_avail(idx) >= frame_count)
         {
-            // if fifo does not have enough data, don't take any
-            // this gives the fifo a chance to fill up a bit
             io_read_fifo_num(idx, f, frame_count);
+            //if (devlist[idx].audio_playing == 0) printf("NOW PLAYING\n");
+            devlist[idx].audio_playing = 1;
+        }
+        else
+        {
+            // nothing to send
+            //if (devlist[idx].audio_playing == 1) printf("STOPS playing\n");
+            devlist[idx].audio_playing = 0;
         }
 
         //measure_speed_bps(frame_count);
@@ -132,8 +140,6 @@ static void write_callback(struct SoundIoOutStream* outstream, int frame_count_m
 
 void underflow_callback(struct SoundIoOutStream* outstream)
 {
-    static int count = 0;
-    printf("underflow %d\n", count++);
 }
 
 void close_playback_stream(int idx)
@@ -148,7 +154,7 @@ void close_playback_stream(int idx)
 int kmaudio_startPlayback(char* devname, int samprate)
 {
     printf("Start request for PB stream:%s\n", devname);
-
+    
     if (devname == NULL || strlen(devname) < 3)  // no devices defined yet
     {
         printf("no PB devices specified\n");
@@ -157,10 +163,11 @@ int kmaudio_startPlayback(char* devname, int samprate)
 
     int idx = 0; // index into devlist
     char* pbdevid = getDevID(devname, 1, &idx);
+    printf("idx:%d\n", idx);
     if (pbdevid == NULL) return -1;
 
     close_playback_stream(idx);
-
+    
     printf("Starting PB stream:%s [%d]\n", devname, idx);
 
     io_fifo_clear(idx);
@@ -199,7 +206,7 @@ int kmaudio_startPlayback(char* devname, int samprate)
         printf("soundio_outstream_create: out of memory\n");
         return 0;
     }
-
+    
     devlist[idx].requested_samprate = samprate;
     if (getRealSamprate(idx) == -1)
     {
@@ -209,7 +216,7 @@ int kmaudio_startPlayback(char* devname, int samprate)
 
     if (devlist[idx].requested_samprate != devlist[idx].real_samprate)
         resampler_create(idx);
-
+        
     devlist[idx].outstream->format = SoundIoFormatFloat32NE;
     devlist[idx].outstream->sample_rate = devlist[idx].real_samprate;
     devlist[idx].outstream->software_latency = 0.1f;
@@ -227,12 +234,13 @@ int kmaudio_startPlayback(char* devname, int samprate)
         printf("unable to start output device: %s", soundio_strerror(err));
         return -1;
     }
-
+    
     printf("selected PLAYBACK device:\nname:%s\nid  :%s\n", devname, pbdevid);
     printf("physical playback rate:%d, requested capture rate:%d\n", devlist[idx].real_samprate, devlist[idx].requested_samprate);
     printf("format: %s\n\n", soundio_format_string(devlist[idx].outstream->format));
-
+    
     devlist[idx].working = 1;
+    
     return idx;
 }
 

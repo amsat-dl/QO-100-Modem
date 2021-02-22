@@ -228,6 +228,7 @@
     <ClInclude Include="fec.h" />
     <ClInclude Include="fftw3.h" />
     <ClInclude Include="fftw_lib\fftw3.h" />
+    <ClInclude Include="fifo.h" />
     <ClInclude Include="frameformat.h" />
     <ClInclude Include="hsmodem.h" />
     <ClInclude Include="libkmaudio\endian.h" />
@@ -239,17 +240,23 @@
     <ClInclude Include="opus_types.h" />
     <ClInclude Include="symboltracker.h" />
     <ClInclude Include="udp.h" />
+    <ClInclude Include="websocket\base64.h" />
+    <ClInclude Include="websocket\sha1.h" />
+    <ClInclude Include="websocket\websocketserver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="announcement.cpp" />
     <ClCompile Include="codec2.cpp" />
     <ClCompile Include="constellation.cpp" />
     <ClCompile Include="crc16.cpp" />
+    <ClCompile Include="distrubution.cpp" />
+    <ClCompile Include="extdata.cpp" />
     <ClCompile Include="fec.cpp" />
     <ClCompile Include="fft.cpp" />
     <ClCompile Include="fifo.cpp" />
     <ClCompile Include="frame_packer.cpp" />
     <ClCompile Include="hsmodem.cpp" />
+    <ClCompile Include="kmtimer.cpp" />
     <ClCompile Include="libkmaudio\libkmaudio_capture.cpp" />
     <ClCompile Include="libkmaudio\libkmaudio_capture_linux.cpp" />
     <ClCompile Include="libkmaudio\libkmaudio_fifo.cpp" />
@@ -271,6 +278,12 @@
     <ClCompile Include="udp.cpp" />
     <ClCompile Include="voiceprocessor.cpp" />
     <ClCompile Include="volume.cpp" />
+    <ClCompile Include="websocket\base64.cpp" />
+    <ClCompile Include="websocket\handshake.cpp" />
+    <ClCompile Include="websocket\sha1.cpp" />
+    <ClCompile Include="websocket\websocketserver.cpp" />
+    <ClCompile Include="websocket\ws.cpp" />
+    <ClCompile Include="websocket\ws_callbacks.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

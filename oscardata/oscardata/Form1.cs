@@ -31,6 +31,8 @@ using System.Diagnostics;
 using System.Threading;
 using oscardata.Properties;
 using System.Reflection;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace oscardata
 {
@@ -50,7 +52,7 @@ namespace oscardata
         int recPhase = 0;
         const int Rtty_deftext_anz = 20;
         String[] Rtty_deftext = new string[Rtty_deftext_anz];
-        
+        DateTime dtfile = DateTime.UtcNow;
 
         public Form1()
         {
@@ -167,10 +169,10 @@ namespace oscardata
                     button_sendimage.Enabled = false;
             }
 
-            if (TXfoldername == "" || lastFullName == "")
+            /*if (TXfoldername == "" || lastFullName == "")
                 cb_loop.Enabled = false;
             else
-                cb_loop.Enabled = true;
+                cb_loop.Enabled = true;*/
 
             ShowTXstatus();
 
@@ -183,10 +185,33 @@ namespace oscardata
                     if (ArraySend.getSending() == false)
                     {
                         // transmission is finished, wait until data in TXfifo have been sent
-                        if (statics.PBfifousage < 2)
+                        if (statics.PBfifousage < 4)
                         {
                             // start sending a new picture
                             startNextImage();
+                        }
+                    }
+                }
+            }
+
+            if (txcommand == statics.AsciiFile || txcommand == statics.HTMLFile || txcommand == statics.BinaryFile)
+            {
+                // if "loop" is selected send the next image in folder
+                if (cb_file_loop.Checked)
+                {
+                    // check pause time
+                    if(retransmitPause() == false)
+                    {
+                        // check if we are ready with any transmission
+                        if (ArraySend.getSending() == false)
+                        {
+                            // transmission is finished, wait until data in TXfifo have been sent
+                            if (statics.PBfifousage < 4)
+                            {
+                                // start sending a new picture
+                                startNextFile();
+                                dtfile = DateTime.UtcNow;
+                            }
                         }
                     }
                 }
@@ -251,7 +276,7 @@ namespace oscardata
             if (setPBvolume >= 0)
             {
                 Byte[] txdata = new byte[2];
-                txdata[0] = (Byte)statics.SetPBvolume;
+                txdata[0] = statics.SetPBvolume;
                 txdata[1] = (Byte)setPBvolume;
                 Udp.UdpSendCtrl(txdata);
                 setPBvolume = -1;
@@ -260,7 +285,7 @@ namespace oscardata
             if (setCAPvolume != -1)
             {
                 Byte[] txdata = new byte[2];
-                txdata[0] = (Byte)statics.SetCAPvolume;
+                txdata[0] = statics.SetCAPvolume;
                 txdata[1] = (Byte)setCAPvolume;
                 Udp.UdpSendCtrl(txdata);
                 setCAPvolume = -1;
@@ -269,7 +294,7 @@ namespace oscardata
             if (setLSvolume >= 0)
             {
                 Byte[] txdata = new byte[2];
-                txdata[0] = (Byte)statics.SetLSvolume;
+                txdata[0] = statics.SetLSvolume;
                 txdata[1] = (Byte)setLSvolume;
                 Udp.UdpSendCtrl(txdata);
                 setLSvolume = -1;
@@ -278,7 +303,7 @@ namespace oscardata
             if (setMICvolume != -1)
             {
                 Byte[] txdata = new byte[2];
-                txdata[0] = (Byte)statics.SetMICvolume;
+                txdata[0] = statics.SetMICvolume;
                 txdata[1] = (Byte)setMICvolume;
                 Udp.UdpSendCtrl(txdata);
                 setMICvolume = -1;
@@ -313,6 +338,35 @@ namespace oscardata
 
                 last_initVoiceStatus = statics.initVoiceStatus;
             }
+        }
+
+        bool sendInProgress = false;
+        bool retransmitPause()
+        {
+            // check if file send is in progress
+            bool fstat = statics.PBfifousage > 1;
+            if (fstat == true)
+            {
+                // file send in progress
+                sendInProgress = true;
+                return true;
+            }
+
+            if(fstat == false && sendInProgress == true)
+            {
+                // just finished sending
+                sendInProgress = false;
+                dtfile = DateTime.UtcNow;
+                return true;
+            }
+
+            // not sending, wait until pause time elapsed
+            String s = cb_file_pause.Text;
+            int dur = int.Parse(Regex.Match(s, @"\d+").Value, NumberFormatInfo.InvariantInfo);
+            if (s.Contains("min")) dur *= 60;
+            TimeSpan ts = DateTime.UtcNow - dtfile;
+            if (ts.TotalSeconds >= dur) return false;
+            return true;
         }
 
         // correct entries in the Audio Device Comboboxes if devices have changed
@@ -362,7 +416,7 @@ namespace oscardata
         {
             // tell hsmodem to terminate itself
             Byte[] txdata = new byte[1];
-            txdata[0] = (Byte)statics.terminate;
+            txdata[0] = statics.terminate;
             Udp.UdpSendCtrl(txdata);
 
             Thread.Sleep(250);
@@ -456,8 +510,15 @@ namespace oscardata
                         {
                             // reception complete, show stored file
                             Console.WriteLine("load " + recfile.filename);
-                            pictureBox_rximage.BackgroundImage = Image.FromFile(recfile.filename);
-                            pictureBox_rximage.Invalidate();
+                            try
+                            {
+                                pictureBox_rximage.BackgroundImage = Image.FromFile(recfile.filename);
+                                pictureBox_rximage.Invalidate();
+                            }
+                            catch
+                            {
+                                // invalid picture
+                            }
                         }
                         if (recfile.pbmp != null)
                         {
@@ -474,7 +535,7 @@ namespace oscardata
                 if (rxtype == statics.AsciiFile)
                 {
                     int fret = recfile.receive(rxd);
-                    if (fret == 1)
+                    if (fret >= 1)
                     {
                         // ASCII file received, show in window
                         String serg = File.ReadAllText(recfile.filename);
@@ -487,13 +548,15 @@ namespace oscardata
                 if (rxtype == statics.HTMLFile)
                 {
                     int fret = recfile.receive(rxd);
-                    if (fret == 1)
+                    if (fret >= 1)
                     {
                         // HTML file received, show in window
                         String serg = File.ReadAllText(recfile.filename);
                         printText(rtb_RXfile, serg);
-                        // and show in browser
-                        OpenUrl(recfile.filename);
+                        // save filename
+                        statics.lastRXedHTMLfile = recfile.filename;
+                        // show the HTML-Show Button
+                        bt_open_html.Visible = true;
                     }
                     if (fret == -5)
                         printBadBlocks();
@@ -502,7 +565,7 @@ namespace oscardata
                 if (rxtype == statics.BinaryFile)
                 {
                     int fret = recfile.receive(rxd);
-                    if (fret == 1)
+                    if (fret >= 1)
                     {
                         // Binary file received, show statistics in window
                         try
@@ -661,7 +724,6 @@ namespace oscardata
             if (ba != null)
             {
                 int rtty_val = ba[0];
-                rtty_txon = ba[1];
                 rtty_sync = ba[2];
                 if (rtty_val != 0)
                 {
@@ -683,7 +745,7 @@ namespace oscardata
                     }
                 }
             }
-            if (rtty_txon == 1)
+            if (statics.rtty_txon == 1)
             {
                 bt_rtty_tx.BackColor = Color.Red;
                 tb_rtty_TX.Enabled = true;
@@ -702,6 +764,7 @@ namespace oscardata
             RTTYmousepos.X = e.X;
             RTTYmousepos.Y = e.Y;
             int cidx = tb_rtty_RX.GetCharIndexFromPosition(RTTYmousepos);
+            Console.WriteLine("cidx: " + cidx.ToString());
 
             // get the word under this position
             // text after pos
@@ -853,6 +916,7 @@ namespace oscardata
         long TXRealFileSize = 0;
         String TXfoldername = "";
         String lastFullName = "";
+        String TXfullfilename = "";
 
         // prepare an image file for transmission
         void prepareImage(String fullfn)
@@ -860,10 +924,10 @@ namespace oscardata
             if (statics.checkImage(fullfn) == false) return;
 
             // all images are converted to jpg, make the new filename
+            TXfullfilename = fullfn;
             TXfoldername = statics.purePath(fullfn);
             TXRealFilename = statics.pureFilename(fullfn);
             TXRealFilename = statics.AddReplaceFileExtension(TXRealFilename,"jpg");
-            lastFullName = fullfn;
 
             // random filename for picturebox control (picturebox cannot reload image from actual filename)
             try {
@@ -888,11 +952,13 @@ namespace oscardata
             if (cb_stampcall.Checked == false) cs = "";
             String inf = tb_info.Text;
             if (cb_stampinfo.Checked == false) inf = "";
-            if (!checkBox_big.Checked)
+            Size picsize = getResolution();
+            if(picsize.Width != 0 && picsize.Height != 0)
             {
-                img = ih.ResizeImage(img, 320, 240, cs, inf);
-                // set quality by reducing the file size and save under default name
-                ih.SaveJpgAtFileSize(img, TXimagefilename, max_size / 2);
+                int reduc = 640 / picsize.Width;
+                if (reduc < 1) reduc = 1;
+                img = ih.ResizeImage(img, picsize.Width, picsize.Height, cs, inf);
+                ih.SaveJpgAtFileSize(img, TXimagefilename, max_size/ reduc);
             }
             else
             {
@@ -901,11 +967,30 @@ namespace oscardata
                 ih.SaveJpgAtFileSize(img, TXimagefilename, max_size);
             }
 
-            //pictureBox_tximage.Load(TXimagefilename); this does not work under ARM mono
+            //pictureBox_tximage.Load(TXimagefilename); // this does not work under ARM mono
             pictureBox_tximage.BackgroundImage = Image.FromFile(TXimagefilename);
             TXRealFileSize = statics.GetFileSize(TXimagefilename);
             ShowTXstatus();
             txcommand = statics.Image;
+        }
+                
+        Size getResolution()
+        {
+            Size sz = new Size(0,0);
+
+            String r = cb_picres.Text;
+            String[] ra = r.Split(new char[] { 'x' });
+            try
+            {
+                int w = Convert.ToInt32(ra[0]);
+                int h = Convert.ToInt32(ra[1]);
+                sz.Width = w;
+                sz.Height = h;
+            }
+            catch { }
+
+
+            return sz;
         }
 
         void ShowTXstatus()
@@ -952,8 +1037,51 @@ namespace oscardata
             button_sendimage_Click(null, null);
         }
 
+        // in loop mode only: send the next picture in current image folder
+        void startNextFile()
+        {
+            if (lastFullName == "") return;
+
+            // read all file from folder
+            String folder = Path.GetDirectoryName(lastFullName);
+            String[] files = Directory.GetFiles(folder);
+            Array.Sort(files);
+            int i;
+            bool found = false;
+            for (i = 0; i < files.Length; i++)
+            {
+                // look for the last transmitted file
+                if (files[i] == lastFullName)
+                {
+                    // choose the next file
+                    if (++i == files.Length) i = 0;
+                    // check if the file is valid
+                    try
+                    {
+                        long sz = statics.GetFileSize(files[i]);
+                        if (sz < 1000000)
+                        {
+                            // do not try to send a file > 1MB
+                            found = true;
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        lastFullName = files[i];
+                    }
+                }
+            }
+            if (!found) return;
+
+            // files[i] is the filename to be sent
+            bt_prepareAndSendFile(files[i], Path.GetFileName(files[i]), statics.BinaryFile);
+            bt_file_send_Click(null, null);
+        }
+
         private void button_loadimage_Click(object sender, EventArgs e)
         {
+            lastFullName = "";
             OpenFileDialog open = new OpenFileDialog();
             open.Filter = statics.langstr[13];
             if (open.ShowDialog() == DialogResult.OK)
@@ -964,6 +1092,7 @@ namespace oscardata
 
         private void button_sendimage_Click(object sender, EventArgs e)
         {
+            lastFullName = TXfullfilename;
             txcommand = statics.Image;
             rxbytecounter = 0;
             pictureBox_rximage.Image = null;
@@ -1207,9 +1336,22 @@ namespace oscardata
                     //Console.WriteLine("BCip: " + ip);
                 }
             }*/
+
+            // if hsmodem is local, use local IP instead of broadcast
+            if (cb_autostart.Checked)
+            {
+                String[] myips = statics.getOwnIPs();
+                if (myips.Length >= 1)
+                {
+                    statics.MyIP = myips[0];
+                }
+                return statics.MyIP;
+            }
+
+
             return ip;
         }
-                
+
         /*
          * search for the modem IP:
          * send a search message via UDP to port UdpBCport
@@ -1226,69 +1368,84 @@ namespace oscardata
          * 4 ... DV loudspeaker volume
          * 5 ... DV mic volume
          * 6 ... safe mode
-         * 7..9 ... unused
-         * 10 .. 109 ... PB device name
-         * 110 .. 209 ... CAP device name
+         * 7 ... send introduction voice record
+         * 8 ... rtty autosync on/off
+         * 9 ... hsmodem speed mode
+         * 10 .. external data IF on/off
+         * 11-19 ... unused
+         * 20 .. 119 ... PB device name
+         * 120 .. 219 ... CAP device name
+         * 220 .. 239 ... Callsign
+         * 230 .. 249 ... qthloc
+         * 250 .. 269 ... Name
          * 
         */
 
         private void search_modem()
         {
-            Byte safemode = 0; //number of frame repeats
-            if (cb_safemode.Text.Contains("medium")) safemode = 2;
-            else if (cb_safemode.Text.Contains("high")) safemode = 4;
+            Byte[] txb = new byte[270];
+            int idx = 0;
+            txb[idx++] = 0x3c;  // ID of this message
+            txb[idx++] = (Byte)tb_PBvol.Value;
+            txb[idx++] = (Byte)tb_CAPvol.Value;
+            txb[idx++] = (Byte)cb_announcement.Items.IndexOf(cb_announcement.Text);
+            txb[idx++] = (Byte)tb_loadspeaker.Value;
+            txb[idx++] = (Byte)tb_mic.Value;
+            txb[idx++] = 0; // unused
+            txb[idx++] = (Byte)(cb_sendIntro.Checked?1:0);
+            txb[idx++] = (Byte)(cb_rx_autosync.Checked ? 1 : 0);
+            if(cb_speed.DroppedDown == false)
+                txb[idx++] = (Byte)cb_speed.SelectedIndex;
+            else
+                txb[idx++] = (Byte)255; // invalid, hsmodem does not use this value
+            txb[idx++] = (Byte)(cb_extIF.Checked ? 1 : 0);
 
-            Byte[] txb = new byte[260];
-            txb[0] = 0x3c;  // ID of this message
-            txb[1] = (Byte)tb_PBvol.Value;
-            txb[2] = (Byte)tb_CAPvol.Value;
-            txb[3] = (Byte)cb_announcement.Items.IndexOf(cb_announcement.Text);
-            txb[4] = (Byte)tb_loadspeaker.Value;
-            txb[5] = (Byte)tb_mic.Value;
-            txb[6] = safemode;
-            txb[7] = (Byte)(cb_sendIntro.Checked?1:0);
-            txb[8] = (Byte)(cb_rx_autosync.Checked ? 1 : 0);
-            txb[9] = (Byte)0;   // unused
 
             Byte[] bpb = statics.StringToByteArrayUtf8(cb_audioPB.Text);
             Byte[] bcap = statics.StringToByteArrayUtf8(cb_audioCAP.Text);
             //Byte[] bpb = statics.StringToByteArray(cb_audioPB.Text);
             //Byte[] bcap = statics.StringToByteArray(cb_audioCAP.Text);
 
-            // 200 Bytes (from 10..209) name of selected sound device
+            // 200 Bytes (from 20..219) name of selected sound device
             for (int i=0; i<100; i++)
             {
                 if (i >= bpb.Length)
-                    txb[i + 10] = 0;
+                    txb[i + 20] = 0;
                 else
-                    txb[i+10] = bpb[i];
+                    txb[i + 20] = bpb[i];
 
                 if (i >= bcap.Length)
-                    txb[i + 110] = 0;
+                    txb[i + 120] = 0;
                 else
-                    txb[i + 110] = bcap[i];
+                    txb[i + 120] = bcap[i];
             }
 
-            // 210 .. 229 = Callsign
+            // 220 .. 239 = Callsign
             Byte[] callarr = statics.StringToByteArray(tb_callsign.Text);
             for (int i = 0; i < 20; i++)
             {
-                if (i >= callarr.Length) txb[i+210] = 0;
-                else txb[i + 210] = callarr[i];
+                if (i >= callarr.Length) 
+                    txb[i + 220] = 0;
+                else 
+                    txb[i + 220] = callarr[i];
             }
-            // 230 .. 239 = qthloc
+            // 240 .. 249 = qthloc
             Byte[] qtharr = statics.StringToByteArray(tb_myqthloc.Text);
             for (int i = 0; i < 10; i++)
             {
-                if (i >= qtharr.Length) txb[i + 230] = 0;
-                else txb[i+230] = qtharr[i];
+                if (i >= qtharr.Length) 
+                    txb[i + 240] = 0;
+                else 
+                    txb[i + 240] = qtharr[i];
             }
-            // 240 .. 259 = Name
+            // 250 .. 269 = Name
             Byte[] namearr = statics.StringToByteArray(tb_myname.Text);
             for (int i = 0; i < 20; i++)
             {
-                if (i >= namearr.Length) txb[i+240] = 0;
-                else txb[i + 240] = namearr[i];
+                if (i >= namearr.Length) 
+                    txb[i + 250] = 0;
+                else 
+                    txb[i + 250] = namearr[i];
             }
 
             if (statics.ModemIP == "1.2.3.4")
@@ -1316,6 +1473,7 @@ namespace oscardata
 
             Byte[] textarr = File.ReadAllBytes(statics.zip_TXtempfilename);
             ArraySend.Send(textarr, (Byte)txcommand, TXfilename, TXRealFilename);
+            lastFullName = TXfilename;
         }
 
         private void bt_file_ascii_Click(object sender, EventArgs e)
@@ -1335,38 +1493,32 @@ namespace oscardata
 
         private void bt_sendFile(String filter, int cmd)
         {
+            lastFullName = "";
             OpenFileDialog open = new OpenFileDialog();
             open.Filter = filter;
             if (open.ShowDialog() == DialogResult.OK)
             {
-                txcommand = cmd;
-                TXfilename = open.FileName;
-                TXRealFilename = open.SafeFileName;
-                if (txcommand == statics.BinaryFile)
-                    rtb_TXfile.Text = statics.langstr[20] + TXfilename + statics.langstr[21];
-                else
-                    rtb_TXfile.Text = File.ReadAllText(TXfilename);
-
-                // compress file
-                ZipStorer zs = new ZipStorer();
-                zs.zipFile(statics.zip_TXtempfilename, open.SafeFileName, open.FileName);
-
-                TXRealFileSize = statics.GetFileSize(statics.zip_TXtempfilename);
-                ShowTXstatus();
+                bt_prepareAndSendFile(open.FileName, open.SafeFileName, cmd);
             }
         }
 
-        /*void removeTab(TabPage tb)
+        private void bt_prepareAndSendFile(String FilenameAndPath, String Filename, int txcmd)
         {
-            if (tabControl1.TabPages.IndexOf(tb) != -1)
-                tabControl1.TabPages.Remove(tb);
-        }
+            txcommand = txcmd;
+            TXfilename = FilenameAndPath;
+            TXRealFilename = Filename;
+            if (txcommand == statics.BinaryFile)
+                rtb_TXfile.Text = statics.langstr[20] + TXfilename + statics.langstr[21];
+            else
+                rtb_TXfile.Text = File.ReadAllText(TXfilename);
 
-        void addTab(int idx, TabPage tb)
-        {
-            if (tabControl1.TabPages.IndexOf(tb) == -1)
-                tabControl1.TabPages.Insert(idx,tb);
-        }*/
+            // compress file
+            ZipStorer zs = new ZipStorer();
+            zs.zipFile(statics.zip_TXtempfilename, Filename, FilenameAndPath);
+
+            TXRealFileSize = statics.GetFileSize(statics.zip_TXtempfilename);
+            ShowTXstatus();
+        }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1395,6 +1547,8 @@ namespace oscardata
                 removeTab(tabPage_rtty);*/
             }
 
+            if (cb_speed.Text.Contains("1200")) statics.real_datarate = 1200;
+            if (cb_speed.Text.Contains("2400")) statics.real_datarate = 2400;
             if (cb_speed.Text.Contains("3000")) statics.real_datarate = 3000;
             if (cb_speed.Text.Contains("4000")) statics.real_datarate = 4000;
             if (cb_speed.Text.Contains("4410")) statics.real_datarate = 4410;
@@ -1404,13 +1558,17 @@ namespace oscardata
             if (cb_speed.Text.Contains("6600")) statics.real_datarate = 6600;
             if (cb_speed.Text.Contains("7200")) statics.real_datarate = 7200;
 
-            Byte[] txdata = new byte[statics.PayloadLen + 2];
+            /*Byte[] txdata = new byte[statics.PayloadLen + 2];
             int idx = cb_speed.SelectedIndex;
             txdata[0] = (Byte)statics.ResamplingRate; // BER Test Marker
             txdata[1] = (Byte)idx;
 
+            
+
             // and send info to modem
-            Udp.UdpSendCtrl(txdata);
+            Udp.UdpSendCtrl(txdata);*/
+
+            String s = cb_speed.Text;
 
             txcommand = statics.noTX;
             // stop any ongoing transmission
@@ -1689,10 +1847,10 @@ namespace oscardata
             switch(i)
             {
                 case 0: 
-                    Rtty_deftext[0] = "\r\n\r\nCQ CQ CQ de %m CQ CQ CQ de %m pse k k k\r\n%r";    // CQ call
+                    Rtty_deftext[0] = "\r\n\r\nRYRYRYRYRYRYRYRYRYRY\r\nCQ CQ CQ de %m CQ CQ CQ de %m pse k k k\r\n%r";    // CQ call
                     break;
                 case 1: 
-                    Rtty_deftext[1] = "\r\n\r\n%c de %m pse k k k\r\n%r";                         // answer CQ call
+                    Rtty_deftext[1] = "\r\n\r\n%c %c de %m %m %m pse k k k\r\n%r";                         // answer CQ call
                     break;
                 case 2:
                     Rtty_deftext[2] = "\r\n\r\n%c de %m\r\n";                                     // start TX
@@ -1724,7 +1882,7 @@ namespace oscardata
             if (dr == DialogResult.Yes)
             {
                 Byte[] txdata = new byte[1];
-                txdata[0] = (Byte)statics.Modem_shutdown;
+                txdata[0] = statics.Modem_shutdown;
                 Udp.UdpSendCtrl(txdata);
 
                 MessageBox.Show(statics.langstr[24], statics.langstr[22], MessageBoxButtons.OK);
@@ -1736,7 +1894,7 @@ namespace oscardata
         private void button1_Click(object sender, EventArgs e)
         {
             Byte[] txdata = new byte[1];
-            txdata[0] = (Byte)statics.AutosendFile;
+            txdata[0] = statics.AutosendFile;
 
             // and transmit it
             Udp.UdpSendCtrl(txdata);
@@ -1745,7 +1903,7 @@ namespace oscardata
         private void bt_resetmodem_Click(object sender, EventArgs e)
         {
             Byte[] txdata = new byte[1];
-            txdata[0] = (Byte)statics.ResetModem;
+            txdata[0] = statics.ResetModem;
 
             // and transmit it
             Udp.UdpSendCtrl(txdata);
@@ -2019,7 +2177,6 @@ namespace oscardata
                 cb_sendIntro.Text = "send introduction before TX";
                 tb_recintro.Text = "record introduction";
                 lb_tuningqrgs.Text = "Send Marker Frequency:";
-                label13.Text = "Data Security:";
                 textBox5.Text = "Click on Callsign or Name in RX window";
                 textBox2.Text = @"Special Markers:
 %m... my call
@@ -2043,6 +2200,11 @@ namespace oscardata
                 bt_rtty_myinfo.Text = "My Info";
                 bt_rtty_station.Text = "My Station";
                 textBox6.Text = "or double click in spectrum";
+                textBox7.Text = "for advanced users only, see developers manual";
+                bt_open_html.Text = "Open received " + Environment.NewLine + "HTML file";
+                groupBox8.Text = "Send all files in folder";
+                cb_file_loop.Text = "ON / off";
+                label13.Text = "Pause between files";
             }
 
             if (language == 1)
@@ -2098,7 +2260,6 @@ namespace oscardata
                 cb_sendIntro.Text = "sende Vorstellung vor TX";
                 tb_recintro.Text = "Vorstellung aufnehmen";
                 lb_tuningqrgs.Text = "Sende Frequenzmarkierung:";
-                label13.Text = "Datensicherheit:";
                 textBox5.Text = "Klicke auf Rufzeichen und Namen im RX Fenster";
                 textBox2.Text = @"Spezialzeichen:
 %m... mein Rufzeichen
@@ -2122,6 +2283,11 @@ namespace oscardata
                 bt_rtty_myinfo.Text = "Meine Info";
                 bt_rtty_station.Text = "Meine Station";
                 textBox6.Text = "oder Doppelklick in Spektrum";
+                textBox7.Text = "nur für spezielle Nutzer, siehe Entwickler - Dokumentation";
+                bt_open_html.Text = "Öffne empfangene" + Environment.NewLine + "HTML Datei";
+                groupBox8.Text = "TX alle Dateien im Verz.";
+                cb_file_loop.Text = "EIN / aus";
+                label13.Text = "Pause zwischen Dateien";
             }
         }
 
@@ -2488,13 +2654,12 @@ namespace oscardata
                 ShowRTTYtext(selected_rtty_deftext, 0);
         }
 
-        int rtty_txon = 0;
         int rtty_sync = 0;
         private void bt_rtty_tx_Click(object sender, EventArgs e)
         {
             Byte[] txdata = new byte[2];
             txdata[0] = statics.txonoff;
-            txdata[1] = (Byte)((rtty_txon==1)?0:1);
+            txdata[1] = (Byte)((statics.rtty_txon==1)?0:1);
             Udp.UdpSendCtrl(txdata);
         }
 
@@ -2592,5 +2757,18 @@ namespace oscardata
         {
             ShowRTTYtext(13);
         }
+
+        private void cb_extIF_CheckedChanged(object sender, EventArgs e)
+        {
+            statics.extData = (Byte)(cb_extIF.Checked?1:0);
+        }
+
+        private void bt_open_html_Click(object sender, EventArgs e)
+        {
+            if(statics.lastRXedHTMLfile.Length > 4)
+                OpenUrl(statics.lastRXedHTMLfile);
+        }
     }
+
+    class DoubleBufferedPanel : Panel { public DoubleBufferedPanel() : base() { DoubleBuffered = true; } }
 }

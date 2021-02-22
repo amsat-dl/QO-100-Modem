@@ -123,6 +123,11 @@ void getMax(int id, float fv)
 		farridx[id] = 0;
 }
 
+int isPlaying(int id)
+{
+	return devlist[id].audio_playing;
+}
+
 /*
 * returns the max level (within 1 second) of this stream in % (0..100)
 * if the level >= 100 the signal will get clipped and distorted

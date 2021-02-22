@@ -37,6 +37,7 @@ void baudot_encoder(char c, uint8_t bd[2], int* pnum);
 uint8_t getBaudot(char c, int letters);
 char baudot_decoder(char c);
 void sendRttyToGUI(uint8_t b);
+void send_baudot(char c);
 
 #define rtty_CENTERFREQUENCY  1500            
 
@@ -75,7 +76,6 @@ fskdem dem = NULL;
 
 int rtty_autosync = 0;
 
-
 void rtty_modifyRXfreq(int f_Hz)
 {
     //printf("set:%d Hz\n", f_Hz);
@@ -89,7 +89,7 @@ void sendRttyToGUI(uint8_t b)
     uint8_t txpl[7];
     txpl[0] = 6;            // RTTY RX Byte follows
     txpl[1] = b;            // RXed byte
-    txpl[2] = rtty_txoff?0:1;    // TX on/off
+    txpl[2] = 0;
     txpl[3] = synced;            
     txpl[4] = 0;            // unused
     txpl[5] = 0;
@@ -414,7 +414,7 @@ void init_rtty()
     //printf("wegen FM test, kein Init RTTY\n");
     //return;
 
-    rtty_init_pipes();
+    fifo_clear(FIFO_RTTYTX);
 
     close_rtty();
 
@@ -517,17 +517,24 @@ void rtty_tx_function(void* param)
             }
         }
 
-        char csend;
-        if (rtty_tx_read_fifo(&csend))
+        uint8_t pcsend[200];
+        int rlen = read_fifo(FIFO_RTTYTX, pcsend, 200);
+
+        if(rlen > 0)
         {
-            baudot_encoder(csend, bd, &anz);
-            //printf("read fifo: %d -> %02X\n", csend, bd[0]);
+            //printf("from fifo:%d <%s>\n", rlen, pcsend);
+            for (int ilen = 0; ilen < rlen; ilen++)
+            {
+                baudot_encoder(pcsend[ilen], bd, &anz);
+                for (int il = 0; il < anz; il++)
+                {
+                    send_baudot(bd[il]);
+                    //printf("send: %d -> %02X\n", pcsend[ilen], bd[il]);
+                }
+            }
         }
         else
         {
-            bd[0] = 0x1f;   // idle
-            anz = 1;
-
             if (rtty_txoff == 1)
             {
                 sleep_ms(10);
@@ -535,69 +542,68 @@ void rtty_tx_function(void* param)
             }
 
             if (rtty_txoff > 1) rtty_txoff--;
-        }
-        
-        //if(bd[0] != 0x1f) printf("send chars: %02X\n",bd[0]);
-
-        for (int i = 0; i < anz; i++)
-        {
-            char c = bd[i];
-            // c is the baudot code, fill into final byte cs
-            uint8_t cs = 0;
-            cs |= ((c & 1) ? 0x40 : 0);
-            cs |= ((c & 2) ? 0x20 : 0);
-            cs |= ((c & 4) ? 0x10 : 0);
-            cs |= ((c & 8) ? 0x08 : 0);
-            cs |= ((c & 16) ? 0x04 : 0);
-            cs &= ~0x80;    // Start bit to 1
-            cs |= 3;        // 2 stop bits 
-
-            // send cs bit per bit
-            for (int bitidx = 7; bitidx >= 0; bitidx--)
-            {
-                if (run_rtty_threads == 0) break;
-
-                //measure_speed_bps(1);
-
-                unsigned int sym_in = (cs & (1 << bitidx)) ? 1 : 0;
-
-                for (int twice = 0; twice < 4; twice++)
-                {
-                    if (bitidx == 0 && twice == 2) break; //last bit only once
-
-                    fskmod_modulate(modi, sym_in, &(buf_tx[0]));
-
-                    // move sample to 1,5kHz carrier
-                    for (int j = 0; j < k; j++)
-                    {
-                        nco_crcf_step(rtty_upnco);
-                        liquid_float_complex outb;
-                        nco_crcf_mix_up(rtty_upnco, buf_tx[j], &outb);
-
-                        float usbf = outb.real + outb.imag;
-
-                        // adapt to audio sample rate
-                        int fs;
-                        while (keeprunning && run_rtty_threads)
-                        {
-                            fs = io_fifo_usedspace(io_pbidx);
-                            //printf("%d\n", fs);
-                            // attention: if this number is too low, the audio write callback will not process it
-                            if (fs < 24000) break;
-                            sleep_ms(10);
-                        }
-
-                        usbf *= 0.2f;
-                        kmaudio_playsamples(io_pbidx, &usbf, 1, pbvol);
-                    }
-                }
-            }
+            send_baudot(0); // idle
         }
     }
 #ifdef _LINUX_
     pthread_exit(NULL); // self terminate this thread
     return NULL;
 #endif
+}
+
+// send one baudot byte
+void send_baudot(char c)
+{
+    // c is the baudot code, fill into final byte cs
+    uint8_t cs = 0;
+    cs |= ((c & 1) ? 0x40 : 0);
+    cs |= ((c & 2) ? 0x20 : 0);
+    cs |= ((c & 4) ? 0x10 : 0);
+    cs |= ((c & 8) ? 0x08 : 0);
+    cs |= ((c & 16) ? 0x04 : 0);
+    cs &= ~0x80;    // Start bit to 1
+    cs |= 3;        // 2 stop bits 
+
+    // send cs bit per bit
+    for (int bitidx = 7; bitidx >= 0; bitidx--)
+    {
+        if (run_rtty_threads == 0) break;
+
+        //measure_speed_bps(1);
+
+        unsigned int sym_in = (cs & (1 << bitidx)) ? 1 : 0;
+
+        for (int twice = 0; twice < 4; twice++)
+        {
+            if (bitidx == 0 && twice == 2) break; //last bit only once
+
+            fskmod_modulate(modi, sym_in, &(buf_tx[0]));
+
+            // move sample to 1,5kHz carrier
+            for (int j = 0; j < k; j++)
+            {
+                nco_crcf_step(rtty_upnco);
+                liquid_float_complex outb;
+                nco_crcf_mix_up(rtty_upnco, buf_tx[j], &outb);
+
+                float usbf = outb.real + outb.imag;
+
+                // adapt to audio sample rate
+                int fs;
+                while (keeprunning && run_rtty_threads)
+                {
+                    fs = io_fifo_usedspace(io_pbidx);
+                    //printf("%d\n", fs);
+                    // attention: if this number is too low, the audio write callback will not process it
+                    if (fs < 24000) break;
+                    sleep_ms(10);
+                }
+
+                usbf *= 0.015f; // make RTTY signal smaller then PSK
+                kmaudio_playsamples(io_pbidx, &usbf, 1, pbvol);
+            }
+        }
+    }
 }
 
 // RTTY RX thread
@@ -662,7 +668,7 @@ void rtty_rx_function(void* param)
             nco_crcf_mix_down(rtty_dnnco, rx1500, &dc_out);
 
             // sharp filter
-            firfilt_crcf_push(rtty_q, dc_out);    // push input sample
+            firfilt_crcf_push(rtty_q, dc_out);              // push input sample
             firfilt_crcf_execute(rtty_q, &(buf_rx[bridx])); // compute output
             
             bridx++;
@@ -677,7 +683,7 @@ void rtty_rx_function(void* param)
                 if (db != -1)
                 {
                     char lt = baudot_decoder((uint8_t)db);
-                    //printf("rxbyte:%02X deoced:%02X\n", db, lt);
+                    //printf("rxbyte:%02X decoded:%02X\n", db, lt);
                     if (lt > 0)
                         sendRttyToGUI(lt);
                 }

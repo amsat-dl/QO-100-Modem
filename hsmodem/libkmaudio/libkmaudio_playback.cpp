@@ -142,6 +142,7 @@ int playCallback(	const void* inputBuffer,
 
 	//measure_speed_bps(framesPerBuffer);
 
+	/* das hier ging
 	int16_t f[FRAMES_PER_BUFFER];
 	memset(f, 0, sizeof(int16_t) * FRAMES_PER_BUFFER);
 	unsigned int num = io_read_fifo_num_short(devidx, f, framesPerBuffer);
@@ -150,6 +151,23 @@ int playCallback(	const void* inputBuffer,
 		//printf("got %d from fifo, requested %d\n", num, framesPerBuffer);
 	}
 	int av = io_fifo_elems_avail(devidx);
+	das nächste ist neu
+	*/
+
+	int16_t f[FRAMES_PER_BUFFER];
+	// if fifo does not have enough data, just send 0.. (silence)
+	// this gives the fifo a chance to fill up a bit
+	memset(f, 0, sizeof(int16_t) * FRAMES_PER_BUFFER);
+	if ((unsigned long)io_fifo_elems_avail(devidx) >= framesPerBuffer)
+	{
+		io_read_fifo_num_short(devidx, f, framesPerBuffer);
+		devlist[devidx].audio_playing = 1;
+	}
+	else
+	{
+		// nothing to send
+		devlist[devidx].audio_playing = 0;
+	}
 
 	for (unsigned int i = 0; i < framesPerBuffer; i++)
 	{
@@ -166,7 +184,7 @@ int playCallback(	const void* inputBuffer,
 	(void)timeInfo;
 	(void)statusFlags;
 
-	if (keeprunning == 1)
+	if (keepcallbacksrunning == 1)
 		return paContinue;
 
 	return paComplete;

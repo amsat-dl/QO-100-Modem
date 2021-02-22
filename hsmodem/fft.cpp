@@ -288,15 +288,13 @@ uint16_t* mean(uint16_t* f, int smoothX, int smoothY)
 
 void _init_fft()
 {
-    printf("init FFT\n");
     fftcount = FFT_AUDIOSAMPLERATE / 2 + 1;     // number of output samples
     // the FFT outputs 400 values from 0 to 4kHz with a resolution of 10 Hz
 
     _exit_fft();
 	din = (double *)fftw_malloc(sizeof(double) * FFT_AUDIOSAMPLERATE);
 	cpout = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * fftcount);
-
-	plan = fftw_plan_dft_r2c_1d(FFT_AUDIOSAMPLERATE, din, cpout, FFTW_MEASURE);
+    plan = fftw_plan_dft_r2c_1d(FFT_AUDIOSAMPLERATE, din, cpout, FFTW_MEASURE);
 
     // create arbitrary pre decimator
     // decimate 44.1k or 48k down to 8000Hz

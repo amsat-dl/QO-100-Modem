@@ -81,6 +81,7 @@ namespace oscardata
         bool autoRXnum = false;
         String blockFilename = "";
 
+        //  2 ... file OK, file already exist
         //  1 ... file OK
         //  0 ... continue receiving
         // -1 ... invalid header
@@ -154,9 +155,10 @@ namespace oscardata
                 if (rxtype == statics.AsciiFile || rxtype == statics.HTMLFile || rxtype == statics.BinaryFile)
                 {
                     // these file type must be unzipped
-                    handleZIPfiles();
+                    int r = 1;
+                    if (handleZIPfiles() == 1) r = 2;
                     receiving = false;
-                    return 1;
+                    return r;
                 }
             }
 
@@ -429,7 +431,7 @@ namespace oscardata
 
         bool SaveFile()
         {
-            Console.WriteLine("save file");
+            //Console.WriteLine("save file");
 
             // check if all blocks ok
             for (int i = 0; i <= blockidx; i++)
@@ -450,7 +452,7 @@ namespace oscardata
             // make filename
             filename = makeRXfilename();
 
-            Console.WriteLine("save at " + filename);
+            //Console.WriteLine("save at " + filename);
 
             try
             {
@@ -513,12 +515,18 @@ namespace oscardata
             return bmp;
         }
 
-        void handleZIPfiles()
+        // returns:
+        // -1 ... error
+        // 0 ... ok
+        // 1 ... ok, but file exists already
+        int handleZIPfiles()
         {
+            int ret = -1;
+
             if (filename == null)
             {
                 Console.WriteLine("handleZIPfile: no filename");
-                return;
+                return ret;
             }
 
             try
@@ -530,7 +538,7 @@ namespace oscardata
                 if (fc.Length < ArraySend.FileSize)
                 {
                     Console.WriteLine("file not complete: got len=" + fc.Length + " expected len=" + ArraySend.FileSize);
-                    return;
+                    return ret;
                 }
                 Array.Copy(fc, 0, fdst, 0, ArraySend.FileSize);
                 File.WriteAllBytes(statics.zip_RXtempfilename, fdst);   // the received file (still zipped) is here
@@ -541,19 +549,28 @@ namespace oscardata
                 if (fl != null)
                 {
                     // save file
+                    ret = 0;
                     // fl is the filename of the file inside the zip file, so the originally zipped file
                     // remove path to get just the filename
                     int idx = fl.LastIndexOf('/');
                     if (idx == -1) idx = fl.LastIndexOf('\\');
                     String fdest = fl.Substring(idx + 1);
                     fdest = statics.getHomePath("", fdest);
-                    // fdest is the file in the oscardata's user home directoty
-                    // remove old file with same name
-                    try { statics.FileDelete(fdest); } catch { }
+                    // fdest is the file in the oscardata's user home directory
+
+                    // check if file already exists
+                    if (File.Exists(fdest))
+                    {
+                        ret = 1;
+                        // remove old file with same name
+                        try { statics.FileDelete(fdest); } catch { }
+                    }
+
                     // move the unzipped file to the final location
                     File.Move(fl, fdest);
                     filesize = statics.GetFileSize(fdest);
                     StatusText = "unzip OK";
+                    sendBulletin(fdest);
                 }
                 else
                     StatusText = "unzip failed";
@@ -564,6 +581,26 @@ namespace oscardata
             {
                 StatusText = "unzip failed";
             }
+
+            return ret;
+        }
+
+        // send a bulletin file to hsmodem
+        // which sends it via websocket to a browser
+        void sendBulletin(String fn)
+        {
+            if (Path.GetExtension(fn) != ".blt") return;    // no bulletin, ignore
+
+            String s = File.ReadAllText(fn);
+            Byte[] tarr = statics.StringToByteArrayUtf8(s);
+
+            Byte[] tsend = new byte[tarr.Length + 1];
+
+            tsend[0] = statics.BulletinFile;
+            for (int i = 0; i < tarr.Length; i++)
+                tsend[i + 1] = tarr[i];
+
+            Udp.UdpSendCtrl(tsend);
         }
     }
 }

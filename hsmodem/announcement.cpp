@@ -79,6 +79,7 @@ void playAudioPCM(char* fn, int destination)
     int16_t d[100];
     printf("play:%s, caprate:%d\n", fn,caprate);
     FILE* fp = fopen(fn, "rb");
+    const float ann_volume = 0.3f;  // volume reduction for announcement
     if (fp)
     {
         while ((len = fread(d, sizeof(int16_t), 100, fp)))
@@ -102,6 +103,8 @@ void playAudioPCM(char* fn, int destination)
                         }
                         sleep_ms(1);
                     }
+                    f = lowpass(f);
+                    f *= ann_volume;   // reduce volume
                     float f1 = f / 32768;
                     kmaudio_playsamples(voice_pbidx, &f1, 1, lsvol);
                 }
@@ -119,6 +122,7 @@ void playAudioPCM(char* fn, int destination)
                 }
 
                 f = lowpass(f);
+                f *= ann_volume;   // reduce volume
                 f /= 32768;
 
                 if ((destination & 1) == 1)

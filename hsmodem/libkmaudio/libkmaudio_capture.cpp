@@ -150,7 +150,7 @@ int recordCallback( const void*                     inputBuffer,
     (void)timeInfo;
     (void)statusFlags;
 
-	if(keeprunning == 1)
+	if(keepcallbacksrunning == 1)
 		return paContinue;
 
 	return paComplete;

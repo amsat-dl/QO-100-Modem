@@ -143,7 +143,7 @@ void close_modulator()
 
 // d ... symbols to send
 // len ... number of symbols in d
-void sendToModulator(uint8_t *d, int len)
+void _sendToModulator(uint8_t *d, int len)
 {
     if(upnco == NULL) return;
     
@@ -304,15 +304,25 @@ void make_FFTdata(float f)
         if (speedmode < 10)
         {
             // Bytes in Fifo
+            /*
             int bus = io_fifo_usedspace(io_pbidx);
             // Payloads in fifo
+            if (bitsPerSymbol == 0 || txinterpolfactor == 0) return; // just for security, no useful function
             us = bus / (txinterpolfactor * UDPBLOCKLEN * 8 / bitsPerSymbol);
+            */
+
+            // checke PSK_GUI_TX
+            us = fifo_usedspace(PSK_GUI_TX);
+
+
             //printf("bytes:%d blocks:%d\n", bus, us);
         }
         if (speedmode == 10)
         {
             // RTTY
             us = io_fifo_usedspace(io_pbidx);
+            us = us * 20 / 48000;
+            //printf("bytes:%d\n", us);
         }
 
         if (us > 255 || ann_running == 1) us = 255;
@@ -331,6 +341,8 @@ void make_FFTdata(float f)
 
         txpl[bidx++] = rtty_frequency >> 8;     // rtty qrg by autosync
         txpl[bidx++] = rtty_frequency & 0xff;
+
+        txpl[bidx++] = rtty_txoff ? 0 : 1;    // TX on/off
 
         for (int i = 0; i < fftlen; i++)
         {

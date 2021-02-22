@@ -109,7 +109,7 @@ void showbitstring(char* title, uint8_t* data, int totallen, int anz)
 
 void showbytestring(char *title, uint8_t *data, int totallen, int anz)
 {
-    printf("%s. len %d: ",title, totallen);
+    printf("%s. len % 4d: ",title, totallen);
     for(int i=0; i<anz; i++)
         printf("%02X ",data[i]);
     printf("\n");
@@ -120,6 +120,14 @@ void showbytestring16(char *title, uint16_t *data, int anz)
     printf("%s. len %d: ",title,anz);
     for(int i=0; i<anz; i++)
         printf("%04X ",data[i]);
+    printf("\n");
+}
+
+void showbytestring32(char* title, uint32_t* data, int anz)
+{
+    printf("%s. len %d: ", title, anz);
+    for (int i = 0; i < anz; i++)
+        printf("%08X ", data[i]);
     printf("\n");
 }
 
@@ -134,7 +142,8 @@ void showbytestringf(char* title, float* data, int totallen, int anz)
 #ifdef _LINUX_
 void sleep_ms(int ms)
 {
-    usleep(ms * 1000);
+    for(int i=0; i<1000; i++)
+        usleep(ms);
 }
 #endif
 #ifdef _WIN32_

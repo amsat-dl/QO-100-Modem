@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>QO-100 Data</title>
+<style>
+</style>
+
+<script type="text/javascript">
+    
+window.onload = onstart;
+var sockintv;
+var sockOpen = 0;
+var websocket;
+
+function onstart()
+{
+    sockintv = setInterval(checkSocket, 1000);
+}
+
+var intervalset = 0;
+
+// checks if the socket is connected,
+// if not, try to connect
+function checkSocket()
+{
+    if(sockOpen == 0)
+    {
+        if(websocket != null)
+            websocketclose();
+        openWebSocket();
+    }
+    
+    websocket.send("alive\0");
+    
+    // set interval to 5s, this ensures that it can reconnect 
+    // if the server was down. This does not work with faster intervals
+    if(intervalset == 0)
+    {
+        intervalset = 1;
+        clearInterval(sockintv);
+        sockintv = setInterval(checkSocket, 5000);
+    }
+}
+
+function websocketclose()
+{
+    if(websocket != null)
+    {
+        console.log("close websocket");
+        websocket.close();
+        websocket = null;
+    }
+    else
+    {
+        console.log("close websocket, already closed");
+    }
+}
+
+var msg = "";
+
+function openWebSocket()
+{
+    window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+    sockurl = "ws://" + "localhost" + ":40134";
+    websocket = new WebSocket(sockurl);
+    websocket.binaryType = "arraybuffer";
+
+    websocket.onopen = function () {
+        sockOpen = 1;
+        console.log("WebSocket " + sockurl + " now OPEN");
+    };
+
+    websocket.onerror = function () {
+        console.log("Error ... reconnecting ...");
+        websocketclose();
+        sockOpen = 0;
+    };
+    
+    websocket.onclose = function () {
+        console.log("Disconnected ... connecting ...");
+        websocketclose();
+        sockOpen = 0;
+    };
+    
+    websocket.onmessage = function (message) 
+    {
+        var arr = new Uint8Array(message.data);
+        console.log("message received: length:" + arr.length + " data" + arr);
+        // TODO: do whatever you want with this message
+    };
+}
+</script>
+</head>
+        
+<body>
+HSmodem Websocket Example
+</body>
+</html>
+

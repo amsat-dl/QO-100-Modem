@@ -20,7 +20,14 @@ libkmaudio/libkmaudio_init_linux.o\
 libkmaudio/libkmaudio_interface.o\
 libkmaudio/libkmaudio_capture_linux.o\
 libkmaudio/libkmaudio_playback_linux.o\
-libkmaudio/libkmaudio_resampler.o
+libkmaudio/libkmaudio_resampler.o\
+websocket/ws.o\
+websocket/ws_callbacks.o\
+websocket/websocketserver.o\
+websocket/sha1.o\
+websocket/base64.o\
+websocket/handshake.o\
+extdata.o distrubution.o kmtimer.o
 
 default: $(OBJ)
 	mkdir -p ../hsmodemLinux
@@ -28,6 +35,6 @@ default: $(OBJ)
 	g++ $(CXXFLAGS) -o ../hsmodemLinux/hsmodem $(OBJ) $(LDFLAGS)
 
 clean:
-	rm -f *.o
-	rm -f libkmaudio/*.o
-	rm -f libkmaudio/*.o
+	rm -r *.o
+	rm -r libkmaudio/*.o
+	rm -r websocket/*.o
