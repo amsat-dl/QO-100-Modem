@@ -67,6 +67,8 @@ void dist_function(void* param)
             // give all data sources the same priority
             if (++circ >= 5) circ = 0;
 
+            //printf("circ:%d\n", circ);
+
             int len = 0;
             switch (circ)
             {
@@ -87,6 +89,10 @@ void dist_function(void* param)
             }
 
             if (len > 0) _sendToModulator(rxdata, len);
+        }
+        else
+        {
+            sleep_ms(100);
         }
     }
     printf("Distributor exits\n");
