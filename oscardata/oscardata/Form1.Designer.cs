@@ -68,7 +68,6 @@
             this.cb_file_pause = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
             this.cb_file_loop = new System.Windows.Forms.CheckBox();
-            this.bt_open_html = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button2 = new System.Windows.Forms.Button();
             this.bt_openrxfile = new System.Windows.Forms.Button();
@@ -208,6 +207,7 @@
             this.label_fifo = new System.Windows.Forms.Label();
             this.panel_txspectrum = new oscardata.DoubleBufferedPanel();
             this.panel_constel = new oscardata.DoubleBufferedPanel();
+            this.bt_open_html = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
@@ -697,20 +697,6 @@
             this.cb_file_loop.TabIndex = 14;
             this.cb_file_loop.Text = "ON / off";
             this.cb_file_loop.UseVisualStyleBackColor = true;
-            // 
-            // bt_open_html
-            // 
-            this.bt_open_html.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.bt_open_html.ImageIndex = 2;
-            this.bt_open_html.ImageList = this.imageList1;
-            this.bt_open_html.Location = new System.Drawing.Point(17, 337);
-            this.bt_open_html.Name = "bt_open_html";
-            this.bt_open_html.Size = new System.Drawing.Size(137, 51);
-            this.bt_open_html.TabIndex = 15;
-            this.bt_open_html.Text = "Open received \r\nHTML file";
-            this.bt_open_html.UseVisualStyleBackColor = true;
-            this.bt_open_html.Visible = false;
-            this.bt_open_html.Click += new System.EventHandler(this.bt_open_html_Click);
             // 
             // pictureBox1
             // 
@@ -2353,6 +2339,20 @@
             this.panel_constel.TabIndex = 5;
             this.panel_constel.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_constel_Paint);
             // 
+            // bt_open_html
+            // 
+            this.bt_open_html.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_open_html.ImageIndex = 2;
+            this.bt_open_html.ImageList = this.imageList1;
+            this.bt_open_html.Location = new System.Drawing.Point(17, 337);
+            this.bt_open_html.Name = "bt_open_html";
+            this.bt_open_html.Size = new System.Drawing.Size(137, 51);
+            this.bt_open_html.TabIndex = 15;
+            this.bt_open_html.Text = "Open received \r\nHTML file";
+            this.bt_open_html.UseVisualStyleBackColor = true;
+            this.bt_open_html.Visible = false;
+            this.bt_open_html.Click += new System.EventHandler(this.bt_open_html_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2367,7 +2367,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "AMSAT-DL Multimedia HS Modem V0.86 by DJ0ABR";
+            this.Text = "AMSAT-DL Multimedia HS Modem V0.87 by DJ0ABR";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -2602,10 +2602,10 @@
         private System.Windows.Forms.ComboBox cb_picres;
         private System.Windows.Forms.CheckBox cb_extIF;
         private System.Windows.Forms.TextBox textBox7;
-        private System.Windows.Forms.Button bt_open_html;
         private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.ComboBox cb_file_pause;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button bt_open_html;
     }
 }
 

@@ -118,7 +118,11 @@ void io_write_fifo_short(int pipenum, int16_t sample)
 
 int io_read_fifo(int pipenum, float* data)
 {
-    if (pipenum < 0 || pipenum >= NUM_OF_PIPES) return 0;
+    if (pipenum < 0 || pipenum >= NUM_OF_PIPES)
+    {
+        printf("io_read_fifo: wrong PIP num: %d\n",pipenum);
+        return 0;
+    }
 
     LOCK(pipenum);
 
@@ -128,7 +132,6 @@ int io_read_fifo(int pipenum, float* data)
         UNLOCK(pipenum);
         return 0;
     }
-
     int16_t id = io_buffer[pipenum][io_rdidx[pipenum]];
     if (++io_rdidx[pipenum] >= AUDIO_FIFOFLEN) io_rdidx[pipenum] = 0;
     UNLOCK(pipenum);

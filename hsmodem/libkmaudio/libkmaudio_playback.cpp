@@ -142,18 +142,19 @@ int playCallback(	const void* inputBuffer,
 
 	//measure_speed_bps(framesPerBuffer);
 
-	/* das hier ging
+	/*
+	// das hier ging
+	//printf("has:%d: %d\n", devidx,io_fifo_elems_avail(devidx));
 	int16_t f[FRAMES_PER_BUFFER];
 	memset(f, 0, sizeof(int16_t) * FRAMES_PER_BUFFER);
 	unsigned int num = io_read_fifo_num_short(devidx, f, framesPerBuffer);
 	if (num < framesPerBuffer)
 	{
-		//printf("got %d from fifo, requested %d\n", num, framesPerBuffer);
+		// not enough data, use what we got from fifo, rest is 0
+		printf("got %d from fifo, requested %d\n", num, framesPerBuffer);
 	}
-	int av = io_fifo_elems_avail(devidx);
-	das nächste ist neu
 	*/
-
+	
 	int16_t f[FRAMES_PER_BUFFER];
 	// if fifo does not have enough data, just send 0.. (silence)
 	// this gives the fifo a chance to fill up a bit
@@ -166,9 +167,10 @@ int playCallback(	const void* inputBuffer,
 	else
 	{
 		// nothing to send
+		//printf("got %d from fifo, requested %d\n", io_fifo_elems_avail(devidx), framesPerBuffer);
 		devlist[devidx].audio_playing = 0;
 	}
-
+	
 	for (unsigned int i = 0; i < framesPerBuffer; i++)
 	{
 		if (chans == 1) rptr[i] = f[i];

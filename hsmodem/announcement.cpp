@@ -45,6 +45,24 @@ void create_a()
     // create arbitrary pre decimator
     // if Audio SR is 48000 but caprate is 44100
     ratio = (float)((float)caprate / 48000.0);
+#ifdef _WIN32_
+    /*
+    * only Windows needs this special resampling ratio
+    * maybe it has to do with the VAC, I don't know why we have
+    * to resample twice 48k -> 44.1k
+    * maybe this will not work on another PC
+    */
+    /*
+    if(caprate == 44100)
+        ratio = (float)(40526.0f / 48000.0);
+    else 
+        ratio = (float)(44100.0f / 48000.0);
+    */
+    if (caprate == 48000)
+        ratio = (float)(48000.0f / 44100.0);
+    else
+        ratio = 1.0f;
+#endif
     anndecim = msresamp_crcf_create(ratio, 40.0f);
 }
 
@@ -64,12 +82,29 @@ float lowpass(float f)
         return f;
     }
     liquid_float_complex inp, outp;
-    inp.real = f/5;
+    inp.real = f;
     inp.imag = 0;
     firfilt_crcf_push(qfilt, inp);      // push input sample
     firfilt_crcf_execute(qfilt, &outp); // compute output
 
     return outp.real;
+}
+
+int measureLevel(char* fn)
+{
+    int max = 0;
+    FILE* fp = fopen(fn, "rb");
+    if (fp)
+    {
+        int len = 0;
+        int16_t v;
+        while ((len = fread(&v, sizeof(int16_t), 1, fp)))
+        {
+            if (v > max) max = v;
+        }
+        fclose(fp);
+    }
+    return max;
 }
 
 // destination: 1=transceiver, 2=loudspeaker, 3=both
@@ -78,15 +113,21 @@ void playAudioPCM(char* fn, int destination)
     int len;
     int16_t d[100];
     printf("play:%s, caprate:%d\n", fn,caprate);
+    int max = measureLevel(fn);
+    float ampl = 32767.0f / (float)max;
+    //printf("max:%d ampl:%f\n", max, ampl);
     FILE* fp = fopen(fn, "rb");
-    const float ann_volume = 0.3f;  // volume reduction for announcement
+    const float ann_volume = 0.1f;  // volume reduction for announcement
     if (fp)
     {
         while ((len = fread(d, sizeof(int16_t), 100, fp)))
         {
             for (int i = 0; i < len; i++)
             {
-                float f = (float)d[i];
+                float f = (float)d[i];  // 16-bit values
+                f /= 32768;             // float values 0..1
+                f *= ampl;              // normalize volume
+                f *= ann_volume;        // reduce volume
 
                 // local playback at 48k, no filtering, no interpolation
                 if ((destination & 2) == 2)
@@ -103,43 +144,42 @@ void playAudioPCM(char* fn, int destination)
                         }
                         sleep_ms(1);
                     }
-                    f = lowpass(f);
-                    f *= ann_volume;   // reduce volume
-                    float f1 = f / 32768;
-                    kmaudio_playsamples(voice_pbidx, &f1, 1, lsvol);
+                    kmaudio_playsamples(voice_pbidx, &f, 1, lsvol);
                 }
 
+                // resample if required (PCM files are always 48000)
+                unsigned int num_written = 1;
+                liquid_float_complex out[10];
+                out[0].real = f; // value, if no resampling
+#ifdef _LINUX_
                 if (caprate == 44100)
+#endif
                 {
-                    unsigned int num_written = 0;
                     liquid_float_complex in;
-                    liquid_float_complex out;
                     in.real = f;
                     in.imag = 0;
-                    msresamp_crcf_execute(anndecim, &in, 1, &out, &num_written);
-                    if (num_written != 1) continue;
-                    f = out.real;
+                    msresamp_crcf_execute(anndecim, &in, 1, out, &num_written);
                 }
-
-                f = lowpass(f);
-                f *= ann_volume;   // reduce volume
-                f /= 32768;
-
-                if ((destination & 1) == 1)
+                for (unsigned int n = 0; n < num_written; n++)
                 {
-                    int to = 4000;
-                    //while (io_pb_fifo_usedspace() > 10000)
-                    while (io_fifo_usedspace(io_pbidx) > 10000)
+                    f = out[n].real;
+                    f = lowpass(f);
+
+                    if ((destination & 1) == 1)
                     {
-                        if (--to == 0)
+                        int to = 4000;
+                        while (io_fifo_usedspace(io_pbidx) > 10000)
                         {
-                            printf("timed out waiting for PB fifo\n");
-                            fclose(fp);
-                            return;
+                            if (--to == 0)
+                            {
+                                printf("timed out waiting for PB fifo\n");
+                                fclose(fp);
+                                return;
+                            }
+                            sleep_ms(1);
                         }
-                        sleep_ms(1);
+                        kmaudio_playsamples(io_pbidx, &f, 1, pbvol);
                     }
-                    kmaudio_playsamples(io_pbidx, &f, 1, pbvol);
                 }
 
             }
@@ -197,7 +237,6 @@ void playIntro()
     snprintf(fn, 499, "%s/oscardata/intro/intro.pcm", homepath);
     fn[499] = 0;
 
-    //io_clear_voice_fifos();
     io_fifo_clear(voice_pbidx);
     io_fifo_clear(voice_capidx);
     create_a();

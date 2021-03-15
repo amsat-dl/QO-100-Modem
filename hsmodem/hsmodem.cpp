@@ -361,9 +361,10 @@ SPEEDRATE sr[NUMSPEEDMODES] = {
 void startModem()
 {
     printf("startModem. Speedmode:%d\n",set_speedmode);
-    close_dsp();
+
     close_rtty();
     fifo_clear(PSK_GUI_TX);
+    close_dsp();
     speedmode = set_speedmode;
     if (speedmode < 0 || speedmode >= NUMSPEEDMODES)
         speedmode = 4;
@@ -376,6 +377,18 @@ void startModem()
     rxPreInterpolfactor = sr[speedmode].rx;
     linespeed = sr[speedmode].linespeed;
     opusbitrate = sr[speedmode].codecrate;
+
+    _init_fft();
+    if (speedmode < 10)
+    {
+        init_dsp();
+    }
+    if (speedmode == 10)
+    {
+        rtty_txoff = 1;
+        init_rtty();
+    }
+
     // int TX audio and modulator
     io_capidx = kmaudio_startCapture(captureDeviceName, caprate);
     if (io_capidx == -1)
@@ -390,18 +403,7 @@ void startModem()
         printf("PB: cannot open device: %s\n", playbackDeviceName);
         return;
     }
-
-    _init_fft();
     
-    if (speedmode < 10)
-    {
-        init_dsp();
-    }
-    if (speedmode == 10)
-    {
-        rtty_txoff = 1;
-        init_rtty();
-    }
     init_tune();
 }
 
@@ -598,6 +600,9 @@ void bc_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 // called by UDP RX thread for data from App
 void appdata_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
 {
+    // ignore data when modem is starting
+    if (restart_modems == 1) return;
+
     uint8_t type = pdata[0];
     uint8_t minfo = pdata[1];
 

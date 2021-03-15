@@ -28,6 +28,8 @@
 
 #include "hsmodem.h"
 
+int mod_running = 0;
+
 void modulator(uint8_t sym_in);
 void init_demodulator();
 void close_demodulator();
@@ -37,17 +39,27 @@ void close_modulator();
 void init_dsp()
 {
     printf("init DSP\n");
+    //close_dsp();
     init_modulator();
     io_fifo_clear(io_pbidx);
     io_fifo_clear(io_capidx);
     init_demodulator();
+    printf("init DSP FIN\n");
+    mod_running = 1;
 }
 
 void close_dsp()
 {
+    printf("close DSP\n");
+    mod_running = 0;
+    io_fifo_clear(io_pbidx);
+    io_fifo_clear(io_capidx);
+    sleep_ms(200); // give system a chance to stop
+    
     close_modulator();
     close_demodulator();
 }
+
 
 modulation_scheme getMod()
 {
@@ -82,7 +94,6 @@ float        tau_FracSymbOffset   =     -0.2f;      // fractional symbol offset
 
 void init_modulator()
 {
-    close_dsp();
     printf("init TX modulator\n");
     
     k_SampPerSymb = txinterpolfactor;
@@ -145,7 +156,10 @@ void close_modulator()
 // len ... number of symbols in d
 void _sendToModulator(uint8_t *d, int len)
 {
-    if(upnco == NULL) return;
+    if (upnco == NULL) return;
+    if (mod == NULL) return;
+    if (TX_interpolator == NULL) return;
+    if (mod_running == 0) return;
     
     int symanz = len * 8 / bitsPerSymbol;
     uint8_t syms[10000]; 
@@ -176,6 +190,11 @@ void _sendToModulator(uint8_t *d, int len)
 // modulates, filters and upmixes symbols and send it to soundcard
 void modulator(uint8_t sym_in)
 {
+    if (upnco == NULL) return;
+    if (mod == NULL) return;
+    if (TX_interpolator == NULL) return;
+    if (mod_running == 0) return;
+
     liquid_float_complex sample;
     modem_modulate(mod, sym_in, &sample);
     
@@ -203,11 +222,24 @@ void modulator(uint8_t sym_in)
         // adapt speed to soundcard samplerate
         int fs;
         int to = 0;
+        /*
         while(keeprunning)
         {
             fs = io_fifo_freespace(io_pbidx);
             // wait until there is space in fifo
             if(fs > 10) break;
+            printf("wit:%d: %d\n", io_pbidx,io_fifo_elems_avail(io_pbidx));
+            sleep_ms(10);
+            if (++to >= 400) break; // give up after 4s 
+        }*/
+
+        // put max. 4 frames in fifo, to minimize latency
+        // 4 frames are 1032 bytes
+        while (keeprunning && mod_running)
+        {
+            fs = io_fifo_usedspace(io_pbidx);
+            if (fs <= 20000) break;
+            //printf("wit:%d: %d\n", io_pbidx, io_fifo_elems_avail(io_pbidx));
             sleep_ms(10);
             if (++to >= 400) break; // give up after 4s 
         }
@@ -278,7 +310,10 @@ void close_demodulator()
 void resetModem()
 {
     //printf("Reset Symtrack\n");
+    if (dnnco == NULL) return;
+    if (decim == NULL) return;
     if (km_symtrack == NULL) return;
+    if (mod_running == 0) return;
     km_symtrack_cccf_reset(km_symtrack,0xff);
 }
 
@@ -363,7 +398,10 @@ static int16_t const_re[CONSTPOINTS];
 static int16_t const_im[CONSTPOINTS];
 static int const_idx = 0;
 
-    if(dnnco == NULL) return 0;
+    if (dnnco == NULL) return 0;
+    if (decim == NULL) return 0;
+    if (km_symtrack == NULL) return 0;
+    if (mod_running == 0) return 0;
 
     // get available received samples
     float farr[1100];

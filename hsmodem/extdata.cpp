@@ -62,6 +62,8 @@ void ext_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
     id <<= 8;
     id += pdata[3];
 
+    //printf("incoming data on 40135, ID: %d, pdata[4]:%d\n", id,pdata[4]);
+
     if (id != extDataID)
     {
         printf("incoming data on 40135, wrong ID: %d\n", id);

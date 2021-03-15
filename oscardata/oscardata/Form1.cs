@@ -185,7 +185,7 @@ namespace oscardata
                     if (ArraySend.getSending() == false)
                     {
                         // transmission is finished, wait until data in TXfifo have been sent
-                        Console.WriteLine("pbf: " + statics.PBfifousage.ToString());
+                        //Console.WriteLine("pbf: " + statics.PBfifousage.ToString());
                         if (statics.PBfifousage < 1)
                         {
                             // start sending a new picture
