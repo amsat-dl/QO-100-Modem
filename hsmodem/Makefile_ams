@@ -32,8 +32,6 @@ websocket/handshake.o\
 
 
 default: $(OBJ)
-	mkdir -p ../hsmodemLinux
-	cp ../oscardata/oscardata/bin/Release/oscardata.exe ../hsmodemLinux
 	g++ $(CXXFLAGS) -o ../hsmodemLinux/hsmodem $(OBJ) $(LDFLAGS)
 
 clean:
