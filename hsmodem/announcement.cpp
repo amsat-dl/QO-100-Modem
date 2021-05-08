@@ -38,7 +38,7 @@ void create_a()
     close_a();
 
     // audio filter to reduce Audio BW for the 2k7 SSB channel
-    float fc = 0.055f; // cut off freq. normalized to 48000 (= 1.0)
+    float fc = 0.07f;// 0.055f;
     liquid_firdes_kaiser(h_len, fc, 60.0f, 0.0f, h);
     qfilt = firfilt_crcf_create(h, h_len);
 
@@ -117,7 +117,7 @@ void playAudioPCM(char* fn, int destination)
     float ampl = 32767.0f / (float)max;
     //printf("max:%d ampl:%f\n", max, ampl);
     FILE* fp = fopen(fn, "rb");
-    const float ann_volume = 0.1f;  // volume reduction for announcement
+    const float ann_volume = 0.08f;  // volume reduction for announcement
     if (fp)
     {
         while ((len = fread(d, sizeof(int16_t), 100, fp)))

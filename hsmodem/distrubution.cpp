@@ -67,8 +67,6 @@ void dist_function(void* param)
             // give all data sources the same priority
             if (++circ >= 5) circ = 0;
 
-            //printf("circ:%d\n", circ);
-
             int len = 0;
             switch (circ)
             {
@@ -77,18 +75,26 @@ void dist_function(void* param)
                 break;
             case 1: 
                 len = read_fifo(EXT_TX, rxdata, sizeof(rxdata));
+                //if (len) printf("=== send DX Cluster/CW Skimmer\n");
                 break;
             case 2: 
                 len = read_fifo(EXT_SPECNB, rxdata, sizeof(rxdata));
+                //if (len) printf("=== send NB\n");
                 break;
             case 3: 
                 len = read_fifo(EXT_SPECWB, rxdata, sizeof(rxdata));
+                //if (len) printf("=== send WB\n");
                 break;
-            case 4: sleep_ms(10); //prevent process from eating 100% CPU time
+            case 4:
+                len = read_fifo(FIFO_FILESEND, rxdata, sizeof(rxdata));
+                //if (len) printf("=== send FILE\n");
+                break;
+            case 5: sleep_ms(10); //prevent process from eating 100% CPU time
                 break;
             }
 
             if (len > 0) _sendToModulator(rxdata, len);
+            else sleep_ms(10);
         }
         else
         {

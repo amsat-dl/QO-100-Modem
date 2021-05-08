@@ -127,14 +127,14 @@ int kmaudio_getDeviceList();
 * starts a capturing stream from devname with samprate
 * returns: id of the capture stream or -1 = error
 */
-int kmaudio_startCapture(char* devname, int samprate);
+int kmaudio_startCapture(char* devname, int samprate, int exclusive);
 
 /*
 * starts a playback stream to devname with samprate
 * returns: id of the playback stream or -1 = error
 */
 
-int kmaudio_startPlayback(char* devname, int samprate);
+int kmaudio_startPlayback(char* devname, int samprate, int exclusive);
 
 /* 
 * plays len samples from psamp to device id

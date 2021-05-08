@@ -132,6 +132,12 @@
     <ClCompile Include="kmtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="filesend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zip\zip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hsmodem.h">
@@ -192,6 +198,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fifo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zip\miniz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zip\zip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,6 +6,7 @@
     // I love LINUX :-) which works 100000x better than Windows
 	#pragma warning( disable : 4091 )
 	#pragma warning( disable : 4003 )
+    #undef AMS_TESTMODE
 #else
 #define _LINUX_
 #endif
@@ -55,6 +56,8 @@
 #include <arpa/inet.h>
 #include <pwd.h>
 #include <math.h>
+#include <dirent.h>
+#include <ifaddrs.h>
 #endif
 
 #include "opus.h"
@@ -69,12 +72,14 @@
 #include "fifo.h"
 #include "libkmaudio/libkmaudio.h"
 #include "websocket/websocketserver.h"
+#include "zip/zip.h"
 
 #define jpg_tempfilename "rxdata.jpg"
 
 #define CRC16TX 0
 #define CRC16RX 1
-#define CRC16FILE 2
+#define CRC16FILETX 2
+#define CRC16FILERX 3
 
 // definitions for audio
 #define MAXDEVSTRLEN    5000
@@ -94,6 +99,10 @@ enum _VOICEMODES_ {
     VOICEMODE_RECORD,
     VOICEMODE_PLAYBACK
 };
+
+// file send definitions
+#define MAXFILENUM	500
+#define MAXFILESIZE	256
 
 void init_packer();
 uint8_t* Pack(uint8_t* payload, int type, int status, int* plen, int repeat);
@@ -185,6 +194,7 @@ void playIntro();
 float do_tuning(int send);
 void init_tune();
 float singleFrequency();
+void singleFrequencyComplex(float* vi, float* vq);
 void showbytestring16(char* title, uint16_t* data, int anz);
 void init_rtty();
 void make_FFTdata(float f);
@@ -201,7 +211,15 @@ void ext_modemRX(uint8_t* pdata);
 int fifo_dataavail(int pipenum);
 void showbytestring32(char* title, uint32_t* data, int anz);
 void start_timer(int mSec, void(*timer_func_handler)(void));
+int GetFilesInDirectory(char* folder, char files[MAXFILENUM][MAXFILESIZE]);
+void temppath_name(char* pn);
+void startFileSend();
 
+#ifdef AMS_TESTMODE
+void ams_BCsimulation();
+void ams_testTX(liquid_float_complex sample);
+int getAMSfifostat();
+#endif
 
 extern int speedmode;
 extern int bitsPerSymbol;
@@ -249,8 +267,11 @@ extern float capvol;
 extern float lsvol;
 extern float micvol;
 extern int extData_active;
+extern char AUTOSENDFOLDER[512];
+extern int filesend_delay_seconds;
 
 #ifdef _LINUX_
 int isRunning(char* prgname);
 void install_signal_handler();
+char* ownIP();
 #endif

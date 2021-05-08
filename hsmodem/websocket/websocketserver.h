@@ -84,4 +84,3 @@ void test_websocket();
 int get_alive(int fd);
 
 extern WS_SOCK actsock[MAX_CLIENTS];
-extern char myIP[20];

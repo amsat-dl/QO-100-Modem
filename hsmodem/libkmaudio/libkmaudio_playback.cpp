@@ -51,7 +51,7 @@ void close_playback_stream(int idx)
 	}
 }
 
-int kmaudio_startPlayback(char* devname, int samprate)
+int kmaudio_startPlayback(char* devname, int samprate, int exclusive)
 {
 	printf("Start request for PB stream:%s\n", devname);
 
@@ -94,7 +94,10 @@ int kmaudio_startPlayback(char* devname, int samprate)
 	wasapiInfo.flags = (paWinWasapiExclusive | paWinWasapiThreadPriority);
 	wasapiInfo.threadPriority = eThreadPriorityProAudio;
 
-	devlist[idx].outputParameters.hostApiSpecificStreamInfo = (&wasapiInfo);
+	if(exclusive)
+		devlist[idx].outputParameters.hostApiSpecificStreamInfo = (&wasapiInfo);
+	else
+		devlist[idx].outputParameters.hostApiSpecificStreamInfo = NULL;
 
 	PaError e = Pa_IsFormatSupported(&devlist[idx].outputParameters, NULL, (double)devlist[idx].real_samprate);
 	printf("Playback : err:%d device:%d PAdev:%d samprate: %f chans:%d\n", e, idx, devlist[idx].devnum, (double)devlist[idx].real_samprate, devlist[idx].outputParameters.channelCount);

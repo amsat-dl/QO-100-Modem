@@ -220,6 +220,11 @@ int main(int argc, char* argv[])
 
     printf("QO100modem initialised and running\n");
 
+#ifdef AMS_TESTMODE
+    ams_BCsimulation();
+    startFileSend();
+#endif
+
     while (keeprunning)
     {
         int wait = 1;
@@ -231,13 +236,17 @@ int main(int argc, char* argv[])
             restart_modems = 0;
         }
 
+#ifdef AMS_TESTMODE
+        sleep_ms(100);
+        continue;
+#endif
+
         if (init_voice == 1)
         {
             initVoice();
             init_voice = 0;
         }
 
-        //doArraySend();
         if (VoiceAudioMode == VOICEMODE_INTERNALLOOP)
         {
             // loop voice mic to LS
@@ -295,18 +304,6 @@ int main(int argc, char* argv[])
         }
         else
         {
-#ifdef _LINUX_
-            /*static uint64_t old_tm = 0;
-            uint64_t tm = getms();
-            if (tm >= (old_tm + 1000))
-            {
-                // read Audio device list every 1s
-                // runtime dectection currently works under linux only
-                kmaudio_getDeviceList();
-                old_tm = tm;
-            }*/
-#endif
-
             // demodulate incoming audio data stream
             int dret = demodulator();
             if (dret) wait = 0;
@@ -389,15 +386,16 @@ void startModem()
         init_rtty();
     }
 
+#ifndef AMS_TESTMODE
     // int TX audio and modulator
-    io_capidx = kmaudio_startCapture(captureDeviceName, caprate);
+    io_capidx = kmaudio_startCapture(captureDeviceName, caprate,1);
     if (io_capidx == -1)
     {
         printf("CAP: cannot open device: %s\n", captureDeviceName);
         return;
     }
     
-    io_pbidx = kmaudio_startPlayback(playbackDeviceName, caprate);
+    io_pbidx = kmaudio_startPlayback(playbackDeviceName, caprate,1);
     if (io_pbidx == -1)
     {
         printf("PB: cannot open device: %s\n", playbackDeviceName);
@@ -405,6 +403,7 @@ void startModem()
     }
     
     init_tune();
+#endif
 }
 
 void initVoice()
@@ -429,13 +428,13 @@ void initVoice()
         if (VoiceAudioMode == VOICEMODE_LISTENAUDIOIN && caprate == 44100)
             srate = 44100;
 
-        voice_capidx = kmaudio_startCapture(micDeviceName, srate);
+        voice_capidx = kmaudio_startCapture(micDeviceName, srate,0);
         if (voice_capidx == -1)
         {
             printf("Voice CAP: cannot open device: %s\n", micDeviceName);
             return;
         }
-        voice_pbidx = kmaudio_startPlayback(lsDeviceName, srate);
+        voice_pbidx = kmaudio_startPlayback(lsDeviceName, srate,0);
         if (voice_pbidx == -1)
         {
             printf("Voice PB: cannot open device: %s\n", lsDeviceName);
@@ -871,6 +870,9 @@ void modem_sendPSKData(uint8_t* data, int type, int status, int repeat, int fifo
         sendPSKdata(txdata, len, fifoID);
     }
     if (repeat == 0) return;
+#ifdef AMS_TESTMODE
+    return;
+#endif
 
     // now check if repetitions are required
     if (bitsPerSymbol == 0 || txinterpolfactor == 0) return; // just for security, no useful function

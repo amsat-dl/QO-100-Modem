@@ -415,15 +415,7 @@ void makeWBSpecData(uint8_t* pdata, int len)
         //avgbuf[i] += snormval[i];
         if (avgbuf[i] < snormval[i]) avgbuf[i] = snormval[i];
     avganz++;
-    /*
-    // check if TX fifo has data already
-    int us = fifo_usedspace(EXT_SPECWB);
-    if (us > 1) return;
-
-    // check if audio playback fifo is filled already
-    us = io_fifo_usedspace(io_pbidx);
-    if (us > 48000) return; // max 1s latency
-    */
+    
     // build average
     //for (int i = 0; i < idx; i++)
       //  avgbuf[i] /= avganz;

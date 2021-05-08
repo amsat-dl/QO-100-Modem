@@ -121,7 +121,7 @@ void close_capture_stream(int idx)
     }
 }
 
-int kmaudio_startCapture(char* devname, int samprate)
+int kmaudio_startCapture(char* devname, int samprate, int exclusive)
 {
     printf("Start request for CAP stream:%s\n", devname);
 

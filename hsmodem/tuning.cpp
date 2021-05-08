@@ -109,3 +109,14 @@ float singleFrequency()
 
     return f;
 }
+
+void singleFrequencyComplex(float *vi, float *vq)
+{
+    int i = 0; // 100 Hz
+    if (tunenco[i] == NULL) return;
+    nco_crcf_step(tunenco[i]);
+    *vi = nco_crcf_sin(tunenco[i]);
+    *vq = nco_crcf_cos(tunenco[i]);
+
+    return;
+}

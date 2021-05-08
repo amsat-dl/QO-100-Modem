@@ -27,7 +27,7 @@
 // since we use a static crc register we need TWO separated registers
 // for RX and TX to get it thread safe, no.2 is for file ID generation
 
-uint16_t reg16[3] = {0xffff,0xffff};        // shift register
+uint16_t reg16[4] = {0xffff,0xffff,0xffff,0xffff };        // shift register
 
 uint16_t Crc16_bytecalc(int rxtx, uint8_t byt)
 {
@@ -44,6 +44,7 @@ uint16_t Crc16_bytecalc(int rxtx, uint8_t byt)
     return reg16[rxtx];
 }
 
+// rx=1, tx=0
 uint16_t Crc16_messagecalc(int rxtx, uint8_t *data,int len)
 {
     reg16[rxtx] = 0xffff;

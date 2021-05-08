@@ -7,9 +7,9 @@
 # then (in the target system) run "sudo install". 
 # This will copy the sharded libs to its final location.
 
-CXXFLAGS = -Wall -O3 -std=c++0x -Wno-write-strings -Wno-narrowing
+CXXFLAGS = -Wall -O3 -std=c++0x -Wno-write-strings -Wno-narrowing -DAMS_TESTMODE
 LDFLAGS = -lpthread -lrt -lsndfile -lasound -lm -lopus -lfftw3 -lfftw3_threads -lliquid -lcodec2 -lsoundio
-OBJ = hsmodem.o constellation.o crc16.o frame_packer.o main_helper.o\
+OBJ = zip/zip.o hsmodem.o constellation.o crc16.o frame_packer.o main_helper.o\
 scrambler.o speed.o fec.o udp.o fft.o liquid_if.o symboltracker.o\
 voiceprocessor.o codec2.o fifo.o announcement.o tuning.o rtty.o volume.o filesend.o\
 extdata.o distrubution.o kmtimer.o\
@@ -28,7 +28,7 @@ websocket/websocketserver.o\
 websocket/sha1.o\
 websocket/base64.o\
 websocket/handshake.o\
-zip/zip.o
+../ams_extension/ams_extension.o ../ams_extension/ams_config.o
 
 
 default: $(OBJ)
@@ -41,3 +41,4 @@ clean:
 	rm -r libkmaudio/*.o
 	rm -r websocket/*.o
 	rm -r zip/*.o
+	rm -r ../ams_extension/*.o 

@@ -151,7 +151,7 @@ void close_playback_stream(int idx)
     }
 }
 
-int kmaudio_startPlayback(char* devname, int samprate)
+int kmaudio_startPlayback(char* devname, int samprate, int exclusive)
 {
     printf("Start request for PB stream:%s\n", devname);
     

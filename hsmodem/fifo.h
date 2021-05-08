@@ -6,6 +6,7 @@ enum _FIFOUSAGE_ {
 	EXT_TX,
 	EXT_SPECNB,
 	EXT_SPECWB,
+	FIFO_FILESEND,
 };
 
 void init_fifos();

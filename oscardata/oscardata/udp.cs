@@ -8,7 +8,7 @@
  * Creates a new thread which handles all incoming and outgoing UDP traffic.
  * Communication to other threads is done via a thread-safe pipe.
  * The UDP transmitter handles the correct datarate according to the modem speed.
-*/
+*/ 
 
 using System;
 using System.Collections;

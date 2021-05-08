@@ -1076,7 +1076,11 @@ namespace oscardata
             if (!found) return;
 
             // files[i] is the filename to be sent
-            bt_prepareAndSendFile(files[i], Path.GetFileName(files[i]), statics.BinaryFile);
+            String ext = Path.GetExtension(files[i]);
+            if(ext.StartsWith(".htm"))
+                bt_prepareAndSendFile(files[i], Path.GetFileName(files[i]), statics.HTMLFile);
+            else
+                bt_prepareAndSendFile(files[i], Path.GetFileName(files[i]), statics.BinaryFile);
             bt_file_send_Click(null, null);
         }
 
@@ -1377,7 +1381,7 @@ namespace oscardata
          * 20 .. 119 ... PB device name
          * 120 .. 219 ... CAP device name
          * 220 .. 239 ... Callsign
-         * 230 .. 249 ... qthloc
+         * 240 .. 249 ... qthloc
          * 250 .. 269 ... Name
          * 
         */
@@ -1558,16 +1562,6 @@ namespace oscardata
             if (cb_speed.Text.Contains("6000")) statics.real_datarate = 6000;
             if (cb_speed.Text.Contains("6600")) statics.real_datarate = 6600;
             if (cb_speed.Text.Contains("7200")) statics.real_datarate = 7200;
-
-            /*Byte[] txdata = new byte[statics.PayloadLen + 2];
-            int idx = cb_speed.SelectedIndex;
-            txdata[0] = (Byte)statics.ResamplingRate; // BER Test Marker
-            txdata[1] = (Byte)idx;
-
-            
-
-            // and send info to modem
-            Udp.UdpSendCtrl(txdata);*/
 
             String s = cb_speed.Text;
 

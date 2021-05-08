@@ -49,7 +49,7 @@ void close_capture_stream(int idx)
 	}
 }
 
-int kmaudio_startCapture(char* devname, int samprate)
+int kmaudio_startCapture(char* devname, int samprate, int exclusive)
 {
 	printf("Start request for CAP stream:%s\n", devname);
 
@@ -92,7 +92,10 @@ int kmaudio_startCapture(char* devname, int samprate)
 	wasapiInfo.flags = (paWinWasapiExclusive | paWinWasapiThreadPriority);
 	wasapiInfo.threadPriority = eThreadPriorityProAudio;
 	
-	devlist[idx].inputParameters.hostApiSpecificStreamInfo = (&wasapiInfo);
+	if(exclusive)
+		devlist[idx].inputParameters.hostApiSpecificStreamInfo = (&wasapiInfo);
+	else
+		devlist[idx].inputParameters.hostApiSpecificStreamInfo = NULL;
 
 	int e = Pa_IsFormatSupported(&devlist[idx].inputParameters, NULL, (double)devlist[idx].real_samprate);
 	printf("err:%d device:%d PAdev:%d samprate: %f\n", e,idx, devlist[idx].devnum,(double)devlist[idx].real_samprate);

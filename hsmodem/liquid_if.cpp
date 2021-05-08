@@ -160,7 +160,7 @@ void _sendToModulator(uint8_t *d, int len)
     if (mod == NULL) return;
     if (TX_interpolator == NULL) return;
     if (mod_running == 0) return;
-    
+
     int symanz = len * 8 / bitsPerSymbol;
     uint8_t syms[10000]; 
     if (symanz >= 10000)
@@ -186,6 +186,36 @@ void _sendToModulator(uint8_t *d, int len)
     }
 }
 
+liquid_float_complex getMarker()
+{
+    static int f = 1;
+    static nco_crcf tm = NULL;
+
+    if (f)
+    {
+        printf("create marker\n");
+        f = 0;
+        float rad_per_sample = ((2.0f * (float)M_PI * 1000.0f) / 2400.0f);
+        tm = nco_crcf_create(LIQUID_NCO);
+        nco_crcf_set_phase(tm, 0.0f);
+        nco_crcf_set_frequency(tm, rad_per_sample);
+    }
+
+    liquid_float_complex m;
+    if (tm)
+    {
+        nco_crcf_step(tm);
+        float s, c;
+        nco_crcf_sincos(tm, &s, &c);
+        m.real = c;
+        m.imag = s;
+    }
+    else
+        printf("tm not initialized\n");
+
+    return m;
+}
+
 // call for every symbol
 // modulates, filters and upmixes symbols and send it to soundcard
 void modulator(uint8_t sym_in)
@@ -197,7 +227,10 @@ void modulator(uint8_t sym_in)
 
     liquid_float_complex sample;
     modem_modulate(mod, sym_in, &sample);
-    
+
+#ifdef AMS_TESTMODE
+    ams_testTX(sample);
+#else
     //printf("TX ================= sample: %f + i%f\n", sample.real, sample.imag);
     
     // interpolate by k_SampPerSymb
@@ -217,21 +250,11 @@ void modulator(uint8_t sym_in)
 
         liquid_float_complex c;
         nco_crcf_mix_up(upnco,y[i],&c);
+
         float usb = c.real + c.imag;
-    
         // adapt speed to soundcard samplerate
         int fs;
         int to = 0;
-        /*
-        while(keeprunning)
-        {
-            fs = io_fifo_freespace(io_pbidx);
-            // wait until there is space in fifo
-            if(fs > 10) break;
-            printf("wit:%d: %d\n", io_pbidx,io_fifo_elems_avail(io_pbidx));
-            sleep_ms(10);
-            if (++to >= 400) break; // give up after 4s 
-        }*/
 
         // put max. 4 frames in fifo, to minimize latency
         // 4 frames are 1032 bytes
@@ -240,7 +263,7 @@ void modulator(uint8_t sym_in)
             fs = io_fifo_usedspace(io_pbidx);
             if (fs <= 20000) break;
             //printf("wit:%d: %d\n", io_pbidx, io_fifo_elems_avail(io_pbidx));
-            sleep_ms(10);
+            sleep_ms(100);
             if (++to >= 400) break; // give up after 4s 
         }
 
@@ -251,6 +274,7 @@ void modulator(uint8_t sym_in)
         usb *= 0.1f;
         kmaudio_playsamples(io_pbidx, &usb, 1, pbvol);
     }
+#endif
 }
 
 // =========== DEMODULATOR =============================

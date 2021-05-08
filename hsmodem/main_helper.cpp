@@ -152,3 +152,126 @@ void sleep_ms(int ms)
     Sleep(ms);
 }
 #endif
+
+/* Returns a list of files in a directory (except the ones that begin with a dot) */
+
+int GetFilesInDirectory(char* folder, char files[MAXFILENUM][MAXFILESIZE])
+{
+#ifdef _WIN32_
+    WIN32_FIND_DATA ffd;
+    char dir[512];
+    int fnum = 0;
+
+    sprintf(dir, "%s/*", folder);
+    printf("List files in:<%s>\n", dir);
+    HANDLE hFind = FindFirstFile(dir, &ffd);
+    if (hFind == INVALID_HANDLE_VALUE)
+    {
+        printf("folder not found\n");
+        return 0;
+    }
+
+    do
+    {
+        if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        {
+            // ignore files > 200k
+            if (ffd.nFileSizeHigh > 0 || ffd.nFileSizeLow > 200000) continue;
+
+            if (strlen(ffd.cFileName) < (size_t)(MAXFILESIZE - 1))
+            {
+                //printf("%s %lld\n", ffd.cFileName, filesize.QuadPart);
+                strcpy(files[fnum], ffd.cFileName);
+                fnum++;
+            }
+            if (fnum >= MAXFILENUM) break;
+        }
+    } while (FindNextFile(hFind, &ffd) != 0);
+    return fnum;
+
+#else
+    DIR* dir;
+    struct dirent* f;
+    int fnum = 0;
+
+    dir = opendir(folder);
+    if (dir)
+    {
+        while ((f = readdir(dir)))
+        {
+            if (!f->d_name || f->d_name[0] == '.' || f->d_type != DT_REG)
+                continue; // Skip everything that starts with a dot
+
+            // ignore files > 200k
+            struct stat st;
+            char ffn[512];
+            snprintf(ffn, 511, "%s/%s", folder, f->d_name);
+            stat(ffn, &st);
+            //printf("File: <%s> size:<%ld>\n", ffn, st.st_size);
+            if (st.st_size < 200000)
+            {
+                strcpy(files[fnum], f->d_name);
+                fnum++;
+            }
+        }
+        closedir(dir);
+    }
+    return fnum;
+#endif
+}
+
+// gets a writeable temporary path
+void temppath_name(char* pn)
+{
+    // Windows: user home
+    // Linux /tmp
+    strcpy(pn,"/tmp/");
+#ifdef _WIN32_
+    snprintf(pn, 256, "%s%s", getenv("HOMEDRIVE"), getenv("HOMEPATH"));
+    strcat(pn, "\\");
+#endif
+}
+
+#ifdef _LINUX_
+// get own IP adress
+char* ownIP()
+{
+    static char ip[20] = { 0 };
+
+    struct ifaddrs* ifaddr, * ifa;
+    int s;
+    char host[NI_MAXHOST];
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        perror("getifaddrs");
+        exit(EXIT_FAILURE);
+    }
+
+
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == NULL)
+            continue;
+
+        s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+        if (ifa->ifa_addr->sa_family == AF_INET)
+        {
+            if (s != 0)
+            {
+                printf("getnameinfo() failed: %s\n", gai_strerror(s));
+                exit(EXIT_FAILURE);
+            }
+            if (strncmp(host, "127", 3) != 0)
+            {
+                strcpy(ip, host);
+                break;
+            }
+        }
+    }
+
+    freeifaddrs(ifaddr);
+    return ip;
+}
+#endif
