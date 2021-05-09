@@ -58,6 +58,7 @@
 #include <math.h>
 #include <dirent.h>
 #include <ifaddrs.h>
+#include <pwd.h>
 #endif
 
 #include "opus.h"
