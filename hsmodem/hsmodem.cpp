@@ -202,8 +202,10 @@ int main(int argc, char* argv[])
     init_fifos();           // init fifos for PSK data and RTTY characters
     init_distributor();     // init distribution process for PSK data
     init_tune();            // init tuning tones (mixed to signal)
+#ifndef AMS_TESTMODE
     kmaudio_init();         // init soundcard driver
     kmaudio_getDeviceList();// get sound devices
+#endif
     init_packer();          // init PSK packer/unpacker
     initFEC();              // init FEC calculator
     ws_init();              // init Websocket
