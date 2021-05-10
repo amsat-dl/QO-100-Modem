@@ -163,7 +163,7 @@ int GetFilesInDirectory(char* folder, char files[MAXFILENUM][MAXFILESIZE])
     int fnum = 0;
 
     sprintf(dir, "%s/*", folder);
-    printf("List files in:<%s>\n", dir);
+    //printf("List files in:<%s>\n", dir);
     HANDLE hFind = FindFirstFile(dir, &ffd);
     if (hFind == INVALID_HANDLE_VALUE)
     {
@@ -215,6 +215,10 @@ int GetFilesInDirectory(char* folder, char files[MAXFILENUM][MAXFILESIZE])
             }
         }
         closedir(dir);
+    }
+    else
+    {
+        printf("cannot open folder:<%s>\n", folder);
     }
     return fnum;
 #endif

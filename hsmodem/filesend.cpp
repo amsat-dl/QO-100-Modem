@@ -119,7 +119,7 @@ void* filesend_function(void* param)
 				continue;
 			}
 
-			printf("send next file in %s\n", AUTOSENDFOLDER);
+			//printf("send next file in %s\n", AUTOSENDFOLDER);
 			sendNextInFolder();
 		}
 		printf("FileSend exits\n");
@@ -145,7 +145,7 @@ void* filesend_function(void* param)
 		static int f = 1;
 		if (f || mode)
 		{
-			printf("reset time\n");
+			//printf("reset time\n");
 			lastSendTime = actTime;
 			f = 0;
 			return 0;
@@ -255,7 +255,8 @@ int zipfile(char* fullname, char *name, char* zipfilename)
 
 int prepare_filesend(char *fullname, char *filename)
 {
-	printf("send <%s> in <%s>\n", filename, fullname);
+	//printf("send <%s> in <%s>\n", filename, fullname);
+	printf("send <%s>\n", filename);
 
 	// read the complete file into memory
 	int len = 0;
