@@ -33,7 +33,7 @@ this software uses these programs:
 # Download alternatives
 * download from github and build from source
 * download windows installer and download Odroid and Raspberry images:
-https://hsmodem.dj0abr.de (Download section)
+https://dj0abr.de/german/technik/sat/modem/images.htm
 
 
 # building the software for Linux
@@ -52,7 +52,7 @@ oscardata.exe starts hsmodem automatically in the background. If you want to run
 
 * Windows
 if the software was installed with this setup file: 
-https://wx.spdns.de/german/technik/sat/modem/images.htm
+https://dj0abr.de/german/technik/sat/modem/images.htm
 then you find the program under the program group "amsat" in the Window's start menu
 
 * Linux
@@ -67,7 +67,7 @@ then you find the program under the program group "amsat" in the Window's start 
 # Manual
 
 complete documentation see:
-https://hsmodem.dj0abr.de
+https://wiki.amsat-dl.org/doku.php?id=en:hsmodem:streaming_beacon
 
 vy 73, DJ0ABR
 
