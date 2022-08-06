@@ -75,7 +75,7 @@ void onclose(int fd);
 void onmessage(int fd, unsigned char *message);
 int onwork(int fd, unsigned char *cnt0, unsigned char *cnt1);
 void insert_socket(int fd, char *cli);
-void remove_socket(int fd);
+int remove_socket(int fd);
 char *getSocketIP(int fd);
 unsigned char *ws_build_txframe(int i, int *plength);
 int get_socket_idx(int fd);

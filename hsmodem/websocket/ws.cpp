@@ -23,8 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 #include "../hsmodem.h"
 
-/* Registered events. */
-struct ws_events events;
 
 /**
  * Gets the IP address relative to a

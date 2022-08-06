@@ -105,6 +105,8 @@ enum _VOICEMODES_ {
 #define MAXFILENUM	500
 #define MAXFILESIZE	256
 
+extern struct ws_events events;
+
 void init_packer();
 uint8_t* Pack(uint8_t* payload, int type, int status, int* plen, int repeat);
 uint8_t* unpack_data(uint8_t* rxd, int len);

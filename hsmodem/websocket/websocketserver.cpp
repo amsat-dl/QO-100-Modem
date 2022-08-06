@@ -251,14 +251,19 @@ void insert_socket(int fd, char *cli)
 }
 
 // remove a socket from the socket-list
-void remove_socket(int fd)
+int remove_socket(int fd)
 {
+    int result = -1;
+
+    printf("Remove socket called %d\n", fd);
+
     WS_LOCK;
     for(int i=0; i<MAX_CLIENTS; i++)
     {
         if(actsock[i].socket == fd)
         {
             printf("remove client %d %d\n", i, fd);
+            result = i;
 /*
 !!!  DO NOT close it here, this is the wrong thread !!!
             close(fd);
@@ -269,6 +274,8 @@ void remove_socket(int fd)
     }
             
     WS_UNLOCK();
+
+    return result;
 }
 
 int get_socket_idx(int fd)
@@ -314,7 +321,10 @@ void ws_alive()
             if (actsock[i].alive == 0)
             {
                 // remove inactive client
-                remove_socket(actsock[i].socket);
+                printf("Remove Inactive Client\n");
+
+                int fd = actsock[i].socket;
+                int result = remove_socket(fd);
             }
         }
     }
