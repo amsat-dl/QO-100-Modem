@@ -27,6 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 extern int useCAT;
 int connections = 0;
 
+/* Registered events. */
+struct ws_events events;
+
+
 // a new browser connected
 void onopen(int fd)
 {
@@ -45,15 +49,28 @@ void onopen(int fd)
 // a browser disconnected
 void onclose(int fd)
 {
-    remove_socket(fd);
+    printf("OnClose Event\n");
+
+    int result = remove_socket(fd);
+
+    if (result > -1)
+    {
+        printf("closing fd\n");
 #ifdef WIN32
-    _close(fd);
+        _close(fd);
 #else
-    close(fd);
+        close(fd);
 #endif
+    }
+    else
+    {
+        printf("fd doesn't exist any more\n");
+    }
+
+
     printf("Connection closed, client: %d\n", fd);
     connections--;
-    printf("%d users logged in\n",connections);
+    printf("%d users logged in\n", connections);
 }
 
 // if avaiable, send data to a browser

@@ -116,7 +116,22 @@ void ext_rxdata(uint8_t* pdata, int len, struct sockaddr_in* rxsock)
         // WB spectrum data
         makeWBSpecData(pdata + 4 + 1, len - 1 - 4);
     }
+    else if (pdata[4] == 25)
+    {
+        // generic data
+        // generate a full payload, padded with zeros
+        uint8_t payload[PAYLOADLEN];
+        memset(payload, 0, PAYLOADLEN);
+        if (len > PAYLOADLEN) len = PAYLOADLEN; // just for security, will usually never happen
+        memcpy(payload, pdata + 4, len - 4);
 
+        printf("generic data ID: %d msglen:%d \n", pdata[4], len);
+
+        // 8 ... ExternalData
+        // 3 ... SingleFrame
+        // 1 ... repeat frame if TX currently down
+        modem_sendPSKData(payload, 8, 3, 1, EXT_TX);
+    }
     else
     {
         printf("external message: %d msglen: %d unknown\n", pdata[0], len);
@@ -166,6 +181,12 @@ void ext_modemRX(uint8_t* pdata)
     if (payload[0] == 3)
     {
         handleWBSpecData(payload, PAYLOADLEN);
+    }
+
+    if (payload[0] == 25)
+    {
+        // send to websocket
+        ws_send(payload, PAYLOADLEN);
     }
 
     // type=16 is also in use, see hsmodem (Bulletin)
