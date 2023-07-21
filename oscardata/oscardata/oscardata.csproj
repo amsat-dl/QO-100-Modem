@@ -157,4 +157,7 @@
     <Content Include="Satellite-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(SolutionDir)\Debug\hsmodem.*" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
