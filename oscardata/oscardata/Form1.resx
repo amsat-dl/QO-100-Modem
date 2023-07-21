@@ -137,7 +137,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAAA+
-        JQAAAk1TRnQBSQFMAgEBFwEAAfgBDQH4AQ0BEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
+        JQAAAk1TRnQBSQFMAgEBFwEAAQgBDgEIAQ4BEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
         AwABQAMAAWADAAEBAQABCAYAARgYAAGAAgABgAMAAoABAAGAAwABgAEAAYABAAKAAgADwAEAAcAB3AHA
         AQAB8AHKAaYBAAEzBQABMwEAATMBAAEzAQACMwIAAxYBAAMcAQADIgEAAykBAANVAQADTQEAA0IBAAM5
         AQABgAF8Af8BAAJQAf8BAAGTAQAB1gEAAf8B7AHMAQABxgHWAe8BAAHWAucBAAGQAakBrQIAAf8BMwMA
@@ -302,7 +302,7 @@
   <data name="pictureBox_rximage.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EwAACxMBAJqcGAAA/7JJREFUeF7sned628i2RO+jW5k5B5FUznJ6RdxatdEkJdNhfDwzHmv/qI8IjQZI
+        EQAACxEBf2RfkQAA/7JJREFUeF7sned628i2RO+jW5k5B5FUznJ6RdxatdEkJdNhfDwzHmv/qI8IjQZI
         yeZS7dD/9+7duyqVSqVSqVQq9XaUAJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caUAJhKpVKp
         VCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caUAJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caU
         AJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caUAJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVS
@@ -2430,7 +2430,7 @@
   <data name="pictureBox_tximage.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EwAACxMBAJqcGAAA/7JJREFUeF7sned628i2RO+jW5k5B5FUznJ6RdxatdEkJdNhfDwzHmv/qI8IjQZI
+        EQAACxEBf2RfkQAA/7JJREFUeF7sned628i2RO+jW5k5B5FUznJ6RdxatdEkJdNhfDwzHmv/qI8IjQZI
         yeZS7dD/9+7duyqVSqVSqVQq9XaUAJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caUAJhKpVKp
         VCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caUAJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caU
         AJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVSqVQq9caUAJhKpVKpVCr1xpQAmEqlUqlUKvXGlACYSqVS
@@ -4937,7 +4937,7 @@
   <data name="pictureBox3.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAOQAAABCCAYAAABHEnp+AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EwAACxMBAJqcGAAAAAd0SU1FB+QMFgsyFAp8eZsAAEU/SURBVHhe7b0HlBVV+q/9nu5zOudIZ5IIZses
+        EQAACxEBf2RfkQAAAAd0SU1FB+QMFgsyFAp8eZsAAEU/SURBVHhe7b0HlBVV+q/9nu5zOudIZ5IIZses
         M45jGrNijmMcBSMiCIIiiCiSo0CTugkSJHeONN3EBiQKiI5/QZIBDP/vu+tbd6177/f86pxqji06OoaB
         O73X+q1dYdeuqtP72e/77l1VbS2pJbWkltSSWlJLakkt6QRIoSgJdUAdAzo5IG07KaD2AbVrprYBtWmm
         1gHlBZT7T+SWk9xjm9fpniv4/O51udepa5bce9D9dApI25OR7rkltaTjMgnGTHQBujygK4KWf45+znFu
@@ -5330,7 +5330,7 @@ VIP user: DP0GVN: https://www.awi.de/expedition/stationen/neumayer-station-iii.h
   <data name="pb_rxsignal.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EwAACxMBAJqcGAAAA3xJREFUSEulVstL1FEYvfmYMR+LisJoU5QEiVipSLQQn6RjNMk4ig+wCJSpDCzU
+        EQAACxEBf2RfkQAAA3xJREFUSEulVstL1FEYvfmYMR+LisJoU5QEiVipSLQQn6RjNMk4ig+wCJSpDCzU
         XspABIaZrUIREzetXLRoIfgHhOQuausixFWL3H9f59yHj0wTunD4vnvvOee73+81Y/YbWVlZESAGTACL
         wIoHc65xL+LpBx8Q5QBD+casJ42RGWP0C/Aj20KYY02wp+SQS42X7z9ALAXzeyrD6M+IUb1WK5IeUZmf
         U/24QAhzGX0m2LMccIUaar3N3wcINYXG/Fo6bESrK0XfjIm+f7c/yAGXGmrp4e12DlYn4VsuTt1xXfRV
@@ -5351,7 +5351,7 @@ VIP user: DP0GVN: https://www.awi.de/expedition/stationen/neumayer-station-iii.h
   <data name="pb_rxsync.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EwAACxMBAJqcGAAAA3xJREFUSEulVstL1FEYvfmYMR+LisJoU5QEiVipSLQQn6RjNMk4ig+wCJSpDCzU
+        EQAACxEBf2RfkQAAA3xJREFUSEulVstL1FEYvfmYMR+LisJoU5QEiVipSLQQn6RjNMk4ig+wCJSpDCzU
         XspABIaZrUIREzetXLRoIfgHhOQuausixFWL3H9f59yHj0wTunD4vnvvOee73+81Y/YbWVlZESAGTACL
         wIoHc65xL+LpBx8Q5QBD+casJ42RGWP0C/Aj20KYY02wp+SQS42X7z9ALAXzeyrD6M+IUb1WK5IeUZmf
         U/24QAhzGX0m2LMccIUaar3N3wcINYXG/Fo6bESrK0XfjIm+f7c/yAGXGmrp4e12DlYn4VsuTt1xXfRV

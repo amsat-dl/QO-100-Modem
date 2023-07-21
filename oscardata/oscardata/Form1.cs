@@ -1095,8 +1095,12 @@ namespace oscardata
             }
         }
 
+        HamlibService hamlibService = new HamlibService();
+
         private void button_sendimage_Click(object sender, EventArgs e)
         {
+            hamlibService.AssertPtt();
+
             lastFullName = TXfullfilename;
             txcommand = statics.Image;
             rxbytecounter = 0;
@@ -1245,6 +1249,7 @@ namespace oscardata
 
         private void button_cancelimg_Click(object sender, EventArgs e)
         {
+            hamlibService.ReleasePtt();
             //txcommand = statics.noTX;    // finished
             label_rximage.ForeColor = Color.Black;
             pictureBox_rximage.Image = null;

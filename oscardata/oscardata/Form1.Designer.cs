@@ -49,15 +49,6 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.button_startBERtest = new System.Windows.Forms.Button();
             this.tabPage_image = new System.Windows.Forms.TabPage();
-            this.groupBox1 = new oscardata.DoubleBufferedPanel();
-            this.cb_picres = new System.Windows.Forms.ComboBox();
-            this.cb_loop = new System.Windows.Forms.CheckBox();
-            this.bt_rximages = new System.Windows.Forms.Button();
-            this.button_loadimage = new System.Windows.Forms.Button();
-            this.comboBox_quality = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.button_cancelimg = new System.Windows.Forms.Button();
-            this.button_sendimage = new System.Windows.Forms.Button();
             this.label_rximage = new System.Windows.Forms.Label();
             this.label_tximage = new System.Windows.Forms.Label();
             this.pictureBox_rximage = new System.Windows.Forms.PictureBox();
@@ -108,6 +99,80 @@
             this.label3 = new System.Windows.Forms.Label();
             this.tb_rtty_TX = new System.Windows.Forms.TextBox();
             this.tb_rtty_RX = new System.Windows.Forms.TextBox();
+            this.tabPage_setup = new System.Windows.Forms.TabPage();
+            this.label_cfgpath = new System.Windows.Forms.Label();
+            this.label_cfgpath_tit = new System.Windows.Forms.Label();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.cb_extIF = new System.Windows.Forms.CheckBox();
+            this.textBox7 = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.cb_language = new System.Windows.Forms.ComboBox();
+            this.cb_autostart = new System.Windows.Forms.CheckBox();
+            this.bt_shutdown = new System.Windows.Forms.Button();
+            this.tb_shutdown = new System.Windows.Forms.TextBox();
+            this.bt_resetmodem = new System.Windows.Forms.Button();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.bt_tune_plus = new System.Windows.Forms.Button();
+            this.bt_tune_minus = new System.Windows.Forms.Button();
+            this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
+            this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.tb_CAPvol = new System.Windows.Forms.TrackBar();
+            this.tb_PBvol = new System.Windows.Forms.TrackBar();
+            this.cb_audioPB = new System.Windows.Forms.ComboBox();
+            this.cb_audioCAP = new System.Windows.Forms.ComboBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tb_myqthloc = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.tb_myqth = new System.Windows.Forms.TextBox();
+            this.lb_qth = new System.Windows.Forms.Label();
+            this.tb_myname = new System.Windows.Forms.TextBox();
+            this.lb_myname = new System.Windows.Forms.Label();
+            this.lb_rec = new System.Windows.Forms.Label();
+            this.tb_recintro = new System.Windows.Forms.TextBox();
+            this.bt_astop = new System.Windows.Forms.Button();
+            this.bt_aplay = new System.Windows.Forms.Button();
+            this.bt_arecord = new System.Windows.Forms.Button();
+            this.cb_sendIntro = new System.Windows.Forms.CheckBox();
+            this.cb_stampinfo = new System.Windows.Forms.CheckBox();
+            this.tb_info = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.cb_announcement = new System.Windows.Forms.ComboBox();
+            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tb_callsign = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cb_stampcall = new System.Windows.Forms.CheckBox();
+            this.tabPage_about = new System.Windows.Forms.TabPage();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.timer_searchmodem = new System.Windows.Forms.Timer(this.components);
+            this.tabPage_rigctl = new System.Windows.Forms.TabPage();
+            this.pn1 = new oscardata.DoubleBufferedPanel();
+            this.progressBar_fifo = new oscardata.KmProgressBar();
+            this.label_capfifo = new System.Windows.Forms.Label();
+            this.label_speed = new System.Windows.Forms.Label();
+            this.pb_rxsignal = new System.Windows.Forms.PictureBox();
+            this.lb_rxsync = new System.Windows.Forms.Label();
+            this.progressBar_capfifo = new oscardata.KmProgressBar();
+            this.cb_speed = new System.Windows.Forms.ComboBox();
+            this.lb_rxsignal = new System.Windows.Forms.Label();
+            this.pb_rxsync = new System.Windows.Forms.PictureBox();
+            this.label_fifo = new System.Windows.Forms.Label();
+            this.panel_txspectrum = new oscardata.DoubleBufferedPanel();
+            this.panel_constel = new oscardata.DoubleBufferedPanel();
+            this.groupBox1 = new oscardata.DoubleBufferedPanel();
+            this.cb_picres = new System.Windows.Forms.ComboBox();
+            this.cb_loop = new System.Windows.Forms.CheckBox();
+            this.bt_rximages = new System.Windows.Forms.Button();
+            this.button_loadimage = new System.Windows.Forms.Button();
+            this.comboBox_quality = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.button_cancelimg = new System.Windows.Forms.Button();
+            this.button_sendimage = new System.Windows.Forms.Button();
             this.panel1 = new oscardata.DoubleBufferedPanel();
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.cb_rx_autosync = new System.Windows.Forms.CheckBox();
@@ -142,76 +207,12 @@
             this.tb_urname = new System.Windows.Forms.TextBox();
             this.tb_urcall = new System.Windows.Forms.TextBox();
             this.label_urcall = new System.Windows.Forms.Label();
-            this.tabPage_setup = new System.Windows.Forms.TabPage();
-            this.label_cfgpath = new System.Windows.Forms.Label();
-            this.label_cfgpath_tit = new System.Windows.Forms.Label();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.cb_extIF = new System.Windows.Forms.CheckBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.cb_language = new System.Windows.Forms.ComboBox();
-            this.cb_autostart = new System.Windows.Forms.CheckBox();
-            this.bt_shutdown = new System.Windows.Forms.Button();
-            this.tb_shutdown = new System.Windows.Forms.TextBox();
-            this.bt_resetmodem = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.bt_tune_plus = new System.Windows.Forms.Button();
-            this.bt_tune_minus = new System.Windows.Forms.Button();
             this.vu_cap = new oscardata.KmProgressBar();
             this.vu_pb = new oscardata.KmProgressBar();
-            this.pb_audioCAPstatus = new System.Windows.Forms.PictureBox();
-            this.pb_audioPBstatus = new System.Windows.Forms.PictureBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.tb_CAPvol = new System.Windows.Forms.TrackBar();
-            this.tb_PBvol = new System.Windows.Forms.TrackBar();
-            this.cb_audioPB = new System.Windows.Forms.ComboBox();
-            this.cb_audioCAP = new System.Windows.Forms.ComboBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.tb_myqthloc = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.tb_myqth = new System.Windows.Forms.TextBox();
-            this.lb_qth = new System.Windows.Forms.Label();
-            this.tb_myname = new System.Windows.Forms.TextBox();
-            this.lb_myname = new System.Windows.Forms.Label();
-            this.lb_rec = new System.Windows.Forms.Label();
-            this.tb_recintro = new System.Windows.Forms.TextBox();
-            this.bt_astop = new System.Windows.Forms.Button();
-            this.bt_aplay = new System.Windows.Forms.Button();
-            this.bt_arecord = new System.Windows.Forms.Button();
-            this.cb_sendIntro = new System.Windows.Forms.CheckBox();
-            this.cb_stampinfo = new System.Windows.Forms.CheckBox();
-            this.tb_info = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.cb_announcement = new System.Windows.Forms.ComboBox();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.tb_callsign = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.cb_stampcall = new System.Windows.Forms.CheckBox();
-            this.tabPage_about = new System.Windows.Forms.TabPage();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.timer_searchmodem = new System.Windows.Forms.Timer(this.components);
-            this.pn1 = new oscardata.DoubleBufferedPanel();
-            this.progressBar_fifo = new oscardata.KmProgressBar();
-            this.label_capfifo = new System.Windows.Forms.Label();
-            this.label_speed = new System.Windows.Forms.Label();
-            this.pb_rxsignal = new System.Windows.Forms.PictureBox();
-            this.lb_rxsync = new System.Windows.Forms.Label();
-            this.progressBar_capfifo = new oscardata.KmProgressBar();
-            this.cb_speed = new System.Windows.Forms.ComboBox();
-            this.lb_rxsignal = new System.Windows.Forms.Label();
-            this.pb_rxsync = new System.Windows.Forms.PictureBox();
-            this.label_fifo = new System.Windows.Forms.Label();
-            this.panel_txspectrum = new oscardata.DoubleBufferedPanel();
-            this.panel_constel = new oscardata.DoubleBufferedPanel();
+            this.rigControlControl1 = new oscardata.RigControlControl();
             this.statusStrip1.SuspendLayout();
             this.tabPage_ber.SuspendLayout();
             this.tabPage_image.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_rximage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_tximage)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -229,7 +230,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tb_mic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_loadspeaker)).BeginInit();
             this.tabPage_rtty.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.tabPage_setup.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -241,9 +241,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.tb_PBvol)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.tabPage_about.SuspendLayout();
+            this.tabPage_rigctl.SuspendLayout();
             this.pn1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_rxsignal)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_rxsync)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // timer_udpTX
@@ -447,127 +450,6 @@
             this.tabPage_image.TabIndex = 1;
             this.tabPage_image.Text = "Image";
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.cb_picres);
-            this.groupBox1.Controls.Add(this.cb_loop);
-            this.groupBox1.Controls.Add(this.bt_rximages);
-            this.groupBox1.Controls.Add(this.button_loadimage);
-            this.groupBox1.Controls.Add(this.comboBox_quality);
-            this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.button_cancelimg);
-            this.groupBox1.Controls.Add(this.button_sendimage);
-            this.groupBox1.Location = new System.Drawing.Point(3, 508);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1277, 42);
-            this.groupBox1.TabIndex = 12;
-            // 
-            // cb_picres
-            // 
-            this.cb_picres.FormattingEnabled = true;
-            this.cb_picres.Items.AddRange(new object[] {
-            "160x120",
-            "240x180",
-            "320x240",
-            "400x300",
-            "480x360",
-            "560x420",
-            "640x480"});
-            this.cb_picres.Location = new System.Drawing.Point(174, 7);
-            this.cb_picres.Name = "cb_picres";
-            this.cb_picres.Size = new System.Drawing.Size(85, 21);
-            this.cb_picres.TabIndex = 12;
-            this.cb_picres.Text = "640x480";
-            // 
-            // cb_loop
-            // 
-            this.cb_loop.AutoSize = true;
-            this.cb_loop.Location = new System.Drawing.Point(644, 5);
-            this.cb_loop.Name = "cb_loop";
-            this.cb_loop.Size = new System.Drawing.Size(167, 17);
-            this.cb_loop.TabIndex = 11;
-            this.cb_loop.Text = "loop (send all images in folder)";
-            this.cb_loop.UseVisualStyleBackColor = true;
-            // 
-            // bt_rximages
-            // 
-            this.bt_rximages.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.bt_rximages.ImageIndex = 5;
-            this.bt_rximages.ImageList = this.imageList1;
-            this.bt_rximages.Location = new System.Drawing.Point(534, 5);
-            this.bt_rximages.Name = "bt_rximages";
-            this.bt_rximages.Size = new System.Drawing.Size(92, 23);
-            this.bt_rximages.TabIndex = 10;
-            this.bt_rximages.Text = "   RX Images";
-            this.bt_rximages.UseVisualStyleBackColor = true;
-            this.bt_rximages.Click += new System.EventHandler(this.bt_rximages_Click);
-            // 
-            // button_loadimage
-            // 
-            this.button_loadimage.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button_loadimage.ImageIndex = 5;
-            this.button_loadimage.ImageList = this.imageList1;
-            this.button_loadimage.Location = new System.Drawing.Point(265, 5);
-            this.button_loadimage.Name = "button_loadimage";
-            this.button_loadimage.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.button_loadimage.Size = new System.Drawing.Size(88, 23);
-            this.button_loadimage.TabIndex = 0;
-            this.button_loadimage.Text = "    Load Image";
-            this.button_loadimage.UseVisualStyleBackColor = true;
-            this.button_loadimage.Click += new System.EventHandler(this.button_loadimage_Click);
-            // 
-            // comboBox_quality
-            // 
-            this.comboBox_quality.FormattingEnabled = true;
-            this.comboBox_quality.Items.AddRange(new object[] {
-            "low, 30s",
-            "medium, 1min",
-            "high, 2min",
-            "very high, 4min"});
-            this.comboBox_quality.Location = new System.Drawing.Point(57, 7);
-            this.comboBox_quality.Name = "comboBox_quality";
-            this.comboBox_quality.Size = new System.Drawing.Size(111, 21);
-            this.comboBox_quality.TabIndex = 6;
-            this.comboBox_quality.Text = "medium, 1min";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 10);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Quality:";
-            // 
-            // button_cancelimg
-            // 
-            this.button_cancelimg.ForeColor = System.Drawing.Color.Red;
-            this.button_cancelimg.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button_cancelimg.ImageIndex = 8;
-            this.button_cancelimg.ImageList = this.imageList1;
-            this.button_cancelimg.Location = new System.Drawing.Point(443, 5);
-            this.button_cancelimg.Name = "button_cancelimg";
-            this.button_cancelimg.Size = new System.Drawing.Size(75, 23);
-            this.button_cancelimg.TabIndex = 9;
-            this.button_cancelimg.Text = "   Cancel";
-            this.button_cancelimg.UseVisualStyleBackColor = true;
-            this.button_cancelimg.Click += new System.EventHandler(this.button_cancelimg_Click);
-            // 
-            // button_sendimage
-            // 
-            this.button_sendimage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_sendimage.ForeColor = System.Drawing.Color.Blue;
-            this.button_sendimage.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button_sendimage.ImageIndex = 10;
-            this.button_sendimage.ImageList = this.imageList1;
-            this.button_sendimage.Location = new System.Drawing.Point(361, 5);
-            this.button_sendimage.Name = "button_sendimage";
-            this.button_sendimage.Size = new System.Drawing.Size(75, 23);
-            this.button_sendimage.TabIndex = 1;
-            this.button_sendimage.Text = "Send";
-            this.button_sendimage.UseVisualStyleBackColor = true;
-            this.button_sendimage.Click += new System.EventHandler(this.button_sendimage_Click);
-            // 
             // label_rximage
             // 
             this.label_rximage.AutoSize = true;
@@ -617,6 +499,7 @@
             this.tabControl1.Controls.Add(this.tabPage_rtty);
             this.tabControl1.Controls.Add(this.tabPage_setup);
             this.tabControl1.Controls.Add(this.tabPage_about);
+            this.tabControl1.Controls.Add(this.tabPage_rigctl);
             this.tabControl1.ImageList = this.imageList1;
             this.tabControl1.Location = new System.Drawing.Point(5, 3);
             this.tabControl1.Name = "tabControl1";
@@ -1164,6 +1047,876 @@
             this.tb_rtty_RX.TabIndex = 2;
             this.tb_rtty_RX.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tb_rtty_RX_MouseDown);
             // 
+            // tabPage_setup
+            // 
+            this.tabPage_setup.BackColor = System.Drawing.Color.Transparent;
+            this.tabPage_setup.Controls.Add(this.label_cfgpath);
+            this.tabPage_setup.Controls.Add(this.label_cfgpath_tit);
+            this.tabPage_setup.Controls.Add(this.groupBox4);
+            this.tabPage_setup.Controls.Add(this.groupBox3);
+            this.tabPage_setup.Controls.Add(this.groupBox2);
+            this.tabPage_setup.ImageIndex = 6;
+            this.tabPage_setup.Location = new System.Drawing.Point(4, 23);
+            this.tabPage_setup.Name = "tabPage_setup";
+            this.tabPage_setup.Size = new System.Drawing.Size(1280, 552);
+            this.tabPage_setup.TabIndex = 4;
+            this.tabPage_setup.Text = "Setup";
+            // 
+            // label_cfgpath
+            // 
+            this.label_cfgpath.AutoSize = true;
+            this.label_cfgpath.Location = new System.Drawing.Point(162, 441);
+            this.label_cfgpath.Name = "label_cfgpath";
+            this.label_cfgpath.Size = new System.Drawing.Size(16, 13);
+            this.label_cfgpath.TabIndex = 17;
+            this.label_cfgpath.Text = "...";
+            // 
+            // label_cfgpath_tit
+            // 
+            this.label_cfgpath_tit.AutoSize = true;
+            this.label_cfgpath_tit.Location = new System.Drawing.Point(17, 441);
+            this.label_cfgpath_tit.Name = "label_cfgpath_tit";
+            this.label_cfgpath_tit.Size = new System.Drawing.Size(115, 13);
+            this.label_cfgpath_tit.TabIndex = 16;
+            this.label_cfgpath_tit.Text = "Configuration stored in:";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.cb_extIF);
+            this.groupBox4.Controls.Add(this.textBox7);
+            this.groupBox4.Controls.Add(this.label12);
+            this.groupBox4.Controls.Add(this.cb_language);
+            this.groupBox4.Controls.Add(this.cb_autostart);
+            this.groupBox4.Controls.Add(this.bt_shutdown);
+            this.groupBox4.Controls.Add(this.tb_shutdown);
+            this.groupBox4.Controls.Add(this.bt_resetmodem);
+            this.groupBox4.Controls.Add(this.textBox3);
+            this.groupBox4.Location = new System.Drawing.Point(12, 313);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(743, 121);
+            this.groupBox4.TabIndex = 15;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Maintenance";
+            // 
+            // cb_extIF
+            // 
+            this.cb_extIF.AutoSize = true;
+            this.cb_extIF.Location = new System.Drawing.Point(213, 22);
+            this.cb_extIF.Name = "cb_extIF";
+            this.cb_extIF.Size = new System.Drawing.Size(135, 17);
+            this.cb_extIF.TabIndex = 27;
+            this.cb_extIF.Text = "External Data Interface";
+            this.cb_extIF.UseVisualStyleBackColor = true;
+            this.cb_extIF.CheckedChanged += new System.EventHandler(this.cb_extIF_CheckedChanged);
+            // 
+            // textBox7
+            // 
+            this.textBox7.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox7.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox7.ForeColor = System.Drawing.Color.Black;
+            this.textBox7.Location = new System.Drawing.Point(211, 45);
+            this.textBox7.Multiline = true;
+            this.textBox7.Name = "textBox7";
+            this.textBox7.Size = new System.Drawing.Size(151, 39);
+            this.textBox7.TabIndex = 28;
+            this.textBox7.Text = "for advanced users only, see developers manual";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(428, 23);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(103, 13);
+            this.label12.TabIndex = 26;
+            this.label12.Text = "Language/Sprache:";
+            // 
+            // cb_language
+            // 
+            this.cb_language.FormattingEnabled = true;
+            this.cb_language.Items.AddRange(new object[] {
+            "English",
+            "German/Deutsch"});
+            this.cb_language.Location = new System.Drawing.Point(428, 42);
+            this.cb_language.Name = "cb_language";
+            this.cb_language.Size = new System.Drawing.Size(110, 21);
+            this.cb_language.TabIndex = 24;
+            this.cb_language.Text = "English";
+            this.cb_language.SelectedIndexChanged += new System.EventHandler(this.cb_language_SelectedIndexChanged);
+            // 
+            // cb_autostart
+            // 
+            this.cb_autostart.AutoSize = true;
+            this.cb_autostart.Checked = true;
+            this.cb_autostart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_autostart.Location = new System.Drawing.Point(17, 23);
+            this.cb_autostart.Name = "cb_autostart";
+            this.cb_autostart.Size = new System.Drawing.Size(155, 17);
+            this.cb_autostart.TabIndex = 4;
+            this.cb_autostart.Text = "LOCAL/(remote) HSmodem";
+            this.cb_autostart.UseVisualStyleBackColor = true;
+            this.cb_autostart.CheckedChanged += new System.EventHandler(this.cb_autostart_CheckedChanged);
+            // 
+            // bt_shutdown
+            // 
+            this.bt_shutdown.Location = new System.Drawing.Point(564, 18);
+            this.bt_shutdown.Name = "bt_shutdown";
+            this.bt_shutdown.Size = new System.Drawing.Size(155, 23);
+            this.bt_shutdown.TabIndex = 4;
+            this.bt_shutdown.Text = "Shutdown Modem-SBC";
+            this.bt_shutdown.UseVisualStyleBackColor = true;
+            this.bt_shutdown.Click += new System.EventHandler(this.bt_shutdown_Click);
+            // 
+            // tb_shutdown
+            // 
+            this.tb_shutdown.BackColor = System.Drawing.SystemColors.Control;
+            this.tb_shutdown.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tb_shutdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_shutdown.ForeColor = System.Drawing.Color.Red;
+            this.tb_shutdown.Location = new System.Drawing.Point(564, 47);
+            this.tb_shutdown.Multiline = true;
+            this.tb_shutdown.Name = "tb_shutdown";
+            this.tb_shutdown.Size = new System.Drawing.Size(155, 50);
+            this.tb_shutdown.TabIndex = 5;
+            this.tb_shutdown.Text = "before switching off the \r\nmodem SBC click here to \r\navoid defective SD-cards.\r\n";
+            // 
+            // bt_resetmodem
+            // 
+            this.bt_resetmodem.Location = new System.Drawing.Point(602, 91);
+            this.bt_resetmodem.Name = "bt_resetmodem";
+            this.bt_resetmodem.Size = new System.Drawing.Size(117, 23);
+            this.bt_resetmodem.TabIndex = 6;
+            this.bt_resetmodem.Text = "Reset RX Modem";
+            this.bt_resetmodem.UseVisualStyleBackColor = true;
+            this.bt_resetmodem.Visible = false;
+            this.bt_resetmodem.Click += new System.EventHandler(this.bt_resetmodem_Click);
+            // 
+            // textBox3
+            // 
+            this.textBox3.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox3.ForeColor = System.Drawing.Color.Black;
+            this.textBox3.Location = new System.Drawing.Point(15, 46);
+            this.textBox3.Multiline = true;
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(151, 39);
+            this.textBox3.TabIndex = 12;
+            this.textBox3.Text = "only uncheck if modem runs on a separate PC";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.pictureBox4);
+            this.groupBox3.Controls.Add(this.pictureBox3);
+            this.groupBox3.Controls.Add(this.bt_tune_plus);
+            this.groupBox3.Controls.Add(this.bt_tune_minus);
+            this.groupBox3.Controls.Add(this.vu_cap);
+            this.groupBox3.Controls.Add(this.vu_pb);
+            this.groupBox3.Controls.Add(this.pb_audioCAPstatus);
+            this.groupBox3.Controls.Add(this.pb_audioPBstatus);
+            this.groupBox3.Controls.Add(this.label6);
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.tb_CAPvol);
+            this.groupBox3.Controls.Add(this.tb_PBvol);
+            this.groupBox3.Controls.Add(this.cb_audioPB);
+            this.groupBox3.Controls.Add(this.cb_audioCAP);
+            this.groupBox3.Location = new System.Drawing.Point(12, 144);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(743, 163);
+            this.groupBox3.TabIndex = 14;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Transceiver Audio";
+            // 
+            // pictureBox4
+            // 
+            this.pictureBox4.BackgroundImage = global::oscardata.Properties.Resources.captureicon;
+            this.pictureBox4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pictureBox4.Location = new System.Drawing.Point(0, 61);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(132, 87);
+            this.pictureBox4.TabIndex = 16;
+            this.pictureBox4.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox3.BackgroundImage")));
+            this.pictureBox3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pictureBox3.Location = new System.Drawing.Point(5, -7);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(127, 85);
+            this.pictureBox3.TabIndex = 16;
+            this.pictureBox3.TabStop = false;
+            // 
+            // bt_tune_plus
+            // 
+            this.bt_tune_plus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bt_tune_plus.Location = new System.Drawing.Point(602, 79);
+            this.bt_tune_plus.Name = "bt_tune_plus";
+            this.bt_tune_plus.Size = new System.Drawing.Size(24, 23);
+            this.bt_tune_plus.TabIndex = 22;
+            this.bt_tune_plus.Text = "+";
+            this.bt_tune_plus.UseVisualStyleBackColor = true;
+            this.bt_tune_plus.Visible = false;
+            this.bt_tune_plus.Click += new System.EventHandler(this.bt_tune_plus_Click);
+            // 
+            // bt_tune_minus
+            // 
+            this.bt_tune_minus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bt_tune_minus.Location = new System.Drawing.Point(602, 55);
+            this.bt_tune_minus.Name = "bt_tune_minus";
+            this.bt_tune_minus.Size = new System.Drawing.Size(24, 23);
+            this.bt_tune_minus.TabIndex = 21;
+            this.bt_tune_minus.Text = "-";
+            this.bt_tune_minus.UseVisualStyleBackColor = true;
+            this.bt_tune_minus.Visible = false;
+            this.bt_tune_minus.Click += new System.EventHandler(this.bt_tune_minus_Click);
+            // 
+            // pb_audioCAPstatus
+            // 
+            this.pb_audioCAPstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioCAPstatus.BackgroundImage")));
+            this.pb_audioCAPstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 87);
+            this.pb_audioCAPstatus.Name = "pb_audioCAPstatus";
+            this.pb_audioCAPstatus.Size = new System.Drawing.Size(21, 21);
+            this.pb_audioCAPstatus.TabIndex = 18;
+            this.pb_audioCAPstatus.TabStop = false;
+            // 
+            // pb_audioPBstatus
+            // 
+            this.pb_audioPBstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioPBstatus.BackgroundImage")));
+            this.pb_audioPBstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_audioPBstatus.Location = new System.Drawing.Point(375, 21);
+            this.pb_audioPBstatus.Name = "pb_audioPBstatus";
+            this.pb_audioPBstatus.Size = new System.Drawing.Size(21, 21);
+            this.pb_audioPBstatus.TabIndex = 17;
+            this.pb_audioPBstatus.TabStop = false;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(428, 89);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(45, 13);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "Volume:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(428, 25);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(45, 13);
+            this.label5.TabIndex = 15;
+            this.label5.Text = "Volume:";
+            // 
+            // tb_CAPvol
+            // 
+            this.tb_CAPvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.tb_CAPvol.Location = new System.Drawing.Point(479, 85);
+            this.tb_CAPvol.Maximum = 100;
+            this.tb_CAPvol.MaximumSize = new System.Drawing.Size(0, 24);
+            this.tb_CAPvol.Minimum = 1;
+            this.tb_CAPvol.MinimumSize = new System.Drawing.Size(100, 0);
+            this.tb_CAPvol.Name = "tb_CAPvol";
+            this.tb_CAPvol.Size = new System.Drawing.Size(100, 24);
+            this.tb_CAPvol.TabIndex = 14;
+            this.tb_CAPvol.TickFrequency = 10;
+            this.tb_CAPvol.Value = 50;
+            this.tb_CAPvol.Scroll += new System.EventHandler(this.tb_CAPvol_Scroll);
+            // 
+            // tb_PBvol
+            // 
+            this.tb_PBvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.tb_PBvol.Location = new System.Drawing.Point(479, 21);
+            this.tb_PBvol.Maximum = 100;
+            this.tb_PBvol.MaximumSize = new System.Drawing.Size(0, 24);
+            this.tb_PBvol.Minimum = 1;
+            this.tb_PBvol.MinimumSize = new System.Drawing.Size(100, 0);
+            this.tb_PBvol.Name = "tb_PBvol";
+            this.tb_PBvol.Size = new System.Drawing.Size(100, 24);
+            this.tb_PBvol.TabIndex = 13;
+            this.tb_PBvol.TickFrequency = 10;
+            this.tb_PBvol.Value = 50;
+            this.tb_PBvol.Scroll += new System.EventHandler(this.tb_PBvol_Scroll);
+            // 
+            // cb_audioPB
+            // 
+            this.cb_audioPB.FormattingEnabled = true;
+            this.cb_audioPB.Location = new System.Drawing.Point(138, 21);
+            this.cb_audioPB.Name = "cb_audioPB";
+            this.cb_audioPB.Size = new System.Drawing.Size(230, 21);
+            this.cb_audioPB.TabIndex = 7;
+            this.cb_audioPB.Text = "Default";
+            // 
+            // cb_audioCAP
+            // 
+            this.cb_audioCAP.FormattingEnabled = true;
+            this.cb_audioCAP.Location = new System.Drawing.Point(138, 87);
+            this.cb_audioCAP.Name = "cb_audioCAP";
+            this.cb_audioCAP.Size = new System.Drawing.Size(230, 21);
+            this.cb_audioCAP.TabIndex = 9;
+            this.cb_audioCAP.Text = "Default";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.tb_myqthloc);
+            this.groupBox2.Controls.Add(this.label14);
+            this.groupBox2.Controls.Add(this.tb_myqth);
+            this.groupBox2.Controls.Add(this.lb_qth);
+            this.groupBox2.Controls.Add(this.tb_myname);
+            this.groupBox2.Controls.Add(this.lb_myname);
+            this.groupBox2.Controls.Add(this.lb_rec);
+            this.groupBox2.Controls.Add(this.tb_recintro);
+            this.groupBox2.Controls.Add(this.bt_astop);
+            this.groupBox2.Controls.Add(this.bt_aplay);
+            this.groupBox2.Controls.Add(this.bt_arecord);
+            this.groupBox2.Controls.Add(this.cb_sendIntro);
+            this.groupBox2.Controls.Add(this.cb_stampinfo);
+            this.groupBox2.Controls.Add(this.tb_info);
+            this.groupBox2.Controls.Add(this.label7);
+            this.groupBox2.Controls.Add(this.cb_announcement);
+            this.groupBox2.Controls.Add(this.textBox4);
+            this.groupBox2.Controls.Add(this.textBox1);
+            this.groupBox2.Controls.Add(this.tb_callsign);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Controls.Add(this.cb_stampcall);
+            this.groupBox2.Location = new System.Drawing.Point(12, 13);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(743, 127);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Personal Settings";
+            // 
+            // tb_myqthloc
+            // 
+            this.tb_myqthloc.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.tb_myqthloc.Location = new System.Drawing.Point(71, 99);
+            this.tb_myqthloc.Name = "tb_myqthloc";
+            this.tb_myqthloc.Size = new System.Drawing.Size(104, 20);
+            this.tb_myqthloc.TabIndex = 35;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(14, 102);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(54, 13);
+            this.label14.TabIndex = 34;
+            this.label14.Text = "QTHLOC:";
+            // 
+            // tb_myqth
+            // 
+            this.tb_myqth.Location = new System.Drawing.Point(71, 72);
+            this.tb_myqth.Name = "tb_myqth";
+            this.tb_myqth.Size = new System.Drawing.Size(104, 20);
+            this.tb_myqth.TabIndex = 33;
+            // 
+            // lb_qth
+            // 
+            this.lb_qth.AutoSize = true;
+            this.lb_qth.Location = new System.Drawing.Point(14, 75);
+            this.lb_qth.Name = "lb_qth";
+            this.lb_qth.Size = new System.Drawing.Size(33, 13);
+            this.lb_qth.TabIndex = 32;
+            this.lb_qth.Text = "QTH:";
+            // 
+            // tb_myname
+            // 
+            this.tb_myname.Location = new System.Drawing.Point(71, 46);
+            this.tb_myname.Name = "tb_myname";
+            this.tb_myname.Size = new System.Drawing.Size(104, 20);
+            this.tb_myname.TabIndex = 31;
+            // 
+            // lb_myname
+            // 
+            this.lb_myname.AutoSize = true;
+            this.lb_myname.Location = new System.Drawing.Point(14, 49);
+            this.lb_myname.Name = "lb_myname";
+            this.lb_myname.Size = new System.Drawing.Size(38, 13);
+            this.lb_myname.TabIndex = 30;
+            this.lb_myname.Text = "Name:";
+            // 
+            // lb_rec
+            // 
+            this.lb_rec.AutoSize = true;
+            this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lb_rec.ForeColor = System.Drawing.Color.Red;
+            this.lb_rec.Location = new System.Drawing.Point(712, 101);
+            this.lb_rec.Name = "lb_rec";
+            this.lb_rec.Size = new System.Drawing.Size(23, 13);
+            this.lb_rec.TabIndex = 29;
+            this.lb_rec.Text = "....";
+            // 
+            // tb_recintro
+            // 
+            this.tb_recintro.BackColor = System.Drawing.SystemColors.Control;
+            this.tb_recintro.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tb_recintro.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_recintro.ForeColor = System.Drawing.Color.Black;
+            this.tb_recintro.Location = new System.Drawing.Point(470, 100);
+            this.tb_recintro.Multiline = true;
+            this.tb_recintro.Name = "tb_recintro";
+            this.tb_recintro.Size = new System.Drawing.Size(121, 19);
+            this.tb_recintro.TabIndex = 28;
+            this.tb_recintro.Text = "record intro audio:";
+            // 
+            // bt_astop
+            // 
+            this.bt_astop.BackgroundImage = global::oscardata.Properties.Resources.stopplay;
+            this.bt_astop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bt_astop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_astop.ForeColor = System.Drawing.SystemColors.Control;
+            this.bt_astop.Location = new System.Drawing.Point(663, 89);
+            this.bt_astop.Name = "bt_astop";
+            this.bt_astop.Size = new System.Drawing.Size(32, 36);
+            this.bt_astop.TabIndex = 27;
+            this.bt_astop.UseVisualStyleBackColor = true;
+            this.bt_astop.Click += new System.EventHandler(this.bt_astop_Click);
+            // 
+            // bt_aplay
+            // 
+            this.bt_aplay.BackgroundImage = global::oscardata.Properties.Resources.playback;
+            this.bt_aplay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bt_aplay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_aplay.ForeColor = System.Drawing.SystemColors.Control;
+            this.bt_aplay.Location = new System.Drawing.Point(625, 89);
+            this.bt_aplay.Name = "bt_aplay";
+            this.bt_aplay.Size = new System.Drawing.Size(32, 36);
+            this.bt_aplay.TabIndex = 26;
+            this.bt_aplay.UseVisualStyleBackColor = true;
+            this.bt_aplay.Click += new System.EventHandler(this.bt_aplay_Click);
+            // 
+            // bt_arecord
+            // 
+            this.bt_arecord.BackgroundImage = global::oscardata.Properties.Resources.record;
+            this.bt_arecord.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bt_arecord.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_arecord.ForeColor = System.Drawing.SystemColors.Control;
+            this.bt_arecord.Location = new System.Drawing.Point(587, 89);
+            this.bt_arecord.Name = "bt_arecord";
+            this.bt_arecord.Size = new System.Drawing.Size(32, 36);
+            this.bt_arecord.TabIndex = 25;
+            this.bt_arecord.UseVisualStyleBackColor = true;
+            this.bt_arecord.Click += new System.EventHandler(this.bt_arecord_Click);
+            // 
+            // cb_sendIntro
+            // 
+            this.cb_sendIntro.AutoSize = true;
+            this.cb_sendIntro.Checked = true;
+            this.cb_sendIntro.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_sendIntro.Location = new System.Drawing.Point(207, 104);
+            this.cb_sendIntro.Name = "cb_sendIntro";
+            this.cb_sendIntro.Size = new System.Drawing.Size(105, 17);
+            this.cb_sendIntro.TabIndex = 24;
+            this.cb_sendIntro.Text = "Send Intro Audio";
+            this.cb_sendIntro.UseVisualStyleBackColor = true;
+            // 
+            // cb_stampinfo
+            // 
+            this.cb_stampinfo.AutoSize = true;
+            this.cb_stampinfo.Checked = true;
+            this.cb_stampinfo.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_stampinfo.Location = new System.Drawing.Point(207, 84);
+            this.cb_stampinfo.Name = "cb_stampinfo";
+            this.cb_stampinfo.Size = new System.Drawing.Size(128, 17);
+            this.cb_stampinfo.TabIndex = 23;
+            this.cb_stampinfo.Text = "Insert Info into picture";
+            this.cb_stampinfo.UseVisualStyleBackColor = true;
+            // 
+            // tb_info
+            // 
+            this.tb_info.Location = new System.Drawing.Point(243, 28);
+            this.tb_info.Name = "tb_info";
+            this.tb_info.Size = new System.Drawing.Size(492, 20);
+            this.tb_info.TabIndex = 22;
+            this.tb_info.Text = "tnx fer QSO, vy 73";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(204, 31);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(28, 13);
+            this.label7.TabIndex = 21;
+            this.label7.Text = "Info:";
+            // 
+            // cb_announcement
+            // 
+            this.cb_announcement.FormattingEnabled = true;
+            this.cb_announcement.Items.AddRange(new object[] {
+            "off",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"});
+            this.cb_announcement.Location = new System.Drawing.Point(589, 60);
+            this.cb_announcement.Name = "cb_announcement";
+            this.cb_announcement.Size = new System.Drawing.Size(56, 21);
+            this.cb_announcement.TabIndex = 19;
+            this.cb_announcement.Text = "4";
+            // 
+            // textBox4
+            // 
+            this.textBox4.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox4.ForeColor = System.Drawing.Color.Black;
+            this.textBox4.Location = new System.Drawing.Point(654, 62);
+            this.textBox4.Multiline = true;
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(75, 19);
+            this.textBox4.TabIndex = 18;
+            this.textBox4.Text = "transmissions";
+            // 
+            // textBox1
+            // 
+            this.textBox1.BackColor = System.Drawing.SystemColors.Control;
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.ForeColor = System.Drawing.Color.Black;
+            this.textBox1.Location = new System.Drawing.Point(395, 64);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(196, 19);
+            this.textBox1.TabIndex = 17;
+            this.textBox1.Text = "send announcement before TX every";
+            // 
+            // tb_callsign
+            // 
+            this.tb_callsign.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.tb_callsign.Location = new System.Drawing.Point(71, 20);
+            this.tb_callsign.Name = "tb_callsign";
+            this.tb_callsign.Size = new System.Drawing.Size(104, 20);
+            this.tb_callsign.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(14, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(46, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Callsign:";
+            // 
+            // cb_stampcall
+            // 
+            this.cb_stampcall.AutoSize = true;
+            this.cb_stampcall.Checked = true;
+            this.cb_stampcall.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cb_stampcall.Location = new System.Drawing.Point(207, 64);
+            this.cb_stampcall.Name = "cb_stampcall";
+            this.cb_stampcall.Size = new System.Drawing.Size(146, 17);
+            this.cb_stampcall.TabIndex = 2;
+            this.cb_stampcall.Text = "Insert Callsign into picture";
+            this.cb_stampcall.UseVisualStyleBackColor = true;
+            // 
+            // tabPage_about
+            // 
+            this.tabPage_about.Controls.Add(this.richTextBox1);
+            this.tabPage_about.ImageIndex = 12;
+            this.tabPage_about.Location = new System.Drawing.Point(4, 23);
+            this.tabPage_about.Name = "tabPage_about";
+            this.tabPage_about.Size = new System.Drawing.Size(1280, 552);
+            this.tabPage_about.TabIndex = 6;
+            this.tabPage_about.Text = "About";
+            this.tabPage_about.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox1.Location = new System.Drawing.Point(17, 22);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(573, 527);
+            this.richTextBox1.TabIndex = 0;
+            this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            // 
+            // timer_searchmodem
+            // 
+            this.timer_searchmodem.Interval = 1000;
+            this.timer_searchmodem.Tick += new System.EventHandler(this.timer_searchmodem_Tick);
+            // 
+            // tabPage_rigctl
+            // 
+            this.tabPage_rigctl.Controls.Add(this.rigControlControl1);
+            this.tabPage_rigctl.Location = new System.Drawing.Point(4, 23);
+            this.tabPage_rigctl.Name = "tabPage_rigctl";
+            this.tabPage_rigctl.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_rigctl.Size = new System.Drawing.Size(1280, 552);
+            this.tabPage_rigctl.TabIndex = 8;
+            this.tabPage_rigctl.Text = "Rig control";
+            this.tabPage_rigctl.UseVisualStyleBackColor = true;
+            // 
+            // pn1
+            // 
+            this.pn1.Controls.Add(this.progressBar_fifo);
+            this.pn1.Controls.Add(this.label_capfifo);
+            this.pn1.Controls.Add(this.label_speed);
+            this.pn1.Controls.Add(this.pb_rxsignal);
+            this.pn1.Controls.Add(this.lb_rxsync);
+            this.pn1.Controls.Add(this.progressBar_capfifo);
+            this.pn1.Controls.Add(this.cb_speed);
+            this.pn1.Controls.Add(this.lb_rxsignal);
+            this.pn1.Controls.Add(this.pb_rxsync);
+            this.pn1.Controls.Add(this.label_fifo);
+            this.pn1.Location = new System.Drawing.Point(540, 588);
+            this.pn1.Name = "pn1";
+            this.pn1.Size = new System.Drawing.Size(538, 74);
+            this.pn1.TabIndex = 30;
+            // 
+            // progressBar_fifo
+            // 
+            this.progressBar_fifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.progressBar_fifo.Location = new System.Drawing.Point(122, 29);
+            this.progressBar_fifo.Maximum = 20;
+            this.progressBar_fifo.Name = "progressBar_fifo";
+            this.progressBar_fifo.Size = new System.Drawing.Size(304, 18);
+            this.progressBar_fifo.Step = 11;
+            this.progressBar_fifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar_fifo.TabIndex = 13;
+            // 
+            // label_capfifo
+            // 
+            this.label_capfifo.AutoSize = true;
+            this.label_capfifo.Location = new System.Drawing.Point(31, 54);
+            this.label_capfifo.Name = "label_capfifo";
+            this.label_capfifo.Size = new System.Drawing.Size(56, 13);
+            this.label_capfifo.TabIndex = 16;
+            this.label_capfifo.Text = "RX Buffer:";
+            // 
+            // label_speed
+            // 
+            this.label_speed.AutoSize = true;
+            this.label_speed.Location = new System.Drawing.Point(31, 5);
+            this.label_speed.Name = "label_speed";
+            this.label_speed.Size = new System.Drawing.Size(71, 13);
+            this.label_speed.TabIndex = 12;
+            this.label_speed.Text = "Speed [bit/s]:";
+            // 
+            // pb_rxsignal
+            // 
+            this.pb_rxsignal.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsignal.BackgroundImage")));
+            this.pb_rxsignal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_rxsignal.Location = new System.Drawing.Point(511, 47);
+            this.pb_rxsignal.Name = "pb_rxsignal";
+            this.pb_rxsignal.Size = new System.Drawing.Size(24, 24);
+            this.pb_rxsignal.TabIndex = 17;
+            this.pb_rxsignal.TabStop = false;
+            // 
+            // lb_rxsync
+            // 
+            this.lb_rxsync.AutoSize = true;
+            this.lb_rxsync.Location = new System.Drawing.Point(448, 7);
+            this.lb_rxsync.Name = "lb_rxsync";
+            this.lb_rxsync.Size = new System.Drawing.Size(52, 13);
+            this.lb_rxsync.TabIndex = 20;
+            this.lb_rxsync.Text = "RX Sync:";
+            // 
+            // progressBar_capfifo
+            // 
+            this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.progressBar_capfifo.Location = new System.Drawing.Point(122, 53);
+            this.progressBar_capfifo.Name = "progressBar_capfifo";
+            this.progressBar_capfifo.Size = new System.Drawing.Size(304, 18);
+            this.progressBar_capfifo.Step = 1;
+            this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar_capfifo.TabIndex = 15;
+            // 
+            // cb_speed
+            // 
+            this.cb_speed.FormattingEnabled = true;
+            this.cb_speed.Items.AddRange(new object[] {
+            "1200 BPSK BW: 1300 Hz",
+            "2400 BPSK BW: 2500 Hz",
+            "3000 QPSK BW: 1700 Hz ",
+            "4000 QPSK BW: 2400 Hz ",
+            "4410 QPSK BW: 2500 Hz (QO-100 Standard)",
+            "4800 QPSK BW: 2700 Hz",
+            "5500 8APSK BW: 2300 Hz",
+            "6000 8APSK BW: 2500 Hz (QO-100 Transceiver)",
+            "6600 8APSK BW: 2600 Hz",
+            "7200 8APSK BW: 2700 Hz (QO-100 SDR)",
+            "45.45 Baud RTTY"});
+            this.cb_speed.Location = new System.Drawing.Point(122, 2);
+            this.cb_speed.Name = "cb_speed";
+            this.cb_speed.Size = new System.Drawing.Size(304, 21);
+            this.cb_speed.TabIndex = 11;
+            this.cb_speed.Text = "4410 QPSK BW: 2500 Hz (QO-100)";
+            this.cb_speed.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // lb_rxsignal
+            // 
+            this.lb_rxsignal.AutoSize = true;
+            this.lb_rxsignal.Location = new System.Drawing.Point(448, 54);
+            this.lb_rxsignal.Name = "lb_rxsignal";
+            this.lb_rxsignal.Size = new System.Drawing.Size(57, 13);
+            this.lb_rxsignal.TabIndex = 18;
+            this.lb_rxsignal.Text = "RX Signal:";
+            // 
+            // pb_rxsync
+            // 
+            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
+            this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pb_rxsync.Location = new System.Drawing.Point(511, 2);
+            this.pb_rxsync.Name = "pb_rxsync";
+            this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
+            this.pb_rxsync.TabIndex = 19;
+            this.pb_rxsync.TabStop = false;
+            // 
+            // label_fifo
+            // 
+            this.label_fifo.AutoSize = true;
+            this.label_fifo.Location = new System.Drawing.Point(31, 31);
+            this.label_fifo.Name = "label_fifo";
+            this.label_fifo.Size = new System.Drawing.Size(55, 13);
+            this.label_fifo.TabIndex = 14;
+            this.label_fifo.Text = "TX Buffer:";
+            // 
+            // panel_txspectrum
+            // 
+            this.panel_txspectrum.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel_txspectrum.Location = new System.Drawing.Point(92, 590);
+            this.panel_txspectrum.Name = "panel_txspectrum";
+            this.panel_txspectrum.Size = new System.Drawing.Size(442, 76);
+            this.panel_txspectrum.TabIndex = 6;
+            this.panel_txspectrum.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_txspectrum_Paint);
+            this.panel_txspectrum.DoubleClick += new System.EventHandler(this.panel_txspectrum_DoubleClick);
+            // 
+            // panel_constel
+            // 
+            this.panel_constel.BackColor = System.Drawing.Color.AliceBlue;
+            this.panel_constel.Location = new System.Drawing.Point(11, 590);
+            this.panel_constel.Name = "panel_constel";
+            this.panel_constel.Size = new System.Drawing.Size(75, 75);
+            this.panel_constel.TabIndex = 5;
+            this.panel_constel.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_constel_Paint);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.cb_picres);
+            this.groupBox1.Controls.Add(this.cb_loop);
+            this.groupBox1.Controls.Add(this.bt_rximages);
+            this.groupBox1.Controls.Add(this.button_loadimage);
+            this.groupBox1.Controls.Add(this.comboBox_quality);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.button_cancelimg);
+            this.groupBox1.Controls.Add(this.button_sendimage);
+            this.groupBox1.Location = new System.Drawing.Point(3, 508);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(1277, 42);
+            this.groupBox1.TabIndex = 12;
+            // 
+            // cb_picres
+            // 
+            this.cb_picres.FormattingEnabled = true;
+            this.cb_picres.Items.AddRange(new object[] {
+            "160x120",
+            "240x180",
+            "320x240",
+            "400x300",
+            "480x360",
+            "560x420",
+            "640x480"});
+            this.cb_picres.Location = new System.Drawing.Point(174, 7);
+            this.cb_picres.Name = "cb_picres";
+            this.cb_picres.Size = new System.Drawing.Size(85, 21);
+            this.cb_picres.TabIndex = 12;
+            this.cb_picres.Text = "640x480";
+            // 
+            // cb_loop
+            // 
+            this.cb_loop.AutoSize = true;
+            this.cb_loop.Location = new System.Drawing.Point(644, 5);
+            this.cb_loop.Name = "cb_loop";
+            this.cb_loop.Size = new System.Drawing.Size(167, 17);
+            this.cb_loop.TabIndex = 11;
+            this.cb_loop.Text = "loop (send all images in folder)";
+            this.cb_loop.UseVisualStyleBackColor = true;
+            // 
+            // bt_rximages
+            // 
+            this.bt_rximages.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bt_rximages.ImageIndex = 5;
+            this.bt_rximages.ImageList = this.imageList1;
+            this.bt_rximages.Location = new System.Drawing.Point(534, 5);
+            this.bt_rximages.Name = "bt_rximages";
+            this.bt_rximages.Size = new System.Drawing.Size(92, 23);
+            this.bt_rximages.TabIndex = 10;
+            this.bt_rximages.Text = "   RX Images";
+            this.bt_rximages.UseVisualStyleBackColor = true;
+            this.bt_rximages.Click += new System.EventHandler(this.bt_rximages_Click);
+            // 
+            // button_loadimage
+            // 
+            this.button_loadimage.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button_loadimage.ImageIndex = 5;
+            this.button_loadimage.ImageList = this.imageList1;
+            this.button_loadimage.Location = new System.Drawing.Point(265, 5);
+            this.button_loadimage.Name = "button_loadimage";
+            this.button_loadimage.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.button_loadimage.Size = new System.Drawing.Size(88, 23);
+            this.button_loadimage.TabIndex = 0;
+            this.button_loadimage.Text = "    Load Image";
+            this.button_loadimage.UseVisualStyleBackColor = true;
+            this.button_loadimage.Click += new System.EventHandler(this.button_loadimage_Click);
+            // 
+            // comboBox_quality
+            // 
+            this.comboBox_quality.FormattingEnabled = true;
+            this.comboBox_quality.Items.AddRange(new object[] {
+            "low, 30s",
+            "medium, 1min",
+            "high, 2min",
+            "very high, 4min"});
+            this.comboBox_quality.Location = new System.Drawing.Point(57, 7);
+            this.comboBox_quality.Name = "comboBox_quality";
+            this.comboBox_quality.Size = new System.Drawing.Size(111, 21);
+            this.comboBox_quality.TabIndex = 6;
+            this.comboBox_quality.Text = "medium, 1min";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(42, 13);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "Quality:";
+            // 
+            // button_cancelimg
+            // 
+            this.button_cancelimg.ForeColor = System.Drawing.Color.Red;
+            this.button_cancelimg.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button_cancelimg.ImageIndex = 8;
+            this.button_cancelimg.ImageList = this.imageList1;
+            this.button_cancelimg.Location = new System.Drawing.Point(443, 5);
+            this.button_cancelimg.Name = "button_cancelimg";
+            this.button_cancelimg.Size = new System.Drawing.Size(75, 23);
+            this.button_cancelimg.TabIndex = 9;
+            this.button_cancelimg.Text = "   Cancel";
+            this.button_cancelimg.UseVisualStyleBackColor = true;
+            this.button_cancelimg.Click += new System.EventHandler(this.button_cancelimg_Click);
+            // 
+            // button_sendimage
+            // 
+            this.button_sendimage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_sendimage.ForeColor = System.Drawing.Color.Blue;
+            this.button_sendimage.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button_sendimage.ImageIndex = 10;
+            this.button_sendimage.ImageList = this.imageList1;
+            this.button_sendimage.Location = new System.Drawing.Point(361, 5);
+            this.button_sendimage.Name = "button_sendimage";
+            this.button_sendimage.Size = new System.Drawing.Size(75, 23);
+            this.button_sendimage.TabIndex = 1;
+            this.button_sendimage.Text = "Send";
+            this.button_sendimage.UseVisualStyleBackColor = true;
+            this.button_sendimage.Click += new System.EventHandler(this.button_sendimage_Click);
+            // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Transparent;
@@ -1601,230 +2354,6 @@
             this.label_urcall.TabIndex = 14;
             this.label_urcall.Text = "Your Callsign:";
             // 
-            // tabPage_setup
-            // 
-            this.tabPage_setup.BackColor = System.Drawing.Color.Transparent;
-            this.tabPage_setup.Controls.Add(this.label_cfgpath);
-            this.tabPage_setup.Controls.Add(this.label_cfgpath_tit);
-            this.tabPage_setup.Controls.Add(this.groupBox4);
-            this.tabPage_setup.Controls.Add(this.groupBox3);
-            this.tabPage_setup.Controls.Add(this.groupBox2);
-            this.tabPage_setup.ImageIndex = 6;
-            this.tabPage_setup.Location = new System.Drawing.Point(4, 23);
-            this.tabPage_setup.Name = "tabPage_setup";
-            this.tabPage_setup.Size = new System.Drawing.Size(1280, 552);
-            this.tabPage_setup.TabIndex = 4;
-            this.tabPage_setup.Text = "Setup";
-            // 
-            // label_cfgpath
-            // 
-            this.label_cfgpath.AutoSize = true;
-            this.label_cfgpath.Location = new System.Drawing.Point(162, 441);
-            this.label_cfgpath.Name = "label_cfgpath";
-            this.label_cfgpath.Size = new System.Drawing.Size(16, 13);
-            this.label_cfgpath.TabIndex = 17;
-            this.label_cfgpath.Text = "...";
-            // 
-            // label_cfgpath_tit
-            // 
-            this.label_cfgpath_tit.AutoSize = true;
-            this.label_cfgpath_tit.Location = new System.Drawing.Point(17, 441);
-            this.label_cfgpath_tit.Name = "label_cfgpath_tit";
-            this.label_cfgpath_tit.Size = new System.Drawing.Size(115, 13);
-            this.label_cfgpath_tit.TabIndex = 16;
-            this.label_cfgpath_tit.Text = "Configuration stored in:";
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.cb_extIF);
-            this.groupBox4.Controls.Add(this.textBox7);
-            this.groupBox4.Controls.Add(this.label12);
-            this.groupBox4.Controls.Add(this.cb_language);
-            this.groupBox4.Controls.Add(this.cb_autostart);
-            this.groupBox4.Controls.Add(this.bt_shutdown);
-            this.groupBox4.Controls.Add(this.tb_shutdown);
-            this.groupBox4.Controls.Add(this.bt_resetmodem);
-            this.groupBox4.Controls.Add(this.textBox3);
-            this.groupBox4.Location = new System.Drawing.Point(12, 313);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(743, 121);
-            this.groupBox4.TabIndex = 15;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Maintenance";
-            // 
-            // cb_extIF
-            // 
-            this.cb_extIF.AutoSize = true;
-            this.cb_extIF.Location = new System.Drawing.Point(213, 22);
-            this.cb_extIF.Name = "cb_extIF";
-            this.cb_extIF.Size = new System.Drawing.Size(135, 17);
-            this.cb_extIF.TabIndex = 27;
-            this.cb_extIF.Text = "External Data Interface";
-            this.cb_extIF.UseVisualStyleBackColor = true;
-            this.cb_extIF.CheckedChanged += new System.EventHandler(this.cb_extIF_CheckedChanged);
-            // 
-            // textBox7
-            // 
-            this.textBox7.BackColor = System.Drawing.SystemColors.Control;
-            this.textBox7.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox7.ForeColor = System.Drawing.Color.Black;
-            this.textBox7.Location = new System.Drawing.Point(211, 45);
-            this.textBox7.Multiline = true;
-            this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(151, 39);
-            this.textBox7.TabIndex = 28;
-            this.textBox7.Text = "for advanced users only, see developers manual";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(428, 23);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(103, 13);
-            this.label12.TabIndex = 26;
-            this.label12.Text = "Language/Sprache:";
-            // 
-            // cb_language
-            // 
-            this.cb_language.FormattingEnabled = true;
-            this.cb_language.Items.AddRange(new object[] {
-            "English",
-            "German/Deutsch"});
-            this.cb_language.Location = new System.Drawing.Point(428, 42);
-            this.cb_language.Name = "cb_language";
-            this.cb_language.Size = new System.Drawing.Size(110, 21);
-            this.cb_language.TabIndex = 24;
-            this.cb_language.Text = "English";
-            this.cb_language.SelectedIndexChanged += new System.EventHandler(this.cb_language_SelectedIndexChanged);
-            // 
-            // cb_autostart
-            // 
-            this.cb_autostart.AutoSize = true;
-            this.cb_autostart.Checked = true;
-            this.cb_autostart.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_autostart.Location = new System.Drawing.Point(17, 23);
-            this.cb_autostart.Name = "cb_autostart";
-            this.cb_autostart.Size = new System.Drawing.Size(155, 17);
-            this.cb_autostart.TabIndex = 4;
-            this.cb_autostart.Text = "LOCAL/(remote) HSmodem";
-            this.cb_autostart.UseVisualStyleBackColor = true;
-            this.cb_autostart.CheckedChanged += new System.EventHandler(this.cb_autostart_CheckedChanged);
-            // 
-            // bt_shutdown
-            // 
-            this.bt_shutdown.Location = new System.Drawing.Point(564, 18);
-            this.bt_shutdown.Name = "bt_shutdown";
-            this.bt_shutdown.Size = new System.Drawing.Size(155, 23);
-            this.bt_shutdown.TabIndex = 4;
-            this.bt_shutdown.Text = "Shutdown Modem-SBC";
-            this.bt_shutdown.UseVisualStyleBackColor = true;
-            this.bt_shutdown.Click += new System.EventHandler(this.bt_shutdown_Click);
-            // 
-            // tb_shutdown
-            // 
-            this.tb_shutdown.BackColor = System.Drawing.SystemColors.Control;
-            this.tb_shutdown.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.tb_shutdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_shutdown.ForeColor = System.Drawing.Color.Red;
-            this.tb_shutdown.Location = new System.Drawing.Point(564, 47);
-            this.tb_shutdown.Multiline = true;
-            this.tb_shutdown.Name = "tb_shutdown";
-            this.tb_shutdown.Size = new System.Drawing.Size(155, 50);
-            this.tb_shutdown.TabIndex = 5;
-            this.tb_shutdown.Text = "before switching off the \r\nmodem SBC click here to \r\navoid defective SD-cards.\r\n";
-            // 
-            // bt_resetmodem
-            // 
-            this.bt_resetmodem.Location = new System.Drawing.Point(602, 91);
-            this.bt_resetmodem.Name = "bt_resetmodem";
-            this.bt_resetmodem.Size = new System.Drawing.Size(117, 23);
-            this.bt_resetmodem.TabIndex = 6;
-            this.bt_resetmodem.Text = "Reset RX Modem";
-            this.bt_resetmodem.UseVisualStyleBackColor = true;
-            this.bt_resetmodem.Visible = false;
-            this.bt_resetmodem.Click += new System.EventHandler(this.bt_resetmodem_Click);
-            // 
-            // textBox3
-            // 
-            this.textBox3.BackColor = System.Drawing.SystemColors.Control;
-            this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox3.ForeColor = System.Drawing.Color.Black;
-            this.textBox3.Location = new System.Drawing.Point(15, 46);
-            this.textBox3.Multiline = true;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(151, 39);
-            this.textBox3.TabIndex = 12;
-            this.textBox3.Text = "only uncheck if modem runs on a separate PC";
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.pictureBox4);
-            this.groupBox3.Controls.Add(this.pictureBox3);
-            this.groupBox3.Controls.Add(this.bt_tune_plus);
-            this.groupBox3.Controls.Add(this.bt_tune_minus);
-            this.groupBox3.Controls.Add(this.vu_cap);
-            this.groupBox3.Controls.Add(this.vu_pb);
-            this.groupBox3.Controls.Add(this.pb_audioCAPstatus);
-            this.groupBox3.Controls.Add(this.pb_audioPBstatus);
-            this.groupBox3.Controls.Add(this.label6);
-            this.groupBox3.Controls.Add(this.label5);
-            this.groupBox3.Controls.Add(this.tb_CAPvol);
-            this.groupBox3.Controls.Add(this.tb_PBvol);
-            this.groupBox3.Controls.Add(this.cb_audioPB);
-            this.groupBox3.Controls.Add(this.cb_audioCAP);
-            this.groupBox3.Location = new System.Drawing.Point(12, 144);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(743, 163);
-            this.groupBox3.TabIndex = 14;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Transceiver Audio";
-            // 
-            // pictureBox4
-            // 
-            this.pictureBox4.BackgroundImage = global::oscardata.Properties.Resources.captureicon;
-            this.pictureBox4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pictureBox4.Location = new System.Drawing.Point(0, 61);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(132, 87);
-            this.pictureBox4.TabIndex = 16;
-            this.pictureBox4.TabStop = false;
-            // 
-            // pictureBox3
-            // 
-            this.pictureBox3.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox3.BackgroundImage")));
-            this.pictureBox3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pictureBox3.Location = new System.Drawing.Point(5, -7);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(127, 85);
-            this.pictureBox3.TabIndex = 16;
-            this.pictureBox3.TabStop = false;
-            // 
-            // bt_tune_plus
-            // 
-            this.bt_tune_plus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_tune_plus.Location = new System.Drawing.Point(602, 79);
-            this.bt_tune_plus.Name = "bt_tune_plus";
-            this.bt_tune_plus.Size = new System.Drawing.Size(24, 23);
-            this.bt_tune_plus.TabIndex = 22;
-            this.bt_tune_plus.Text = "+";
-            this.bt_tune_plus.UseVisualStyleBackColor = true;
-            this.bt_tune_plus.Visible = false;
-            this.bt_tune_plus.Click += new System.EventHandler(this.bt_tune_plus_Click);
-            // 
-            // bt_tune_minus
-            // 
-            this.bt_tune_minus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_tune_minus.Location = new System.Drawing.Point(602, 55);
-            this.bt_tune_minus.Name = "bt_tune_minus";
-            this.bt_tune_minus.Size = new System.Drawing.Size(24, 23);
-            this.bt_tune_minus.TabIndex = 21;
-            this.bt_tune_minus.Text = "-";
-            this.bt_tune_minus.UseVisualStyleBackColor = true;
-            this.bt_tune_minus.Visible = false;
-            this.bt_tune_minus.Click += new System.EventHandler(this.bt_tune_minus_Click);
-            // 
             // vu_cap
             // 
             this.vu_cap.Location = new System.Drawing.Point(479, 111);
@@ -1839,519 +2368,15 @@
             this.vu_pb.Size = new System.Drawing.Size(100, 10);
             this.vu_pb.TabIndex = 19;
             // 
-            // pb_audioCAPstatus
-            // 
-            this.pb_audioCAPstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioCAPstatus.BackgroundImage")));
-            this.pb_audioCAPstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_audioCAPstatus.Location = new System.Drawing.Point(375, 87);
-            this.pb_audioCAPstatus.Name = "pb_audioCAPstatus";
-            this.pb_audioCAPstatus.Size = new System.Drawing.Size(21, 21);
-            this.pb_audioCAPstatus.TabIndex = 18;
-            this.pb_audioCAPstatus.TabStop = false;
-            // 
-            // pb_audioPBstatus
-            // 
-            this.pb_audioPBstatus.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_audioPBstatus.BackgroundImage")));
-            this.pb_audioPBstatus.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_audioPBstatus.Location = new System.Drawing.Point(375, 21);
-            this.pb_audioPBstatus.Name = "pb_audioPBstatus";
-            this.pb_audioPBstatus.Size = new System.Drawing.Size(21, 21);
-            this.pb_audioPBstatus.TabIndex = 17;
-            this.pb_audioPBstatus.TabStop = false;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(428, 89);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(45, 13);
-            this.label6.TabIndex = 16;
-            this.label6.Text = "Volume:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(428, 25);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(45, 13);
-            this.label5.TabIndex = 15;
-            this.label5.Text = "Volume:";
-            // 
-            // tb_CAPvol
-            // 
-            this.tb_CAPvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.tb_CAPvol.Location = new System.Drawing.Point(479, 85);
-            this.tb_CAPvol.Maximum = 100;
-            this.tb_CAPvol.MaximumSize = new System.Drawing.Size(0, 24);
-            this.tb_CAPvol.Minimum = 1;
-            this.tb_CAPvol.MinimumSize = new System.Drawing.Size(100, 0);
-            this.tb_CAPvol.Name = "tb_CAPvol";
-            this.tb_CAPvol.Size = new System.Drawing.Size(100, 24);
-            this.tb_CAPvol.TabIndex = 14;
-            this.tb_CAPvol.TickFrequency = 10;
-            this.tb_CAPvol.Value = 50;
-            this.tb_CAPvol.Scroll += new System.EventHandler(this.tb_CAPvol_Scroll);
-            // 
-            // tb_PBvol
-            // 
-            this.tb_PBvol.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.tb_PBvol.Location = new System.Drawing.Point(479, 21);
-            this.tb_PBvol.Maximum = 100;
-            this.tb_PBvol.MaximumSize = new System.Drawing.Size(0, 24);
-            this.tb_PBvol.Minimum = 1;
-            this.tb_PBvol.MinimumSize = new System.Drawing.Size(100, 0);
-            this.tb_PBvol.Name = "tb_PBvol";
-            this.tb_PBvol.Size = new System.Drawing.Size(100, 24);
-            this.tb_PBvol.TabIndex = 13;
-            this.tb_PBvol.TickFrequency = 10;
-            this.tb_PBvol.Value = 50;
-            this.tb_PBvol.Scroll += new System.EventHandler(this.tb_PBvol_Scroll);
-            // 
-            // cb_audioPB
-            // 
-            this.cb_audioPB.FormattingEnabled = true;
-            this.cb_audioPB.Location = new System.Drawing.Point(138, 21);
-            this.cb_audioPB.Name = "cb_audioPB";
-            this.cb_audioPB.Size = new System.Drawing.Size(230, 21);
-            this.cb_audioPB.TabIndex = 7;
-            this.cb_audioPB.Text = "Default";
-            // 
-            // cb_audioCAP
-            // 
-            this.cb_audioCAP.FormattingEnabled = true;
-            this.cb_audioCAP.Location = new System.Drawing.Point(138, 87);
-            this.cb_audioCAP.Name = "cb_audioCAP";
-            this.cb_audioCAP.Size = new System.Drawing.Size(230, 21);
-            this.cb_audioCAP.TabIndex = 9;
-            this.cb_audioCAP.Text = "Default";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.tb_myqthloc);
-            this.groupBox2.Controls.Add(this.label14);
-            this.groupBox2.Controls.Add(this.tb_myqth);
-            this.groupBox2.Controls.Add(this.lb_qth);
-            this.groupBox2.Controls.Add(this.tb_myname);
-            this.groupBox2.Controls.Add(this.lb_myname);
-            this.groupBox2.Controls.Add(this.lb_rec);
-            this.groupBox2.Controls.Add(this.tb_recintro);
-            this.groupBox2.Controls.Add(this.bt_astop);
-            this.groupBox2.Controls.Add(this.bt_aplay);
-            this.groupBox2.Controls.Add(this.bt_arecord);
-            this.groupBox2.Controls.Add(this.cb_sendIntro);
-            this.groupBox2.Controls.Add(this.cb_stampinfo);
-            this.groupBox2.Controls.Add(this.tb_info);
-            this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Controls.Add(this.cb_announcement);
-            this.groupBox2.Controls.Add(this.textBox4);
-            this.groupBox2.Controls.Add(this.textBox1);
-            this.groupBox2.Controls.Add(this.tb_callsign);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.cb_stampcall);
-            this.groupBox2.Location = new System.Drawing.Point(12, 13);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(743, 127);
-            this.groupBox2.TabIndex = 13;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Personal Settings";
-            // 
-            // tb_myqthloc
-            // 
-            this.tb_myqthloc.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.tb_myqthloc.Location = new System.Drawing.Point(71, 99);
-            this.tb_myqthloc.Name = "tb_myqthloc";
-            this.tb_myqthloc.Size = new System.Drawing.Size(104, 20);
-            this.tb_myqthloc.TabIndex = 35;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(14, 102);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(54, 13);
-            this.label14.TabIndex = 34;
-            this.label14.Text = "QTHLOC:";
-            // 
-            // tb_myqth
-            // 
-            this.tb_myqth.Location = new System.Drawing.Point(71, 72);
-            this.tb_myqth.Name = "tb_myqth";
-            this.tb_myqth.Size = new System.Drawing.Size(104, 20);
-            this.tb_myqth.TabIndex = 33;
-            // 
-            // lb_qth
-            // 
-            this.lb_qth.AutoSize = true;
-            this.lb_qth.Location = new System.Drawing.Point(14, 75);
-            this.lb_qth.Name = "lb_qth";
-            this.lb_qth.Size = new System.Drawing.Size(33, 13);
-            this.lb_qth.TabIndex = 32;
-            this.lb_qth.Text = "QTH:";
-            // 
-            // tb_myname
-            // 
-            this.tb_myname.Location = new System.Drawing.Point(71, 46);
-            this.tb_myname.Name = "tb_myname";
-            this.tb_myname.Size = new System.Drawing.Size(104, 20);
-            this.tb_myname.TabIndex = 31;
-            // 
-            // lb_myname
-            // 
-            this.lb_myname.AutoSize = true;
-            this.lb_myname.Location = new System.Drawing.Point(14, 49);
-            this.lb_myname.Name = "lb_myname";
-            this.lb_myname.Size = new System.Drawing.Size(38, 13);
-            this.lb_myname.TabIndex = 30;
-            this.lb_myname.Text = "Name:";
-            // 
-            // lb_rec
-            // 
-            this.lb_rec.AutoSize = true;
-            this.lb_rec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lb_rec.ForeColor = System.Drawing.Color.Red;
-            this.lb_rec.Location = new System.Drawing.Point(712, 101);
-            this.lb_rec.Name = "lb_rec";
-            this.lb_rec.Size = new System.Drawing.Size(23, 13);
-            this.lb_rec.TabIndex = 29;
-            this.lb_rec.Text = "....";
-            // 
-            // tb_recintro
-            // 
-            this.tb_recintro.BackColor = System.Drawing.SystemColors.Control;
-            this.tb_recintro.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.tb_recintro.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_recintro.ForeColor = System.Drawing.Color.Black;
-            this.tb_recintro.Location = new System.Drawing.Point(470, 100);
-            this.tb_recintro.Multiline = true;
-            this.tb_recintro.Name = "tb_recintro";
-            this.tb_recintro.Size = new System.Drawing.Size(121, 19);
-            this.tb_recintro.TabIndex = 28;
-            this.tb_recintro.Text = "record intro audio:";
-            // 
-            // bt_astop
-            // 
-            this.bt_astop.BackgroundImage = global::oscardata.Properties.Resources.stopplay;
-            this.bt_astop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.bt_astop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bt_astop.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_astop.Location = new System.Drawing.Point(663, 89);
-            this.bt_astop.Name = "bt_astop";
-            this.bt_astop.Size = new System.Drawing.Size(32, 36);
-            this.bt_astop.TabIndex = 27;
-            this.bt_astop.UseVisualStyleBackColor = true;
-            this.bt_astop.Click += new System.EventHandler(this.bt_astop_Click);
-            // 
-            // bt_aplay
-            // 
-            this.bt_aplay.BackgroundImage = global::oscardata.Properties.Resources.playback;
-            this.bt_aplay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.bt_aplay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bt_aplay.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_aplay.Location = new System.Drawing.Point(625, 89);
-            this.bt_aplay.Name = "bt_aplay";
-            this.bt_aplay.Size = new System.Drawing.Size(32, 36);
-            this.bt_aplay.TabIndex = 26;
-            this.bt_aplay.UseVisualStyleBackColor = true;
-            this.bt_aplay.Click += new System.EventHandler(this.bt_aplay_Click);
-            // 
-            // bt_arecord
-            // 
-            this.bt_arecord.BackgroundImage = global::oscardata.Properties.Resources.record;
-            this.bt_arecord.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.bt_arecord.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bt_arecord.ForeColor = System.Drawing.SystemColors.Control;
-            this.bt_arecord.Location = new System.Drawing.Point(587, 89);
-            this.bt_arecord.Name = "bt_arecord";
-            this.bt_arecord.Size = new System.Drawing.Size(32, 36);
-            this.bt_arecord.TabIndex = 25;
-            this.bt_arecord.UseVisualStyleBackColor = true;
-            this.bt_arecord.Click += new System.EventHandler(this.bt_arecord_Click);
-            // 
-            // cb_sendIntro
-            // 
-            this.cb_sendIntro.AutoSize = true;
-            this.cb_sendIntro.Checked = true;
-            this.cb_sendIntro.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_sendIntro.Location = new System.Drawing.Point(207, 104);
-            this.cb_sendIntro.Name = "cb_sendIntro";
-            this.cb_sendIntro.Size = new System.Drawing.Size(105, 17);
-            this.cb_sendIntro.TabIndex = 24;
-            this.cb_sendIntro.Text = "Send Intro Audio";
-            this.cb_sendIntro.UseVisualStyleBackColor = true;
-            // 
-            // cb_stampinfo
-            // 
-            this.cb_stampinfo.AutoSize = true;
-            this.cb_stampinfo.Checked = true;
-            this.cb_stampinfo.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_stampinfo.Location = new System.Drawing.Point(207, 84);
-            this.cb_stampinfo.Name = "cb_stampinfo";
-            this.cb_stampinfo.Size = new System.Drawing.Size(128, 17);
-            this.cb_stampinfo.TabIndex = 23;
-            this.cb_stampinfo.Text = "Insert Info into picture";
-            this.cb_stampinfo.UseVisualStyleBackColor = true;
-            // 
-            // tb_info
-            // 
-            this.tb_info.Location = new System.Drawing.Point(243, 28);
-            this.tb_info.Name = "tb_info";
-            this.tb_info.Size = new System.Drawing.Size(492, 20);
-            this.tb_info.TabIndex = 22;
-            this.tb_info.Text = "tnx fer QSO, vy 73";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(204, 31);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(28, 13);
-            this.label7.TabIndex = 21;
-            this.label7.Text = "Info:";
-            // 
-            // cb_announcement
-            // 
-            this.cb_announcement.FormattingEnabled = true;
-            this.cb_announcement.Items.AddRange(new object[] {
-            "off",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10"});
-            this.cb_announcement.Location = new System.Drawing.Point(589, 60);
-            this.cb_announcement.Name = "cb_announcement";
-            this.cb_announcement.Size = new System.Drawing.Size(56, 21);
-            this.cb_announcement.TabIndex = 19;
-            this.cb_announcement.Text = "4";
-            // 
-            // textBox4
-            // 
-            this.textBox4.BackColor = System.Drawing.SystemColors.Control;
-            this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox4.ForeColor = System.Drawing.Color.Black;
-            this.textBox4.Location = new System.Drawing.Point(654, 62);
-            this.textBox4.Multiline = true;
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(75, 19);
-            this.textBox4.TabIndex = 18;
-            this.textBox4.Text = "transmissions";
-            // 
-            // textBox1
-            // 
-            this.textBox1.BackColor = System.Drawing.SystemColors.Control;
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.ForeColor = System.Drawing.Color.Black;
-            this.textBox1.Location = new System.Drawing.Point(395, 64);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(196, 19);
-            this.textBox1.TabIndex = 17;
-            this.textBox1.Text = "send announcement before TX every";
-            // 
-            // tb_callsign
-            // 
-            this.tb_callsign.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.tb_callsign.Location = new System.Drawing.Point(71, 20);
-            this.tb_callsign.Name = "tb_callsign";
-            this.tb_callsign.Size = new System.Drawing.Size(104, 20);
-            this.tb_callsign.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 23);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(46, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Callsign:";
-            // 
-            // cb_stampcall
-            // 
-            this.cb_stampcall.AutoSize = true;
-            this.cb_stampcall.Checked = true;
-            this.cb_stampcall.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cb_stampcall.Location = new System.Drawing.Point(207, 64);
-            this.cb_stampcall.Name = "cb_stampcall";
-            this.cb_stampcall.Size = new System.Drawing.Size(146, 17);
-            this.cb_stampcall.TabIndex = 2;
-            this.cb_stampcall.Text = "Insert Callsign into picture";
-            this.cb_stampcall.UseVisualStyleBackColor = true;
-            // 
-            // tabPage_about
-            // 
-            this.tabPage_about.Controls.Add(this.richTextBox1);
-            this.tabPage_about.ImageIndex = 12;
-            this.tabPage_about.Location = new System.Drawing.Point(4, 23);
-            this.tabPage_about.Name = "tabPage_about";
-            this.tabPage_about.Size = new System.Drawing.Size(1280, 552);
-            this.tabPage_about.TabIndex = 6;
-            this.tabPage_about.Text = "About";
-            this.tabPage_about.UseVisualStyleBackColor = true;
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(17, 22);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(573, 527);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
-            // 
-            // timer_searchmodem
-            // 
-            this.timer_searchmodem.Interval = 1000;
-            this.timer_searchmodem.Tick += new System.EventHandler(this.timer_searchmodem_Tick);
-            // 
-            // pn1
-            // 
-            this.pn1.Controls.Add(this.progressBar_fifo);
-            this.pn1.Controls.Add(this.label_capfifo);
-            this.pn1.Controls.Add(this.label_speed);
-            this.pn1.Controls.Add(this.pb_rxsignal);
-            this.pn1.Controls.Add(this.lb_rxsync);
-            this.pn1.Controls.Add(this.progressBar_capfifo);
-            this.pn1.Controls.Add(this.cb_speed);
-            this.pn1.Controls.Add(this.lb_rxsignal);
-            this.pn1.Controls.Add(this.pb_rxsync);
-            this.pn1.Controls.Add(this.label_fifo);
-            this.pn1.Location = new System.Drawing.Point(540, 588);
-            this.pn1.Name = "pn1";
-            this.pn1.Size = new System.Drawing.Size(538, 74);
-            this.pn1.TabIndex = 30;
-            // 
-            // progressBar_fifo
-            // 
-            this.progressBar_fifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.progressBar_fifo.Location = new System.Drawing.Point(122, 29);
-            this.progressBar_fifo.Maximum = 20;
-            this.progressBar_fifo.Name = "progressBar_fifo";
-            this.progressBar_fifo.Size = new System.Drawing.Size(304, 18);
-            this.progressBar_fifo.Step = 11;
-            this.progressBar_fifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar_fifo.TabIndex = 13;
-            // 
-            // label_capfifo
-            // 
-            this.label_capfifo.AutoSize = true;
-            this.label_capfifo.Location = new System.Drawing.Point(31, 54);
-            this.label_capfifo.Name = "label_capfifo";
-            this.label_capfifo.Size = new System.Drawing.Size(56, 13);
-            this.label_capfifo.TabIndex = 16;
-            this.label_capfifo.Text = "RX Buffer:";
-            // 
-            // label_speed
-            // 
-            this.label_speed.AutoSize = true;
-            this.label_speed.Location = new System.Drawing.Point(31, 5);
-            this.label_speed.Name = "label_speed";
-            this.label_speed.Size = new System.Drawing.Size(71, 13);
-            this.label_speed.TabIndex = 12;
-            this.label_speed.Text = "Speed [bit/s]:";
-            // 
-            // pb_rxsignal
-            // 
-            this.pb_rxsignal.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsignal.BackgroundImage")));
-            this.pb_rxsignal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsignal.Location = new System.Drawing.Point(511, 47);
-            this.pb_rxsignal.Name = "pb_rxsignal";
-            this.pb_rxsignal.Size = new System.Drawing.Size(24, 24);
-            this.pb_rxsignal.TabIndex = 17;
-            this.pb_rxsignal.TabStop = false;
-            // 
-            // lb_rxsync
-            // 
-            this.lb_rxsync.AutoSize = true;
-            this.lb_rxsync.Location = new System.Drawing.Point(448, 7);
-            this.lb_rxsync.Name = "lb_rxsync";
-            this.lb_rxsync.Size = new System.Drawing.Size(52, 13);
-            this.lb_rxsync.TabIndex = 20;
-            this.lb_rxsync.Text = "RX Sync:";
-            // 
-            // progressBar_capfifo
-            // 
-            this.progressBar_capfifo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.progressBar_capfifo.Location = new System.Drawing.Point(122, 53);
-            this.progressBar_capfifo.Name = "progressBar_capfifo";
-            this.progressBar_capfifo.Size = new System.Drawing.Size(304, 18);
-            this.progressBar_capfifo.Step = 1;
-            this.progressBar_capfifo.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar_capfifo.TabIndex = 15;
-            // 
-            // cb_speed
-            // 
-            this.cb_speed.FormattingEnabled = true;
-            this.cb_speed.Items.AddRange(new object[] {
-            "1200 BPSK BW: 1300 Hz",
-            "2400 BPSK BW: 2500 Hz",
-            "3000 QPSK BW: 1700 Hz ",
-            "4000 QPSK BW: 2400 Hz ",
-            "4410 QPSK BW: 2500 Hz (QO-100 Standard)",
-            "4800 QPSK BW: 2700 Hz",
-            "5500 8APSK BW: 2300 Hz",
-            "6000 8APSK BW: 2500 Hz (QO-100 Transceiver)",
-            "6600 8APSK BW: 2600 Hz",
-            "7200 8APSK BW: 2700 Hz (QO-100 SDR)",
-            "45.45 Baud RTTY"});
-            this.cb_speed.Location = new System.Drawing.Point(122, 2);
-            this.cb_speed.Name = "cb_speed";
-            this.cb_speed.Size = new System.Drawing.Size(304, 21);
-            this.cb_speed.TabIndex = 11;
-            this.cb_speed.Text = "4410 QPSK BW: 2500 Hz (QO-100)";
-            this.cb_speed.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            // 
-            // lb_rxsignal
-            // 
-            this.lb_rxsignal.AutoSize = true;
-            this.lb_rxsignal.Location = new System.Drawing.Point(448, 54);
-            this.lb_rxsignal.Name = "lb_rxsignal";
-            this.lb_rxsignal.Size = new System.Drawing.Size(57, 13);
-            this.lb_rxsignal.TabIndex = 18;
-            this.lb_rxsignal.Text = "RX Signal:";
-            // 
-            // pb_rxsync
-            // 
-            this.pb_rxsync.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pb_rxsync.BackgroundImage")));
-            this.pb_rxsync.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pb_rxsync.Location = new System.Drawing.Point(511, 2);
-            this.pb_rxsync.Name = "pb_rxsync";
-            this.pb_rxsync.Size = new System.Drawing.Size(24, 24);
-            this.pb_rxsync.TabIndex = 19;
-            this.pb_rxsync.TabStop = false;
-            // 
-            // label_fifo
-            // 
-            this.label_fifo.AutoSize = true;
-            this.label_fifo.Location = new System.Drawing.Point(31, 31);
-            this.label_fifo.Name = "label_fifo";
-            this.label_fifo.Size = new System.Drawing.Size(55, 13);
-            this.label_fifo.TabIndex = 14;
-            this.label_fifo.Text = "TX Buffer:";
-            // 
-            // panel_txspectrum
-            // 
-            this.panel_txspectrum.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.panel_txspectrum.Location = new System.Drawing.Point(92, 590);
-            this.panel_txspectrum.Name = "panel_txspectrum";
-            this.panel_txspectrum.Size = new System.Drawing.Size(442, 76);
-            this.panel_txspectrum.TabIndex = 6;
-            this.panel_txspectrum.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_txspectrum_Paint);
-            this.panel_txspectrum.DoubleClick += new System.EventHandler(this.panel_txspectrum_DoubleClick);
-            // 
-            // panel_constel
-            // 
-            this.panel_constel.BackColor = System.Drawing.Color.AliceBlue;
-            this.panel_constel.Location = new System.Drawing.Point(11, 590);
-            this.panel_constel.Name = "panel_constel";
-            this.panel_constel.Size = new System.Drawing.Size(75, 75);
-            this.panel_constel.TabIndex = 5;
-            this.panel_constel.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_constel_Paint);
+            // rigControlControl1
+            // 
+            this.rigControlControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rigControlControl1.Location = new System.Drawing.Point(6, 6);
+            this.rigControlControl1.Name = "rigControlControl1";
+            this.rigControlControl1.Size = new System.Drawing.Size(1268, 540);
+            this.rigControlControl1.TabIndex = 0;
             // 
             // Form1
             // 
@@ -2375,8 +2400,6 @@
             this.tabPage_ber.PerformLayout();
             this.tabPage_image.ResumeLayout(false);
             this.tabPage_image.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_rximage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_tximage)).EndInit();
             this.tabControl1.ResumeLayout(false);
@@ -2400,8 +2423,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.tb_loadspeaker)).EndInit();
             this.tabPage_rtty.ResumeLayout(false);
             this.tabPage_rtty.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.tabPage_setup.ResumeLayout(false);
             this.tabPage_setup.PerformLayout();
             this.groupBox4.ResumeLayout(false);
@@ -2417,10 +2438,15 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tabPage_about.ResumeLayout(false);
+            this.tabPage_rigctl.ResumeLayout(false);
             this.pn1.ResumeLayout(false);
             this.pn1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_rxsignal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_rxsync)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2606,6 +2632,8 @@
         private System.Windows.Forms.ComboBox cb_file_pause;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Button bt_open_html;
+        private System.Windows.Forms.TabPage tabPage_rigctl;
+        private RigControlControl rigControlControl1;
     }
 }
 
