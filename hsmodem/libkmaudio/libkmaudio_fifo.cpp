@@ -33,7 +33,7 @@
 
 #include "libkmaudio.h"
 
-#define NUM_OF_PIPES 20
+#define NUM_OF_PIPES 50
 
 #ifdef WIN32
 CRITICAL_SECTION crit_sec[NUM_OF_PIPES];
