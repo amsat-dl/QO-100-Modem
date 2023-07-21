@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Drawing;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -131,11 +132,11 @@ namespace oscardata
                             //String s = statics.ByteArrayToString(b,4);
                             String s = statics.ByteArrayToStringUtf8(b, 4);
                             String[] sa1 = s.Split(new char[] { '^' });
-                            statics.AudioPBdevs = sa1[0].Split(new char[] { '~' });
-                            statics.AudioCAPdevs = sa1[1].Split(new char[] { '~' }); 
+                            statics.AudioPBdevs = ExtractAudioDevices(sa1[0]);
+                            statics.AudioCAPdevs = ExtractAudioDevices(sa1[1]);
 
                             // has the device list changed ?
-                            if(s != last_audiodevstring)
+                            if (s != last_audiodevstring)
                             {
                                 statics.GotAudioDevices = 1;
                                 last_audiodevstring = s;
@@ -195,6 +196,9 @@ namespace oscardata
                 catch { }
             }
         }
+
+        private static string[] ExtractAudioDevices(string v) => 
+            v.Split(new char[] { '~' }).Where(s => !s.Contains("DAX RESERVED")).OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToArray();
 
         static int panelw = 75, panelh = 75;
         static Bitmap bm;
