@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30517.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsmodem", "hsmodem\hsmodem.vcxproj", "{E6292FAA-E794-4107-BD89-2310BCDBC858}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oscardata", "oscardata\oscardata\oscardata.csproj", "{989BF5C6-36F6-4158-9FB2-42E86D2020DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E6292FAA-E794-4107-BD89-2310BCDBC858} = {E6292FAA-E794-4107-BD89-2310BCDBC858}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
