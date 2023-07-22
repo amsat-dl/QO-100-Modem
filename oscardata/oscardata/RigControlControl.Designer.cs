@@ -40,6 +40,7 @@
             this.btnGetFrequency = new System.Windows.Forms.Button();
             this.frequencyLabel = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
+            this.hamlibLinkLabel = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // combo_radio
@@ -153,10 +154,22 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // hamlibLinkLabel
+            // 
+            this.hamlibLinkLabel.AutoSize = true;
+            this.hamlibLinkLabel.Location = new System.Drawing.Point(365, 29);
+            this.hamlibLinkLabel.Name = "hamlibLinkLabel";
+            this.hamlibLinkLabel.Size = new System.Drawing.Size(121, 13);
+            this.hamlibLinkLabel.TabIndex = 12;
+            this.hamlibLinkLabel.TabStop = true;
+            this.hamlibLinkLabel.Text = "https://hamlib.github.io/";
+            this.hamlibLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.hamlibLinkLabel_LinkClicked);
+            // 
             // RigControlControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.hamlibLinkLabel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.frequencyLabel);
             this.Controls.Add(this.btnGetFrequency);
@@ -191,5 +204,6 @@
         private System.Windows.Forms.Button btnGetFrequency;
         private System.Windows.Forms.Label frequencyLabel;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.LinkLabel hamlibLinkLabel;
     }
 }

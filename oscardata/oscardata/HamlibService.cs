@@ -14,18 +14,11 @@ namespace oscardata
         public string HamlibBitness { get; private set; }
         private string rigctlFile;
         private string appdataPath;
-        private string settingsFile => Path.Combine(appdataPath, "audiointerface.json");
+        private string settingsFile => Path.Combine(appdataPath, "transceiver-interface.json");
 
         public HamlibService()
         {
-            var hamlib = Task.Run(FindHamlib).Result;
-
-            if (hamlib != default)
-            {
-                rigctlFile = Path.Combine(hamlib.Item1, "bin", "rigctl.exe");
-                HamlibVersion = hamlib.Item2;
-                HamlibBitness = hamlib.Item3;
-            }
+            SetHamlib();
 
             var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             appdataPath = Path.Combine(path, "hamradioapps");
@@ -37,8 +30,20 @@ namespace oscardata
             if (File.Exists(settingsFile))
             {
                 var settings = JsonConvert.DeserializeObject<HamlibSettings>(File.ReadAllText(settingsFile));
-                HamlibRigNumber = settings.RigNumber;
-                RigDevice = settings.Device;
+                HamlibRigNumber = settings.HamlibRigNumber;
+                RigDevice = settings.HamlibDevice;
+            }
+        }
+
+        private void SetHamlib()
+        {
+            var hamlib = Task.Run(FindHamlib).Result;
+
+            if (hamlib != default)
+            {
+                rigctlFile = Path.Combine(hamlib.Item1, "bin", "rigctl.exe");
+                HamlibVersion = hamlib.Item2;
+                HamlibBitness = hamlib.Item3;
             }
         }
 
@@ -75,6 +80,13 @@ namespace oscardata
 
         internal bool IsInstalled()
         {
+            if (File.Exists(rigctlFile))
+            {
+                return true;
+            }
+
+            SetHamlib();
+
             return File.Exists(rigctlFile);
         }
 
@@ -132,14 +144,14 @@ namespace oscardata
 
         public void Save()
         {
-            var json = JsonConvert.SerializeObject(new HamlibSettings { Device = RigDevice, RigNumber = HamlibRigNumber }, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(new HamlibSettings { HamlibDevice = RigDevice, HamlibRigNumber = HamlibRigNumber }, Formatting.Indented);
             File.WriteAllText(settingsFile, json);
         }
 
         private class HamlibSettings
         {
-            public int RigNumber { get; set; }
-            public string Device { get; set; }
+            public int HamlibRigNumber { get; set; }
+            public string HamlibDevice { get; set; }
         }
 
         internal async Task<long> GetFrequency()
