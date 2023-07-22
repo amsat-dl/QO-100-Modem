@@ -136,7 +136,8 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y ..\Debug\hsmodem.* ..\oscardata\oscardata\bin\Debug\</Command>
+      <Command>copy /y ..\Debug\hsmodem.* ..\oscardata\oscardata\bin\Debug\
+copy /y SharedLibs\windows\* ..\oscardata\oscardata\bin\Debug\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
