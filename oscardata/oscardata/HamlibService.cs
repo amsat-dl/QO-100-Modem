@@ -176,7 +176,14 @@ namespace oscardata
 
         private string GetArgs()
         {
-            return $"-m {HamlibRigNumber} -r {RigDevice}";
+            var args = $"-m {HamlibRigNumber} -r {RigDevice}";
+
+            if (Baud != default)
+            {
+                args += $" -s {Baud}";
+            }
+
+            return args;
         }
 
         internal async void AssertPtt()
