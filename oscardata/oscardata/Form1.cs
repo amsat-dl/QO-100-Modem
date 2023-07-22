@@ -1111,6 +1111,7 @@ namespace oscardata
 
         private void button_startBERtest_Click(object sender, EventArgs e)
         {
+            hamlibService.AssertPtt();
             rtb.Text = "";
             missBlocks = 0;
             frameinfo = (Byte)statics.FirstFrame;
