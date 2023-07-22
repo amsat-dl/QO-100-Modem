@@ -58,6 +58,7 @@ namespace oscardata
         public static Byte udp_fft = 4;
         public static Byte udp_iq = 5;
         public static Byte udp_rtty_rx = 6;
+        public static Byte udp_donesending = 99;
 
         // global static variables
         public static bool running = true;

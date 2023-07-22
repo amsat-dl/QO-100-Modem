@@ -32,6 +32,7 @@
 */
 
 #include "libkmaudio.h"
+#include "../hsmodem.h"
 
 #define FRAMES_PER_BUFFER 512
 
@@ -132,6 +133,8 @@ int kmaudio_startPlayback(char* devname, int samprate, int exclusive)
 	return idx;
 }
 
+bool sendingSilence;
+
 int playCallback(	const void* inputBuffer,
 					void* outputBuffer,
 					unsigned long                   framesPerBuffer,
@@ -166,12 +169,21 @@ int playCallback(	const void* inputBuffer,
 	{
 		io_read_fifo_num_short(devidx, f, framesPerBuffer);
 		devlist[devidx].audio_playing = 1;
+		sendingSilence = false;
 	}
 	else
 	{
 		// nothing to send
 		//printf("got %d from fifo, requested %d\n", io_fifo_elems_avail(devidx), framesPerBuffer);
 		devlist[devidx].audio_playing = 0;
+
+		if (!sendingSilence) {
+			printf("notifying tx silence\n");
+
+			uint8_t txdata[] = { 99 };
+			sendUDP(appIP, 40133, txdata, 1);
+		}
+		sendingSilence = true;
 	}
 	
 	for (unsigned int i = 0; i < framesPerBuffer; i++)

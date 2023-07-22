@@ -114,7 +114,7 @@ namespace oscardata
             comboBox1_SelectedIndexChanged(null, null);
 
             // create Udp Communication ports and init UDP system
-            Udp.InitUdp();
+            Udp.InitUdp(hamlibService.ReleasePtt);
             ArraySend.ArraySendInit();
 
             // enable processing
@@ -1481,7 +1481,15 @@ namespace oscardata
             rtb_RXfile.Text = "";
             statics.FileDelete(statics.zip_RXtempfilename);
 
+            if (!File.Exists(statics.zip_TXtempfilename))
+            {
+                return;
+            }
+
             Byte[] textarr = File.ReadAllBytes(statics.zip_TXtempfilename);
+
+            hamlibService.AssertPtt();
+
             ArraySend.Send(textarr, (Byte)txcommand, TXfilename, TXRealFilename);
             lastFullName = TXfilename;
         }

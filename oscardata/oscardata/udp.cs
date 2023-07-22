@@ -20,7 +20,7 @@ using System.Threading;
 
 namespace oscardata
 {
-    public static class Udp
+    internal static class Udp
     {
         // this thread handles udp RX
         static Thread udprx_thread;
@@ -37,10 +37,14 @@ namespace oscardata
         public static int searchtimeout = 0;
         static String last_audiodevstring = "";
 
+        private static Action releasePtt;
+
         // Constructor
         // called when Udp is created by the main program
-        public static void InitUdp()
+        public static void InitUdp(Action releasePttCallback)
         {
+            releasePtt = releasePttCallback;
+
             // create thread for UDP RX
             udprx_thread = new Thread(new ThreadStart(Udprxloop));
             udprx_thread.Name = "Thread: oscardata UDP-RX";
@@ -89,6 +93,11 @@ namespace oscardata
                         int rxtype = rxarr[0];
                         Byte[] b = new byte[rxarr.Length - 1];
                         Array.Copy(rxarr, 1, b, 0, b.Length);
+
+                        if (rxtype == statics.udp_donesending)
+                        {
+                            new Timer(_ => releasePtt(), null, 1000, 0);
+                        }
 
                         // payload
                         if (rxtype == statics.udp_payload)
