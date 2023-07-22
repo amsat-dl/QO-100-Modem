@@ -78,7 +78,7 @@ namespace oscardata
         public void SetRig(int hamlibNumber, string rigDevice)
         {
             HamlibRigNumber = hamlibNumber;
-            this.RigDevice = rigDevice;
+            RigDevice = rigDevice;
         }
 
         public void Save()
