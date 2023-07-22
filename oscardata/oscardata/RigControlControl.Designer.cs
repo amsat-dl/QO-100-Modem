@@ -41,6 +41,8 @@
             this.frequencyLabel = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
             this.hamlibLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.label5 = new System.Windows.Forms.Label();
+            this.comboSpeed = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // combo_radio
@@ -80,7 +82,7 @@
             // 
             // btnTestPtt
             // 
-            this.btnTestPtt.Location = new System.Drawing.Point(111, 127);
+            this.btnTestPtt.Location = new System.Drawing.Point(111, 170);
             this.btnTestPtt.Name = "btnTestPtt";
             this.btnTestPtt.Size = new System.Drawing.Size(75, 23);
             this.btnTestPtt.TabIndex = 4;
@@ -90,7 +92,7 @@
             // 
             // btnReleasePtt
             // 
-            this.btnReleasePtt.Location = new System.Drawing.Point(192, 127);
+            this.btnReleasePtt.Location = new System.Drawing.Point(192, 170);
             this.btnReleasePtt.Name = "btnReleasePtt";
             this.btnReleasePtt.Size = new System.Drawing.Size(93, 23);
             this.btnReleasePtt.TabIndex = 5;
@@ -126,7 +128,7 @@
             // 
             // btnGetFrequency
             // 
-            this.btnGetFrequency.Location = new System.Drawing.Point(291, 127);
+            this.btnGetFrequency.Location = new System.Drawing.Point(291, 170);
             this.btnGetFrequency.Name = "btnGetFrequency";
             this.btnGetFrequency.Size = new System.Drawing.Size(93, 23);
             this.btnGetFrequency.TabIndex = 9;
@@ -137,7 +139,7 @@
             // frequencyLabel
             // 
             this.frequencyLabel.AutoSize = true;
-            this.frequencyLabel.Location = new System.Drawing.Point(390, 132);
+            this.frequencyLabel.Location = new System.Drawing.Point(390, 175);
             this.frequencyLabel.Name = "frequencyLabel";
             this.frequencyLabel.Size = new System.Drawing.Size(54, 13);
             this.frequencyLabel.TabIndex = 10;
@@ -165,10 +167,41 @@
             this.hamlibLinkLabel.Text = "https://hamlib.github.io/";
             this.hamlibLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.hamlibLinkLabel_LinkClicked);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(22, 108);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(38, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "Speed";
+            // 
+            // comboSpeed
+            // 
+            this.comboSpeed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSpeed.FormattingEnabled = true;
+            this.comboSpeed.Items.AddRange(new object[] {
+            "",
+            "1200",
+            "2400",
+            "4800",
+            "9600",
+            "19200",
+            "28800",
+            "38400",
+            "57600",
+            "115200"});
+            this.comboSpeed.Location = new System.Drawing.Point(111, 105);
+            this.comboSpeed.Name = "comboSpeed";
+            this.comboSpeed.Size = new System.Drawing.Size(235, 21);
+            this.comboSpeed.TabIndex = 14;
+            // 
             // RigControlControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.comboSpeed);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.hamlibLinkLabel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.frequencyLabel);
@@ -205,5 +238,7 @@
         private System.Windows.Forms.Label frequencyLabel;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.LinkLabel hamlibLinkLabel;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox comboSpeed;
     }
 }

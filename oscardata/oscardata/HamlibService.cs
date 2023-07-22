@@ -32,6 +32,7 @@ namespace oscardata
                 var settings = JsonConvert.DeserializeObject<HamlibSettings>(File.ReadAllText(settingsFile));
                 HamlibRigNumber = settings.HamlibRigNumber;
                 RigDevice = settings.HamlibDevice;
+                Baud = settings.Baud ?? 0;
             }
         }
 
@@ -135,16 +136,23 @@ namespace oscardata
 
         public int HamlibRigNumber { get; private set; }
         public string RigDevice { get; private set; }
+        public int Baud { get; private set; }
 
-        public void SetRig(int hamlibNumber, string rigDevice)
+        public void SetRig(int hamlibNumber, string rigDevice, int speed)
         {
             HamlibRigNumber = hamlibNumber;
             RigDevice = rigDevice;
+            Baud = speed;
         }
 
         public void Save()
         {
-            var json = JsonConvert.SerializeObject(new HamlibSettings { HamlibDevice = RigDevice, HamlibRigNumber = HamlibRigNumber }, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(new HamlibSettings
+            {
+                HamlibDevice = RigDevice,
+                HamlibRigNumber = HamlibRigNumber,
+                Baud = Baud == default ? default(int?) : Baud
+            }, Formatting.Indented);
             File.WriteAllText(settingsFile, json);
         }
 
@@ -152,6 +160,7 @@ namespace oscardata
         {
             public int HamlibRigNumber { get; set; }
             public string HamlibDevice { get; set; }
+            public int? Baud { get; set; }
         }
 
         internal async Task<long> GetFrequency()

@@ -37,6 +37,10 @@ namespace oscardata
             combo_radio.Items.AddRange((rigs).OrderBy(r => r.Mfg).ThenBy(r => r.Model).ToArray());
             combo_radio.SelectedItem = rigs.SingleOrDefault(s => s.Number == hamlibService.HamlibRigNumber);
             tbRigDevice.Text = hamlibService.RigDevice;
+            if (hamlibService.Baud != default)
+            {
+                comboSpeed.SelectedItem = hamlibService.Baud.ToString();
+            }
         }
 
         private bool SetupHamlib()
@@ -81,11 +85,12 @@ namespace oscardata
         {
             if (combo_radio.SelectedItem is HamlibRig rig && !string.IsNullOrWhiteSpace(tbRigDevice.Text))
             {
-                hamlibService.SetRig(rig.Number, tbRigDevice.Text);
+                var baud = string.IsNullOrWhiteSpace(comboSpeed.SelectedItem as string) ? 0 : int.Parse((string)comboSpeed.SelectedItem);
+                hamlibService.SetRig(rig.Number, tbRigDevice.Text, baud);
             }
             else
             {
-                hamlibService.SetRig(0, null);
+                hamlibService.SetRig(default, default, default);
             }
         }
 
