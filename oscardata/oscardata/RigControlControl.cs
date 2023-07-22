@@ -19,7 +19,7 @@ namespace oscardata
         private async void RigControlControl_Load(object sender, EventArgs e)
         {
             var installed = hamlibService.IsInstalled();
-            tb_hamlibDetected.Text = installed ? "Installed" : "Not detected - install hamlib-w64-4.5.5";
+            tb_hamlibDetected.Text = installed ? $"{hamlibService.HamlibVersion} ({hamlibService.HamlibBitness})" : "not found";
 
             if (!installed)
             {
