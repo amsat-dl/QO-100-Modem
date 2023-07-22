@@ -391,7 +391,7 @@ namespace oscardata
 
                     if (cmd != null)
                     {
-                        cmd.StartInfo.WindowStyle = ProcessWindowStyle.Normal;// .Hidden;
+                        cmd.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         cmd.StartInfo.Arguments = "";
                         cmd.Start();
                         Console.WriteLine("hsmodem started");
